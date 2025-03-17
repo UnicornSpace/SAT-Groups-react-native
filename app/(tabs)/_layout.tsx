@@ -1,45 +1,114 @@
-import { Tabs } from 'expo-router';
-import React from 'react';
-import { Platform } from 'react-native';
+import { Image, StyleSheet, View ,Text} from "react-native";
+import { Tabs } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
+import React from "react";
+import ActiveButtonCustomized from "../../components/General/button";
+import LanguageSelection from "@/components/Home/lang-dropdown";
+import { theme } from "@/infrastructure/themes";
+function LogoTitle() {
+  return (
+    <View style={{flexDirection:'row',justifyContent:'space-between',alignItems:'center',backgroundColor:"#F8F9FA",paddingHorizontal:10}}>
+      <Image
+      style={{ width: 80, height: 50 }}
+      source={require("../../assets/images/satgroups/Logo.png")}
+      resizeMode="contain"
+    />
+    <LanguageSelection/>
+    </View>
 
-import { HapticTab } from '@/components/HapticTab';
-import { IconSymbol } from '@/components/ui/IconSymbol';
-import TabBarBackground from '@/components/ui/TabBarBackground';
-import { Colors } from '@/constants/Colors';
-import { useColorScheme } from '@/hooks/useColorScheme';
-
-export default function TabLayout() {
-  const colorScheme = useColorScheme();
-
+  );
+}
+const TabLayout = () => {
   return (
     <Tabs
+      backBehavior="order"
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-        headerShown: false,
-        tabBarButton: HapticTab,
-        tabBarBackground: TabBarBackground,
-        tabBarStyle: Platform.select({
-          ios: {
-            // Use a transparent background on iOS to show the blur effect
-            position: 'absolute',
-          },
-          default: {},
-        }),
-      }}>
+        sceneStyle: { backgroundColor: '#F8F9FA' },
+        tabBarActiveTintColor: theme.colors.brand.blue,
+        tabBarShowLabel: false,
+        tabBarStyle: {
+          paddingTop: 10,
+          height: 60,
+        },
+        header: () => <LogoTitle />,
+       
+      }}
+    >
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
+          
+          // header: () => <LogoTitle />,
+          tabBarIcon: ({ focused, size, color }) => (
+            <View style={[styles.iconContainer, focused && styles.activeIcon]}>
+              <Ionicons
+                name={focused ? "home-sharp" : "home-outline"}
+                size={focused ? 18 : 23}
+                color={focused ? "white" : "black"}
+              />
+            </View>
+          ),
         }}
       />
       <Tabs.Screen
-        name="explore"
+        name="location"
         options={{
-          title: 'Explore',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
+          tabBarIcon: ({ focused, size, color }) => (
+            <View style={[styles.iconContainer, focused && styles.activeIcon]}>
+              <Ionicons
+                name={focused ? "location-sharp" : "location-outline"}
+                size={focused ? 18 : 23}
+                color={focused ? "white" : "black"}
+              />
+            </View>
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="product"
+        options={{
+          tabBarIcon: ({ focused, size, color }) => (
+            <View style={[styles.iconContainer, focused && styles.activeIcon]}>
+              <Ionicons
+                name={focused ? "cart-sharp" : "cart-outline"}
+                size={focused ? 18 : 23}
+                color={focused ? "white" : "black"}
+              />
+            </View>
+          ),
+        }}
+      />
+
+      <Tabs.Screen
+        name="profile"
+        options={{
+          tabBarIcon: ({ focused, size, color }) => (
+            <View style={[styles.iconContainer, focused && styles.activeIcon]}>
+              <Ionicons
+                name={focused ? "person-sharp" : "person-outline"}
+                size={focused ? 18 : 23}
+                color={focused ? "white" : "black"}
+              />
+            </View>
+          ),
         }}
       />
     </Tabs>
   );
-}
+};
+
+export default TabLayout;
+
+const styles = StyleSheet.create({
+  iconContainer: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  activeIcon: {
+    width: 55,
+    height: 35,
+    backgroundColor: theme.colors.brand.blue,
+    borderRadius: 20,
+  },
+});
