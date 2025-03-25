@@ -1,23 +1,28 @@
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import React from "react";
-import CustomizedCard from "@/components/General/card-container";
 import BannerContainer from "@/components/Home/banner-container";
-import { theme } from "@/infrastructure/themes";
-import { Badge } from "react-native-paper";
 import UserContainer from "@/components/Home/user-container";
 import Title from "@/components/General/Title";
 import TranscationBtnCollection from "@/components/Home/transcation-btn";
 import TranscationCard from "@/components/Home/transcation-card";
-
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from "react-native-responsive-screen";
+import { useTranslation } from "react-i18next";
 
 const Home = () => {
+  const { t } = useTranslation();
+
   return (
     <View style={styles.container}>
-      <UserContainer/>
+      <UserContainer />
       <BannerContainer />
-      <Title>Recent Transcation</Title>
-      <TranscationBtnCollection/>
-      <TranscationCard/>
+      <View style={{ width: wp("90%"), alignItems: "flex-start", gap: 10 }}>
+        <Title>{t("Recent_Transcation")}</Title>
+        <TranscationBtnCollection />
+      </View>
+      <TranscationCard />
     </View>
   );
 };
@@ -26,14 +31,11 @@ export default Home;
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    marginHorizontal: 16,
-    marginVertical: 16,
-    // backgroundColor: "red",
-    overflow: "hidden",
+    width: wp("100%"),
+    height: hp("100%"),
     alignItems: "flex-start",
+    paddingHorizontal: hp(2.5),
+    paddingVertical: hp(2.5),
     gap: 20,
-    
   },
- 
 });

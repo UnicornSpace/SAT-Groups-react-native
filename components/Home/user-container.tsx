@@ -3,8 +3,13 @@ import React from "react";
 import CustomizedCard from "../General/card-container";
 import { Badge } from "react-native-paper";
 import { theme } from "@/infrastructure/themes";
-
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from "react-native-responsive-screen";
+import { useTranslation } from "react-i18next";
 const UserContainer = () => {
+    const { t } = useTranslation();
   return (
     <View style={styles.userContainer}>
       <View
@@ -21,7 +26,7 @@ const UserContainer = () => {
             alignItems: "flex-start",
           }}
         >
-          <Text style={styles.cardText}>Welcome back,</Text>
+          <Text style={styles.cardText}>{t("welcome_message")}</Text>
           <Text style={styles.userNametext}>Sachin</Text>
         </View>
         <View>
@@ -37,34 +42,34 @@ export default UserContainer;
 const styles = StyleSheet.create({
   cardText: {
     fontFamily: theme.fontFamily.medium,
-    fontSize: theme.fontSize.caption,
+    fontSize: hp("1.65%"),
     color: theme.colors.text.secondary,
   },
   userNametext: {
     fontFamily: theme.fontFamily.semiBold,
-    fontSize: theme.fontSize.medium,
+    fontSize: hp("2.5%"),
     color: theme.colors.ui.black,
   },
   badge: {
-    width: 38,
-    height: 38,
+    width: wp("10%"),
+    height: hp("5%"),
     borderRadius: 50,
     backgroundColor: theme.colors.brand.blue,
     color: theme.colors.text.primary,
     fontFamily: theme.fontFamily.bold,
-    fontSize: theme.fontSize.medium,
+    fontSize: hp("2.5%"),
     lineHeight: 40,
   },
   userContainer: {
-    width: 325,
-    height: 65,
+    width: wp("90%"),
+    height: hp(9),
     backgroundColor: theme.colors.ui.screenbg,
     boxShadow: "0px 3px 3px rgba(0, 0, 0, 0.10)",
     borderRadius: 8,
     borderColor: "#C5C5C5",
     borderWidth: 0.3,
     display: "flex",
-    paddingHorizontal: 12,
-    paddingVertical: 10,
+    paddingHorizontal: hp(1.5),
+    paddingVertical: hp(1.5),
   },
 });

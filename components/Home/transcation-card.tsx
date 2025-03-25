@@ -3,8 +3,13 @@ import React from "react";
 import CustomizedCard from "../General/card-container";
 import { Badge } from "react-native-paper";
 import { theme } from "@/infrastructure/themes";
-
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from "react-native-responsive-screen";
+import { useTranslation } from "react-i18next";
 const TranscationCard = () => {
+  const { t } = useTranslation();
   return (
     <View style={styles.card}>
       <View
@@ -30,10 +35,10 @@ const TranscationCard = () => {
             alignItems: "flex-start",
           }}
         >
-          <Text style={styles.heading}>Nox Solution</Text>
-          <Text style={styles.place}>Perundurai</Text>
+          <Text style={styles.heading}>{t("Nox Solution")}</Text>
+          <Text style={styles.place}>{t("Perundurai")}</Text>
           <View style={styles.dateContainer}>
-            <Text style={styles.date}>9th march</Text>
+            <Text style={styles.date}>{t("9th march")}</Text>
           </View>
         </View>
       </View>
@@ -48,9 +53,9 @@ export default TranscationCard;
 
 const styles = StyleSheet.create({
   card: {
-    width: 325,
-    height: 100,
-    backgroundColor: '#F2F3F5',
+    width: wp("90%"),
+    height: hp("14%"),
+    backgroundColor: "#F2F3F5",
     boxShadow: "0px 2px 2px rgba(0, 0, 0, 0.25)",
     borderRadius: 8,
     borderColor: "#C5C5C5",
@@ -59,35 +64,35 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    padding: 17,
+    padding: hp(2),
   },
   heading: {
-    fontSize: theme.fontSize.p,
+    fontSize: hp("2.3%"),
     fontFamily: theme.fontFamily.semiBold,
     color: theme.colors.brand.blue,
   },
   place: {
-    fontSize: theme.fontSize.caption,
+    fontSize: hp("1.6%"),
     color: theme.colors.text.secondary,
-    fontFamily: theme.fontFamily.regular,
+    fontFamily: theme.fontFamily.medium,
   },
   dateContainer: {
     borderRadius: 5,
-    height: 23,
-    width: 65,
+    height: hp("3%"),
+    width: wp("20%"),
     backgroundColor: theme.colors.brand.blue,
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
   },
   date: {
-    fontSize: 10,
+    fontSize: hp("1.5%"),
     color: theme.colors.text.primary,
     fontFamily: theme.fontFamily.medium,
   },
-  points:{
-    fontSize: 20,
+  points: {
+    fontSize: hp("3%"),
     color: theme.colors.brand.green,
     fontFamily: theme.fontFamily.bold,
-  }
+  },
 });

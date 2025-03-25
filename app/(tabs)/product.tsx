@@ -1,17 +1,33 @@
-import { StyleSheet, Text, View } from 'react-native'
-import React from 'react'
-import Product from '@/components/Products/product'
-import Title from '@/components/General/Title'
 
+
+import { StyleSheet, Text, View } from "react-native";
+import React from "react";
+import Title from "@/components/General/Title";
+import ProductContainer from "@/components/Products/product";
+import OfferCard from "@/components/General/offer";
+import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
 const product = () => {
   return (
-    <View>
-      <Title>Product</Title>
-     <Product/>
+    <View style={styles.container}>
+      <Title>Products</Title>
+      <View style={{ flexDirection: "row", flexWrap: "wrap", gap:27,justifyContent:"center",alignItems:"center",width:wp("100%") }}>
+        <ProductContainer />
+        <ProductContainer />
+      </View>
+       {/* <OfferCard /> */}
     </View>
-  )
-}
+  );
+};
 
-export default product
+export default product;
 
-const styles = StyleSheet.create({})
+const styles = StyleSheet.create({
+  container: {
+    width: wp('100%'),
+    height: hp('100%'),
+    alignItems:"center",
+    paddingHorizontal: hp(2.5),
+    paddingVertical: hp(2.5),
+    gap: 20,
+  },
+});

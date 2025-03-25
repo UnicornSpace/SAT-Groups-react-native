@@ -1,58 +1,49 @@
-import React, { useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-import { Dropdown } from 'react-native-element-dropdown';
-import AntDesign from '@expo/vector-icons/AntDesign';
-import Ionicons from '@expo/vector-icons/Ionicons';
-import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-import { theme } from '@/infrastructure/themes';
+import React, { useState } from "react";
+import { StyleSheet, Text, View } from "react-native";
+import { Dropdown } from "react-native-element-dropdown";
+import AntDesign from "@expo/vector-icons/AntDesign";
+import Ionicons from "@expo/vector-icons/Ionicons";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import { theme } from "@/infrastructure/themes";
+import i18n from "i18next";
 const data = [
-  { label: 'Item 1', value: '1' },
-  { label: 'Item 2', value: '2' },
-  { label: 'Item 3', value: '3' },
-  { label: 'Item 4', value: '4' },
-  { label: 'Item 5', value: '5' },
-  { label: 'Item 6', value: '6' },
-  { label: 'Item 7', value: '7' },
-  { label: 'Item 8', value: '8' },
+  { label: "ENG", value: "1" ,trans:"en"},
+  { label: "ಕನ್ನಡ", value: "2" ,trans:"kan"},
+  { label: "हिन्दी", value: "3" ,trans:"hi"},
+  { label: "తెలుగు", value: "4",trans:"tel" },
+  { label: "తెలుగు", value: "5" ,trans:"tam"},
 ];
 
 const LanguageSelection = () => {
   const [value, setValue] = useState(null);
   const [isFocus, setIsFocus] = useState(false);
 
-  const renderLabel = () => {
-    if (value || isFocus) {
-      return (
-        <Text style={[styles.label, isFocus && { color: 'blue' }]}>
-          Dropdown label
-        </Text>
-      );
-    }
-    return null;
-  };
 
   return (
     <View style={styles.container}>
       {/* {renderLabel()} */}
       <Dropdown
-        style={[styles.dropdown, isFocus && { borderColor: 'blue' }]}
+        style={[styles.dropdown, isFocus && { borderColor: "blue" }]}
         placeholderStyle={styles.placeholderStyle}
         selectedTextStyle={styles.selectedTextStyle}
         inputSearchStyle={styles.inputSearchStyle}
         iconStyle={styles.iconStyle}
         data={data}
-        search
+        // search
         maxHeight={300}
         labelField="label"
         valueField="value"
-        placeholder={!isFocus ? 'ENG' : '...'}
+        placeholder={!isFocus ? "ENG" : "..."}
         searchPlaceholder="Search..."
         value={value}
         onFocus={() => setIsFocus(true)}
         onBlur={() => setIsFocus(false)}
-        onChange={item => {
+        onChange={(item) => {
           setValue(item.value);
           setIsFocus(false);
+          
+          i18n.changeLanguage(item.trans);
+          console.log(item.label);
         }}
         renderLeftIcon={() => (
           // <Ionicons name="language-sharp" size={18} color="" />
@@ -67,13 +58,16 @@ export default LanguageSelection;
 
 const styles = StyleSheet.create({
   container: {
-  width: '35%',
+    width: "37%",
     padding: 14,
   },
   dropdown: {
-    
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
     height: 30,
-    borderColor: 'gray',
+    borderColor: "gray",
     borderWidth: 0.5,
     borderRadius: 6,
     paddingHorizontal: 8,
@@ -82,8 +76,8 @@ const styles = StyleSheet.create({
     marginRight: 5,
   },
   label: {
-    position: 'absolute',
-    backgroundColor: 'white',
+    position: "absolute",
+    backgroundColor: "white",
     left: 22,
     top: 8,
     zIndex: 999,
@@ -92,16 +86,19 @@ const styles = StyleSheet.create({
   },
   placeholderStyle: {
     fontSize: 14,
-    fontFamily:theme.fontFamily.medium
-    
+    fontFamily: theme.fontFamily.medium,
   },
   selectedTextStyle: {
-    fontSize: 10,
+    fontSize: 12,
+    fontFamily: theme.fontFamily.semiBold,
+    color: theme.colors.ui.black,
+    // fontWeight: 'bold',
+    marginLeft: 5,
   },
   iconStyle: {
     width: 20,
     height: 20,
-    color: 'black',
+    color: "black",
   },
   inputSearchStyle: {
     height: 40,

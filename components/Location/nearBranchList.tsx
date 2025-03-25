@@ -1,24 +1,59 @@
-import { Image, StyleSheet, Text, View } from "react-native";
+import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import React from "react";
 import Title from "../General/Title";
 import { theme } from "@/infrastructure/themes";
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from "react-native-responsive-screen";
 
 const Branches = () => {
-  return <View style={styles.card}>
-    <View style={{display:"flex",flexDirection:"row",alignItems:"center",gap:8}}>
-    <Image source={require("@/assets/images/satgroups/LocationLogo.png")} />
-    <Text style={{fontFamily:theme.fontFamily.semiBold,fontSize:18}}>Salem</Text>
+  return (
+    <View style={styles.card}>
+      <View
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          alignItems: "center",
+          gap: 8,
+        }}
+      >
+        <Image source={require("@/assets/images/satgroups/LocationLogo.png")} />
+        <Text
+          style={{ fontFamily: theme.fontFamily.semiBold, fontSize: hp(2.4) }}
+        >
+          Salem
+        </Text>
+      </View>
+      <View
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          alignItems: "flex-end",
+          gap: 22,
+        }}
+      >
+        <Text style={{ fontFamily: theme.fontFamily.medium, fontSize:hp(2) }}>
+          6 KM
+        </Text>
+        <Text style={{ fontFamily: theme.fontFamily.medium, fontSize:hp(2) }}>
+          1 hrs
+        </Text>
+      </View>
     </View>
-    <View style={{display:"flex",flexDirection:"row",alignItems:"flex-end",gap:22}}>
-    <Text style={{fontFamily:theme.fontFamily.medium,fontSize:16}}>6 KM</Text>
-    <Text style={{fontFamily:theme.fontFamily.medium,fontSize:16}}>1 hrs</Text>
-    </View>
-  </View>;
+  );
 };
 
 const NearBranchList = () => {
   return (
-    <View>
+    <View
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        gap: 20,
+        width: wp("90%"),
+      }}
+    >
       {/* Heading */}
       <View
         style={{
@@ -26,14 +61,14 @@ const NearBranchList = () => {
           flexDirection: "row",
           justifyContent: "space-between",
           alignItems: "center",
-          width: "100%",
+          width: wp("90%"),
         }}
       >
         <Title style={styles.h1}>Nearest Branch</Title>
-        <View
+        <TouchableOpacity
           style={{
-            width: 84,
-            height: 29,
+            width: wp(24),
+            height: hp(4),
             borderRadius: 8,
             backgroundColor: theme.colors.brand.blue,
             display: "flex",
@@ -44,14 +79,14 @@ const NearBranchList = () => {
           <Text
             style={{
               fontFamily: theme.fontFamily.semiBold,
-              fontSize: theme.fontSize.caption,
+              fontSize: hp(1.8),
               color: theme.colors.text.primary,
             }}
           >
             {" "}
             Near me
           </Text>
-        </View>
+        </TouchableOpacity>
       </View>
       {/* Branches List */}
       <Branches />
@@ -69,8 +104,8 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   card: {
-    width: 325,
-    height: 64,
+    width: wp("90%"),
+    height: hp(8),
     backgroundColor: "#F2F3F5",
     boxShadow: "0px 2px 2px rgba(0, 0, 0, 0.25)",
     borderRadius: 8,
