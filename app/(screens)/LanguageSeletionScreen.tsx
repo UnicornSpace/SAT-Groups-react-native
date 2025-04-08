@@ -9,9 +9,11 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
+import i18next from "i18next";
 type Language = {
   code: string;
   name: string;
+  trans:string
 };
 
 const LanguageSeletionScreen = () => {
@@ -19,17 +21,19 @@ const LanguageSeletionScreen = () => {
   const [SelectLang, setSelectLang] = useState<string | null>(null);
 
   const languages: Language[] = [
-    { code: "A", name: "ENGLISH" },
-    { code: "ಅ", name: "ಕನ್ನಡ" },
-    { code: "अ", name: "हिन्दी" },
-    { code: "అ", name: "తెలుగు" },
-    { code: "அ", name: "தமிழ்" },
+    { code: "A", name: "ENGLISH",trans:"en" },
+    { code: "ಅ", name: "ಕನ್ನಡ",trans:"kan" },
+    { code: "अ", name: "हिन्दी",trans:"hi" },
+    { code: "అ", name: "తెలుగు",trans:"tel" },
+    { code: "அ", name: "தமிழ்",trans:"tam" },
   ];
 
   const SubmitLang = () => {
     if (SelectLang) {
       router.replace("/(screens)/otp-screen");
     }
+    i18next.changeLanguage(SelectLang!)
+    console.log(SelectLang);
   };
 
   return (
@@ -85,7 +89,7 @@ const LanguageSeletionScreen = () => {
         {languages.map((lang) => (
           <TouchableOpacity
             key={lang.code}
-            onPress={() => setSelectLang(lang.code)}
+            onPress={() => setSelectLang(lang.trans)}
             style={{
               width: wp(90),
               height: hp(8),
@@ -121,7 +125,7 @@ const LanguageSeletionScreen = () => {
               >
                 {lang.name}
               </Text>
-              {SelectLang == lang.code && (
+              {SelectLang == lang.trans && (
                 <MaterialIcons
                   name="check-circle"
                   size={20}

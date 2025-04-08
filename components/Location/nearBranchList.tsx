@@ -6,8 +6,10 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
+import { useTranslation } from "react-i18next";
 
 const Branches = () => {
+  const { t } = useTranslation();
   return (
     <View style={styles.card}>
       <View
@@ -22,7 +24,7 @@ const Branches = () => {
         <Text
           style={{ fontFamily: theme.fontFamily.semiBold, fontSize: hp(2.4) }}
         >
-          Salem
+          {t("Salem")}
         </Text>
       </View>
       <View
@@ -34,10 +36,10 @@ const Branches = () => {
         }}
       >
         <Text style={{ fontFamily: theme.fontFamily.medium, fontSize:hp(2) }}>
-          6 KM
+          {t("6 KM")}
         </Text>
         <Text style={{ fontFamily: theme.fontFamily.medium, fontSize:hp(2) }}>
-          1 hrs
+          {t("1 hrs")}
         </Text>
       </View>
     </View>
@@ -45,6 +47,7 @@ const Branches = () => {
 };
 
 const NearBranchList = () => {
+  const { t } = useTranslation();
   return (
     <View
       style={{
@@ -64,7 +67,7 @@ const NearBranchList = () => {
           width: wp("90%"),
         }}
       >
-        <Title style={styles.h1}>Nearest Branch</Title>
+        <Title style={styles.h1}>{t("Nearest Branch")}</Title>
         <TouchableOpacity
           style={{
             width: wp(24),
@@ -84,7 +87,7 @@ const NearBranchList = () => {
             }}
           >
             {" "}
-            Near me
+            {t("Near me")}
           </Text>
         </TouchableOpacity>
       </View>

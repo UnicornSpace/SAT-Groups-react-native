@@ -4,6 +4,7 @@ import { Button } from "react-native-paper";
 import { theme } from "@/infrastructure/themes";
 
 import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
+import { useTranslation } from "react-i18next";
 const ProductContainer = () => {
   return (
     <View>
@@ -33,6 +34,7 @@ const ImageContainer = () => {
 };
 
 const TextContainer = () => {
+  const {t}  = useTranslation();
   return (
     <View style={{ display: "flex", flexDirection: "column", gap: 6 }}>
       <View
@@ -48,7 +50,7 @@ const TextContainer = () => {
             fontFamily: theme.fontFamily.semiBold,
           }}
         >
-          Adblue
+          {t("Adblue")}
         </Text>
         <Text
           style={{
@@ -57,13 +59,13 @@ const TextContainer = () => {
             color: theme.colors.brand.blue,
           }}
         >
-          $50
+          {t("$50")}
         </Text>
       </View>
       <View style={{ display: "flex", flexDirection: "row" }}>
         {/* <TouchableOpacity style={styles.addBtn} ><Text style={styles.addText}>Add to Cart</Text></TouchableOpacity> */}
         <TouchableOpacity style={styles.buyBtn}>
-          <Text style={styles.buyText}>Buy now</Text>
+          <Text style={styles.buyText}>{t("Buy now")}</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -71,9 +73,10 @@ const TextContainer = () => {
 };
 
 const QuantityBanner = () => {
+  const {t} = useTranslation();
   return(
     <View style={styles.quantityContainer}>
-      <Text style={styles.quantityContainerText}>1000L</Text>
+      <Text style={styles.quantityContainerText}>{t("1000L")}</Text>
     </View>
   )
 }

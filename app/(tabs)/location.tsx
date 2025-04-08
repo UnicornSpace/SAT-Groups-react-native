@@ -11,16 +11,18 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
+import { useTranslation } from "react-i18next";
 const location = () => {
+  const {t} = useTranslation();
   return (
     <View style={styles.container}>
       <View>
-        <Title>Our Branches</Title>
-        <Text style={styles.description}>Find the branches near you</Text>
+        <Title>{t("Our Branches")}</Title>
+        <Text style={styles.description}>{t("Find the branches near you")}</Text>
       </View>
       <TextInput
         mode="outlined"
-        placeholder="Search the near branches "
+        placeholder={t("Search the near branches")}
         cursorColor={theme.colors.brand.blue}
         outlineColor={theme.colors.text.secondary + 20}
         activeOutlineColor={theme.colors.brand.blue}
@@ -41,7 +43,7 @@ const location = () => {
       />
       <NearBranchList />
       <AllBranches />
-      {/* <GoogleMapLocation/> */}
+      <GoogleMapLocation/>
     </View>
   );
 };

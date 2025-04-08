@@ -26,7 +26,7 @@ const openInGoogleMaps = async (destination:any) => {
 
 export default function App() {
   return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+    <View style={{  justifyContent: 'center', alignItems: 'center' }}>
       <TouchableOpacity
         onPress={() => openInGoogleMaps('Taj Mahal')}
         style={{
@@ -36,7 +36,7 @@ export default function App() {
         }}
       >
         <Text style={{ fontSize: 18, fontWeight: 'bold', color: 'white' }}>
-          Navigate to Taj Mahal
+          Locate
         </Text>
       </TouchableOpacity>
     </View>

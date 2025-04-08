@@ -1,11 +1,12 @@
 import {
+  Alert,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
-import React from "react";
+import React, { useState } from "react";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { theme } from "@/infrastructure/themes";
 import { LinearGradient } from "expo-linear-gradient";
@@ -14,12 +15,59 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
+import { useTranslation } from "react-i18next";
+import CustomAlert from "@/components/General/AlterBox";
+import axios from "axios";
+import { ActivityIndicator } from "react-native-paper";
 const UserOTPScreen = () => {
-  // const [text, onChangeText] = React.useState('Useless Text');
+  const [showAlert, setShowAlert] = useState(false);
   const [number, onChangeNumber] = React.useState("");
-  const SubmitNumber =() =>{
-    number.length > 0 ? router.replace("/(screens)/otpConfirmationScreen") : null
-  }
+  const [loading, setLoading] = useState(false);
+  const SubmitNumber = () => {
+    number.length === 11
+      ? router.replace("/(screens)/otpConfirmationScreen")
+      : Alert.alert("Invalid Number", "Please enter a valid number", [
+          {
+            text: "OK",
+            onPress: () => console.log("OK Pressed"),
+          },
+        ]);
+  };
+  // const SubmitNumber = async () => {
+  //   number.length === 11;
+  //   if (number.length !== 11) {
+  //     Alert.alert("Invalid Number", "Please enter a valid number", [
+  //       { text: "OK", onPress: () => console.log("OK Pressed") },
+  //     ]);
+  //     return;
+  //   }
+  //   try {
+  //     setLoading(true);
+  //     const response = await axios.post("", { number });
+  //     if (response.data.success) {
+  //       router.replace{
+  // ("/(screens)/otpConfirmationScreen"),params: { number } });
+  //     }
+  //   } catch (error) {
+  //     Alert.alert("Something went wrong");
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+  const formateNumber = (text: string) => {
+    let cleanText = text.replace(/[^0-9]/g, "");
+    if (!/^([6789])/.test(cleanText)) {
+      return; // Don't update state if invalid
+    }
+    if (cleanText.length > 10) {
+      cleanText = cleanText.slice(0, 10);
+    }
+    if (cleanText.length > 5) {
+      cleanText = cleanText.slice(0, 5) + "-" + cleanText.slice(5);
+    }
+    onChangeNumber(cleanText);
+  };
+  const { t } = useTranslation();
   return (
     <View
       style={{
@@ -29,10 +77,11 @@ const UserOTPScreen = () => {
         justifyContent: "center",
         alignItems: "center",
         width: wp(100),
-        height: hp(100),
+        height: "100%",
         paddingHorizontal: hp(5),
       }}
     >
+      {/* {showAlert && <CustomAlert />} */}
       <Text
         style={{
           color: theme.colors.brand.blue,
@@ -40,7 +89,7 @@ const UserOTPScreen = () => {
           fontSize: hp(3.3),
         }}
       >
-        Enter Your Number
+        {t("Enter Your Number")}
       </Text>
       <View style={{ display: "flex", flexDirection: "column", gap: 12 }}>
         <View
@@ -61,24 +110,33 @@ const UserOTPScreen = () => {
             color={theme.colors.brand.blue}
           />
           <TextInput
-          autoFocus={true}
+            autoFocus={true}
             style={styles.input}
-            onChangeText={onChangeNumber}
+            onChangeText={formateNumber}
             value={number}
-            placeholder="+ 91 XXXXX  XXXXX"
+            placeholder={t("+ 91 XXXXX  XXXXX")}
             keyboardType="numeric"
+            maxLength={11}
             placeholderTextColor={theme.colors.ui.black + 70}
           />
         </View>
 
-        <View style={{ display: "flex", flexDirection: "column", gap: 10,justifyContent: "center", alignItems: "center"}}>
+        <View
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: 10,
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
           <Text
             style={{
               fontFamily: theme.fontFamily.light,
               fontSize: hp(1.9),
             }}
           >
-            We will send an SMS code to verify your number
+            {t("We will send an SMS code to verify your number")}
           </Text>
 
           <Text
@@ -88,7 +146,7 @@ const UserOTPScreen = () => {
               fontSize: hp(2.5),
             }}
           >
-            OR
+            {t("OR")}
           </Text>
 
           <TouchableOpacity
@@ -104,26 +162,28 @@ const UserOTPScreen = () => {
             }}
           >
             <TextInput
-            placeholder="Refferal code (optional)"
+              placeholder={t("Refferal code (optional)")}
               style={{
                 fontFamily: theme.fontFamily.medium,
                 fontSize: hp(2),
                 color: theme.colors.text.secondary,
               }}
-            >
-              
-            </TextInput>
+            ></TextInput>
           </TouchableOpacity>
         </View>
       </View>
-      <TouchableOpacity onPress={SubmitNumber}>
-        <LinearGradient
-          colors={["#26456C", "#4073B4", "#4073B4"]}
-          style={styles.gradient2}
-        >
-          <Text style={styles.buttonText}>Continue</Text>
-        </LinearGradient>
-      </TouchableOpacity>
+      {loading ? (
+        <ActivityIndicator size={"large"} />
+      ) : (
+        <TouchableOpacity onPress={SubmitNumber}>
+          <LinearGradient
+            colors={["#26456C", "#4073B4", "#4073B4"]}
+            style={styles.gradient2}
+          >
+            <Text style={styles.buttonText}>{t("Continue")}</Text>
+          </LinearGradient>
+        </TouchableOpacity>
+      )}
     </View>
   );
 };

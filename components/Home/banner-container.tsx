@@ -19,17 +19,17 @@ const BannerContainer = () => {
       <View style={{ position: "absolute", top: hp(4), left: wp(6) }}>
         <View style={{ flexDirection: "column", justifyContent: "flex-start" }}>
           <Text style={styles.bannerText}>{t("TOTAL POINTS")}</Text>
-          <Text style={styles.pointsText}>450</Text>
+          <Text style={styles.pointsText}>{t("450")}</Text>
         </View>
         <TouchableOpacity style={styles.bannerBtn}>
           <Text
+
             style={{
               fontFamily: theme.fontFamily.bold,
               fontSize: hp("1.8%"),
               color: theme.colors.brand.red,
             }}
           >
-            {" "}
             {t("Redeem")}
           </Text>
         </TouchableOpacity>

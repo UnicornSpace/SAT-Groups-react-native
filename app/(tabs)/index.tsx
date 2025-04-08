@@ -16,7 +16,7 @@ const Home = () => {
 
   return (
     <View style={styles.container}>
-      <UserContainer />
+      {/* <UserContainer /> */}
       <BannerContainer />
       <View style={{ width: wp("90%"), alignItems: "flex-start", gap: 10 }}>
         <Title>{t("Recent_Transcation")}</Title>

@@ -56,7 +56,7 @@ const styles = StyleSheet.create({
     width: wp("90%"),
     height: hp("14%"),
     backgroundColor: "#F2F3F5",
-    boxShadow: "0px 2px 2px rgba(0, 0, 0, 0.25)",
+    // boxShadow: "0px 2px 2px rgba(0, 0, 0, 0.25)",
     borderRadius: 8,
     borderColor: "#C5C5C5",
     borderWidth: 0.3,

@@ -2,18 +2,17 @@ import { Image, StyleSheet, View ,Text} from "react-native";
 import { Tabs } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
-import ActiveButtonCustomized from "../../components/General/button";
-import LanguageSelection from "@/components/Home/lang-dropdown";
 import { theme } from "@/infrastructure/themes";
+import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
 function LogoTitle() {
   return (
-    <View style={{flexDirection:'row',justifyContent:'space-between',alignItems:'center',backgroundColor:"#F8F9FA",paddingHorizontal:10}}>
+    <View style={{flexDirection:'row',justifyContent:'space-between',alignItems:'center',backgroundColor:"#F8F9FA",paddingHorizontal:hp(2.5)}}>
       <Image
       style={{ width: 80, height: 50 }}
       source={require("../../assets/images/satgroups/Logo.png")}
       resizeMode="contain"
     />
-    <LanguageSelection/>
+    {/* <LanguageSelection/> */}
     </View>
 
   );
@@ -70,7 +69,7 @@ const TabLayout = () => {
           tabBarIcon: ({ focused, size, color }) => (
             <View style={[styles.iconContainer, focused && styles.activeIcon]}>
               <Ionicons
-                name={focused ? "cart-sharp" : "cart-outline"}
+                name={focused ? "gift" : "gift-outline"}
                 size={focused ? 18 : 23}
                 color={focused ? "white" : "black"}
               />

@@ -14,12 +14,14 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
+import { useTranslation } from "react-i18next";
 const UserDetails = () => {
   const [userName, setuserName] = React.useState("");
   const [userAge, setuserAge] = React.useState("");
-  const onSubmitDetails=()=>{
-    userAge.length > 0 && userName.length > 0 ? router.push("/(tabs)") : null
-  }
+  const onSubmitDetails = () => {
+    userAge.length > 0 && userName.length > 0 ? router.push("/(tabs)") : alert("Please fill all the details");
+  };
+  const { t } = useTranslation();
   return (
     <View
       style={{
@@ -30,7 +32,6 @@ const UserDetails = () => {
         justifyContent: "center",
         alignItems: "center",
         paddingHorizontal: 30,
-       
       }}
     >
       <Text
@@ -40,36 +41,41 @@ const UserDetails = () => {
           fontSize: hp("3.5%"),
         }}
       >
-        {" "}
-        Personal Details
+        {t("Personal Details")}
       </Text>
-     <View style={{ display: "flex", flexDirection: "column", gap: 40,width: wp("90%") }}>
-     <TextInput
-        autoFocus={true}
-        style={styles.input}
-        onChangeText={setuserName}
-        value={userName}
-        placeholder="Enter your Full Name"
-        keyboardType="name-phone-pad"
-        placeholderTextColor={theme.colors.ui.black + 70}
-      />
-      <TextInput
-       
-        style={styles.input}
-        onChangeText={setuserAge}
-        value={userAge}
-        placeholder="Enter your Age "
-        keyboardType="number-pad"
-        placeholderTextColor={theme.colors.ui.black + 70}
-      />
-     </View>
-    
-      <TouchableOpacity onPress={onSubmitDetails} style={{  }}>
+      <View
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          gap: 40,
+          width: wp("90%"),
+        }}
+      >
+        <TextInput
+          autoFocus={true}
+          style={styles.input}
+          onChangeText={setuserName}
+          value={userName}
+          placeholder={t("Enter your Full Name")}
+          keyboardType="name-phone-pad"
+          placeholderTextColor={theme.colors.ui.black + 70}
+        />
+        <TextInput
+          style={styles.input}
+          onChangeText={setuserAge}
+          value={userAge}
+          placeholder={t("Enter your Age")}
+          keyboardType="number-pad"
+          placeholderTextColor={theme.colors.ui.black + 70}
+        />
+      </View>
+
+      <TouchableOpacity onPress={onSubmitDetails} style={{}}>
         <LinearGradient
           colors={["#26456C", "#4073B4", "#4073B4"]}
           style={styles.gradient2}
         >
-          <Text style={styles.buttonText}>Next</Text>
+          <Text style={styles.buttonText}>{t("Next")}</Text>
           <Ionicons
             name="arrow-forward"
             size={20}
