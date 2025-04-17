@@ -45,6 +45,11 @@ const TabLayout = () => {
                 size={focused ? 18 : 23}
                 color={focused ? "white" : "black"}
               />
+              {/* <Image
+                style={{ width: 34, height: 34 }}
+                source={require("../../assets/images/icons/home.png")}
+                resizeMode="contain"
+              /> */}
             </View>
           ),
         }}
@@ -80,7 +85,9 @@ const TabLayout = () => {
 
       <Tabs.Screen
         name="profile"
+
         options={{
+          
           tabBarIcon: ({ focused, size, color }) => (
             <View style={[styles.iconContainer, focused && styles.activeIcon]}>
               <Ionicons

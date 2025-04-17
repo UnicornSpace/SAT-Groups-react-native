@@ -1,5 +1,6 @@
 import {
   Image,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -18,6 +19,7 @@ import { useTranslation } from "react-i18next";
 import { LinearGradient } from "expo-linear-gradient";
 import UserBentogrids from "@/components/Profile/bentogrids";
 import UserDetails from "@/components/Profile/UserDetails";
+import LanguageSetting from "@/components/Profile/languageSetting";
 const profile = () => {
   const [address, setaddress] = useState("");
   const logot = () => {
@@ -25,50 +27,54 @@ const profile = () => {
   };
   const { t } = useTranslation();
   return (
-    <View style={styles.container}>
-      <View>
-        <Image
-          source={require("@/assets/images/satgroups/profilePic.png")}
-          resizeMode="cover"
-          width={wp("25%")}
-          height={hp("12%")}
-        />
-        <View
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          <Text
-            style={{ fontSize: hp(3), fontFamily: theme.fontFamily.semiBold }}
+    <ScrollView>
+      <View style={styles.container}>
+        <View>
+          <Image
+            source={require("@/assets/images/satgroups/profilePic.png")}
+            resizeMode="cover"
+            width={wp("25%")}
+            height={hp("12%")}
+          />
+          <View
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
           >
-            Sachin
-          </Text>
+            <Text
+              style={{ fontSize: hp(3), fontFamily: theme.fontFamily.semiBold }}
+            >
+              Sachin
+            </Text>
 
-          <LinearGradient
-            colors={["#4A86D2", theme.colors.brand.blue]}
-            style={styles.gradient}
-          >
-            <Text style={styles.date}>{t("Driver ID : 1063")}</Text>
-          </LinearGradient>
+            <LinearGradient
+              colors={["#4A86D2", theme.colors.brand.blue]}
+              style={styles.gradient}
+            >
+              <Text style={styles.date}>{t("Driver ID : 1063")}</Text>
+            </LinearGradient>
+          </View>
         </View>
+        <UserBentogrids />
+        <UserDetails />
+
+        <LanguageSetting />
+        <TouchableOpacity onPress={logot} style={styles.btn}>
+          <Text
+            style={{
+              color: theme.colors.text.primary,
+              fontFamily: theme.fontFamily.semiBold,
+              fontSize: hp(2.5),
+            }}
+          >
+            {t("LogOut")}
+          </Text>
+        </TouchableOpacity>
       </View>
-      <UserBentogrids/>
-      <UserDetails/>
-      <TouchableOpacity onPress={logot} style={styles.btn}>
-        <Text
-          style={{
-            color: theme.colors.text.primary,
-            fontFamily: theme.fontFamily.semiBold,
-            fontSize: hp(2.5),
-          }}
-        >
-          {t("LogOut")}
-        </Text>
-      </TouchableOpacity>
-    </View>
+    </ScrollView>
   );
 };
 

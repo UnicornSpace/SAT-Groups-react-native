@@ -43,7 +43,7 @@ const location = () => {
       />
       <NearBranchList />
       <AllBranches />
-      <GoogleMapLocation/>
+      {/* <GoogleMapLocation/> */}
     </View>
   );
 };

@@ -24,7 +24,7 @@ const TranscationCard = () => {
         <View>
           <Image
             source={require("@/assets/images/satgroups/noxBlue-Logo.png")}
-            style={{ width: 70, height: 80 }}
+            style={{ width: 50, height: 50 }}
           />
         </View>
         <View
@@ -43,7 +43,7 @@ const TranscationCard = () => {
         </View>
       </View>
       <View>
-        <Text style={styles.points}>+ 50</Text>
+        <Text style={styles.points}>{t("+ 50")}</Text>
       </View>
     </View>
   );
@@ -54,7 +54,7 @@ export default TranscationCard;
 const styles = StyleSheet.create({
   card: {
     width: wp("90%"),
-    height: hp("14%"),
+    // height: hp("12%"),
     backgroundColor: "#F2F3F5",
     // boxShadow: "0px 2px 2px rgba(0, 0, 0, 0.25)",
     borderRadius: 8,
@@ -64,12 +64,13 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    padding: hp(2),
+    padding: hp(1.5),
   },
   heading: {
     fontSize: hp("2.3%"),
     fontFamily: theme.fontFamily.semiBold,
     color: theme.colors.brand.blue,
+    
   },
   place: {
     fontSize: hp("1.6%"),

@@ -1,4 +1,4 @@
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import React from 'react'
 import {
   widthPercentageToDP as wp,
@@ -34,6 +34,38 @@ const PersonDetails = ()=>{
 
   )
 }
+const PersonDetails2 = ()=>{
+  return (
+  <View style={{display:"flex", flexDirection:"row", justifyContent:"flex-start", alignItems:"center",gap:wp(4), }}>
+    <TouchableOpacity style={styles.userbtn}>
+      {/* <Ionicons name="pencil" size={20} color="black" /> */}
+      <FontAwesome name="user" size={20} color={theme.colors.brand.blue} />
+      {/* <FontAwesome5 name="user" size={16} color={theme.colors.brand.blue} /> */}
+    </TouchableOpacity>
+    <View style={{display:"flex", flexDirection:"column",}}>
+      <Text style={{fontFamily:theme.fontFamily.regular , fontSize:hp(1.5),color:"#8E8F8F"}}>Address</Text>
+      <Text  style={{fontFamily:theme.fontFamily.semiBold , fontSize:hp(2),color:theme.colors.brand.blue}}>Kormangala 2nd Block</Text>
+    </View>
+  </View>
+
+  )
+}
+const PersonDetails3 = ()=>{
+  return (
+  <View style={{display:"flex", flexDirection:"row", justifyContent:"flex-start", alignItems:"center",gap:wp(4), }}>
+    <TouchableOpacity style={styles.userbtn}>
+      {/* <Ionicons name="pencil" size={20} color="black" /> */}
+      <FontAwesome name="user" size={20} color={theme.colors.brand.blue} />
+      {/* <FontAwesome5 name="user" size={16} color={theme.colors.brand.blue} /> */}
+    </TouchableOpacity>
+    <View style={{display:"flex", flexDirection:"column",}}>
+      <Text style={{fontFamily:theme.fontFamily.regular , fontSize:hp(1.5),color:"#8E8F8F"}}>State</Text>
+      <Text  style={{fontFamily:theme.fontFamily.semiBold , fontSize:hp(2),color:theme.colors.brand.blue}}>karnataka </Text>
+    </View>
+  </View>
+
+  )
+}
 
 
 
@@ -46,7 +78,9 @@ const UserDetails = () => {
       <EditButton/>
       </View>
       <View style={styles.container}>
-      <PersonDetails/>
+      <PersonDetails />
+      <PersonDetails2/>
+      <PersonDetails3/>
     </View>
     </View>
   )
@@ -57,7 +91,10 @@ export default UserDetails
 const styles = StyleSheet.create({
   container: {
     width: wp(85),
-
+    display: "flex",
+    flexDirection: "column",    
+   
+    gap: hp(2),
 
   },
   editbtn: {

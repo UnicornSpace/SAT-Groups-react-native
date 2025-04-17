@@ -22,7 +22,7 @@ const LanguageSelection = () => {
   return (
     <View style={styles.container}>
       {/* {renderLabel()} */}
-      <Dropdown
+      {/* <Dropdown
         style={[styles.dropdown, isFocus && { borderColor: "blue" }]}
         placeholderStyle={styles.placeholderStyle}
         selectedTextStyle={styles.selectedTextStyle}
@@ -49,7 +49,9 @@ const LanguageSelection = () => {
           // <Ionicons name="language-sharp" size={18} color="" />
           <MaterialIcons name="language" size={18} color="black" />
         )}
-      />
+      /> */}
+
+
     </View>
   );
 };
