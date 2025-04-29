@@ -7,7 +7,7 @@ import {
 import { theme } from "@/infrastructure/themes";
 const UserBentogrids = () => {
   return (
-    <View style={{ flexDirection: "row", gap: hp(3), width: wp(80),justifyContent:"center",  }}>
+    <View style={{ flexDirection: "row", gap: hp(2), width: wp(90),justifyContent:"center",  }}>
       <View style={styles.box1}>
         <Text
           style={{
@@ -61,7 +61,7 @@ export default UserBentogrids;
 const styles = StyleSheet.create({
   box1: {
     height: hp(12),
-    width: wp(40),
+    width: wp(45),
     borderRadius: 10,
     borderWidth: 0.7,
     borderColor: "#D5D5D7",
@@ -72,7 +72,7 @@ const styles = StyleSheet.create({
   },
   box2: {
     height: hp(12),
-    width: wp(25),
+    width: wp(30),
     borderRadius: 10,
 
     borderWidth: 0.7,

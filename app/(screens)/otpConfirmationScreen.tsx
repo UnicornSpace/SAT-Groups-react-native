@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { theme } from "@/infrastructure/themes";
 import { router, useLocalSearchParams } from "expo-router";
 import {
@@ -14,57 +14,77 @@ import {
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
 import { useTranslation } from "react-i18next";
-import axios from "axios";
+import axiosInstance from "@/utils/axionsInstance";
 
 const OtpConfirmationScreen = () => {
-  const { number } = useLocalSearchParams();
-  const [count, setcount] = React.useState(60);
+  const { number } = useLocalSearchParams<{ number: string }>();
+  const [count, setCount] = useState(60);
   const [loading, setLoading] = useState(false);
+  const [otpArray, setOtpArray] = useState(["", "", "", "", ""]);
+
+  const inputs = useRef<TextInput[]>([]);
+
+  const { t } = useTranslation();
+
+  // Countdown timer
   useEffect(() => {
     if (count <= 0) return;
     const interval = setInterval(() => {
-      setcount((prevCount) => prevCount - 1);
+      setCount((prev) => prev - 1);
     }, 1000);
     return () => clearInterval(interval);
   }, [count]);
-  const [OTPnumber, onChangeNumber] = React.useState("");
 
-  const OTP = [2, 4, 5, 6];
-  const otpVerfifed = () => {
-    router.push("/(screens)/userDetails");
+  const handleOtpChange = (text: string, i: number) => {
+    if (!/^\d+$/.test(text) && text !== "") return;
+
+    const newOtp = [...otpArray];
+    newOtp[i] = text;
+    setOtpArray(newOtp);
+
+    if (text && i < inputs.current.length - 1) {
+      inputs.current[i + 1]?.focus();
+    }
+    if (!text && i > 0) {
+      inputs.current[i - 1]?.focus();
+    }
   };
-  // const otpVerfifed = async () => {
-  //   if (!OTPnumber) {
-  //     Alert.alert("Error", "Please enter OTP");
-  //     return;
-  //   }
-  //   try {
-  //     setLoading(true);
-  //     const response = await axios.post("", { number, OTPnumber });
 
-  //     if (response.data.success) {
-  //       Alert.alert("Success", "OTP Verified ");
-  //       console.log("User Token:", response.data.token);
-  //       router.push("/(screens)/userDetails");
-  //     } else {
-  //       Alert.alert("Error", "Invalid OTP ❌");
-  //     }
-  //   } catch (error) {
-  //     Alert.alert("Something went wrong");
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-  const { t } = useTranslation();
+  const otpVerified = async () => {
+    const finalOtp = otpArray.join("");
+
+    if (finalOtp.length < 5) {
+      Alert.alert("Error", "Please enter a valid 5-digit OTP");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const response = await axiosInstance.post("/user-login-verify-otp.php", {
+        mobile: number,
+        otp: finalOtp,
+      });
+      router.push("/(screens)/userDetails");
+      // if (response.data?.success) {
+      //   router.push("/(screens)/userDetails");
+      // } else {
+      //   Alert.alert("Error", "Invalid OTP ❌");
+      // }
+    } catch (error: any) {
+      Alert.alert("Something went wrong", error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <View
       style={{
         width: wp("100%"),
-        display: "flex",
-        gap: 40,
+        height: hp("100%"),
         alignItems: "center",
         justifyContent: "center",
-        height: hp("100%"),
+        gap: 40,
       }}
     >
       <Text
@@ -76,38 +96,23 @@ const OtpConfirmationScreen = () => {
       >
         {t("OTP Code")}
       </Text>
-      <View
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: 15,
-          justifyContent: "center",
-          width: wp("90%"),
-        }}
-      >
-        <View
-          style={{
-            flexDirection: "row",
-            gap: 15,
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          {OTP.map((e) => {
-            return (
-              <TextInput
-                key={e}
-                style={styles.input}
-                onChangeText={onChangeNumber}
-                value={OTPnumber}
-                placeholder={e.toString()}
-                placeholderTextColor={theme.colors.text.secondary}
-                maxLength={1}
-                autoFocus={e === 0}
-                keyboardType="numeric"
-              />
-            );
-          })}
+
+      <View style={{ alignItems: "center", gap: 15, width: wp("90%") }}>
+        <View style={styles.otpInputContainer}>
+          {otpArray.map((digit, i) => (
+            <TextInput
+              autoFocus={i === 0}
+              key={i}
+              ref={(ref) => (inputs.current[i] = ref!)}
+              style={styles.input}
+              value={digit}
+              onChangeText={(text) => handleOtpChange(text, i)}
+              maxLength={1}
+              keyboardType="numeric"
+              placeholder="-"
+              placeholderTextColor={theme.colors.text.secondary}
+            />
+          ))}
         </View>
         <Text
           style={{
@@ -116,21 +121,23 @@ const OtpConfirmationScreen = () => {
             fontSize: hp(1.9),
           }}
         >
-          {t("We sent a confirmation code to +91 816XX XXXXX")}
+          {t("We sent a confirmation code to")} +91{" "}
+          {String(number).slice(0, 3)}XX XXXXX
         </Text>
       </View>
-      <View
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: 15,
-          justifyContent: "center",
-          width: wp("90%"),
-        }}
-      >
-        <TouchableOpacity onPress={otpVerfifed} style={styles.btn}>
+
+      <View style={{ alignItems: "center", gap: 15, width: wp("90%") }}>
+        <TouchableOpacity
+          onPress={otpVerified}
+          style={[
+            styles.btn,
+            { opacity: otpArray.includes("") || loading ? 0.5 : 1 },
+          ]}
+          disabled={otpArray.includes("") || loading}
+        >
           <Text style={styles.buttonText}>{t("Continue")}</Text>
         </TouchableOpacity>
+
         <Text
           style={{
             fontFamily: theme.fontFamily.regular,
@@ -138,13 +145,12 @@ const OtpConfirmationScreen = () => {
             fontSize: hp(1.9),
           }}
         >
-          {t("Resend code in")}
+          {t("Resend code in")}{" "}
           <Text
             style={{
-              fontFamily: theme.fontFamily.regular,
-              color: theme.colors.text.secondary,
-              fontSize: hp(1.9),
               fontWeight: "bold",
+              fontSize: hp(1.9),
+              fontFamily: theme.fontFamily.regular,
             }}
           >
             {count} {t("sec")}
@@ -160,7 +166,7 @@ export default OtpConfirmationScreen;
 const styles = StyleSheet.create({
   input: {
     height: hp(10),
-    width: wp(18),
+    width: wp(15),
     borderWidth: 1,
     color: theme.colors.brand.blue,
     fontFamily: theme.fontFamily.semiBold,
@@ -168,6 +174,12 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     borderColor: theme.colors.brand.blue,
     textAlign: "center",
+  },
+  otpInputContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: 15,
   },
   buttonText: {
     fontSize: theme.fontSize.medium,
@@ -178,7 +190,6 @@ const styles = StyleSheet.create({
   btn: {
     backgroundColor: theme.colors.brand.blue,
     borderRadius: 10,
-    display: "flex",
     justifyContent: "center",
     alignItems: "center",
     width: wp("90%"),

@@ -8,10 +8,11 @@ import { FontAwesome } from "@expo/vector-icons";
 import { theme } from "@/infrastructure/themes";
 import { useTranslation } from "react-i18next";
 import LanguageSelection from "../Home/lang-dropdown";
+import { router } from "expo-router";
 const LanguageSetting = () => {
   const { t } = useTranslation();
   return (
-    <View>
+    <TouchableOpacity onPress={() => {router.push("/(screens)/language-setting")}}>
       <View
         style={{
           display: "flex",
@@ -41,16 +42,15 @@ const LanguageSetting = () => {
           <TouchableOpacity style={styles.userbtn}>
             {/* <Ionicons name="pencil" size={20} color="black" /> */}
             <FontAwesome
-              name="user"
+              name="language"
               size={20}
               color={theme.colors.brand.blue}
             />
-            {/* <FontAwesome5 name="user" size={16} color={theme.colors.brand.blue} /> */}
           </TouchableOpacity>
           <Text
             style={{
-              fontFamily: theme.fontFamily.semiBold,
-              fontSize: hp(2.3),
+              fontFamily: theme.fontFamily.medium,
+              fontSize: hp(1.8),
               color: theme.colors.brand.blue,
             }}
           >
@@ -59,7 +59,7 @@ const LanguageSetting = () => {
         </View>
         <LanguageSelection/>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 };
 

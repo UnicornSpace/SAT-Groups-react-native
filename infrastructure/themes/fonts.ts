@@ -37,5 +37,14 @@ export const fontFamily = {
   extrabold: "Poppins_800ExtraBold",
 };
 
+// export const fontFamily = {
+//   light: "Inter_400Regular",
+//   regular: "Inter_400Regular",
+//   medium: "Inter_500Medium",
+//   semiBold: "Inter_600SemiBold",
+//   bold: "Inter_700Bold",
+//   extrabold: "Inter_800ExtraBold",
+// };
+
 
 

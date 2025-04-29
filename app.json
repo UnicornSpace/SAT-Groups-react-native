@@ -15,7 +15,8 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.likitha.n.satGroups"
     },
     "web": {
       "bundler": "metro",
@@ -37,6 +38,18 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "2cd3171b-3702-44f1-ba5e-b49eca68d346"
+      }
     }
-  }
+  },
+  "assetBundlePatterns": [
+  "**/*",
+  "locales/**/*"
+]
 }

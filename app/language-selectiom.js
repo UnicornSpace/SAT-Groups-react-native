@@ -22,6 +22,9 @@ i18n
     fallbackLng: 'en',
     interpolation: {
       escapeValue: false
+    },
+    react:{
+      useSuspense: false
     }
   })
   .then(() => console.log('✅ i18n initialized successfully'))

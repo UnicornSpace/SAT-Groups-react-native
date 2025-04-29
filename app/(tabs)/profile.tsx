@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { theme } from "@/infrastructure/themes";
 import Button from "@/components/General/button";
 import { router } from "expo-router";
@@ -20,22 +20,73 @@ import { LinearGradient } from "expo-linear-gradient";
 import UserBentogrids from "@/components/Profile/bentogrids";
 import UserDetails from "@/components/Profile/UserDetails";
 import LanguageSetting from "@/components/Profile/languageSetting";
+import axiosInstance from "@/utils/axionsInstance";
+import ReferalCard from "@/components/Profile/referalCard";
+import { Badge } from "react-native-paper";
+import EditButton from "@/components/Profile/edit";
+
 const profile = () => {
-  const [address, setaddress] = useState("");
+  const [userInfo, setuserInfo] = useState<{ id?: number; name?: string }>({});
+
+  useEffect(() => {
+    const driver_id = 2;
+    const token =
+      "8ef3cf4ed84148e6a5c9faa3267a0acf57f7320703fd7644785a16342a41e7e2";
+
+    const getUserDetails = async () => {
+      try {
+        const response = await axiosInstance.post(
+          "/user-details.php",
+          { driver_id },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        const userDetails = response.data;
+        setuserInfo(userDetails.driver);
+        console.log("User Details:", userDetails.driver);
+      } catch (error) {
+        console.error("Error fetching user details:", error);
+      }
+    };
+
+    getUserDetails();
+  }, []);
+
   const logot = () => {
     router.push("/(screens)/LanguageSeletionScreen");
   };
   const { t } = useTranslation();
+
   return (
     <ScrollView>
       <View style={styles.container}>
+      
         <View>
-          <Image
+          {/* <Image
             source={require("@/assets/images/satgroups/profilePic.png")}
             resizeMode="cover"
             width={wp("25%")}
             height={hp("12%")}
-          />
+          /> */}
+          <View>
+            <Badge
+              style={{
+                width: wp("31%"),
+                height: hp("15%"),
+                borderRadius: 100,
+                backgroundColor: theme.colors.brand.blue,
+                color: theme.colors.text.primary,
+                fontFamily: theme.fontFamily.bold,
+                fontSize: hp("5%"),
+                lineHeight: 40,
+              }}
+            >
+              {userInfo.name?.charAt(0)}
+            </Badge>
+          </View>
           <View
             style={{
               display: "flex",
@@ -47,26 +98,28 @@ const profile = () => {
             <Text
               style={{ fontSize: hp(3), fontFamily: theme.fontFamily.semiBold }}
             >
-              Sachin
+              {userInfo.name}
             </Text>
 
             <LinearGradient
               colors={["#4A86D2", theme.colors.brand.blue]}
               style={styles.gradient}
             >
-              <Text style={styles.date}>{t("Driver ID : 1063")}</Text>
+              <Text style={styles.date}>{t(`Driver ID : ${userInfo.id}`)}</Text>
             </LinearGradient>
           </View>
         </View>
+
         <UserBentogrids />
-        <UserDetails />
+        <ReferalCard />
+        <UserDetails data={userInfo} />
 
         <LanguageSetting />
         <TouchableOpacity onPress={logot} style={styles.btn}>
           <Text
             style={{
               color: theme.colors.text.primary,
-              fontFamily: theme.fontFamily.semiBold,
+              fontFamily: theme.fontFamily.medium,
               fontSize: hp(2.5),
             }}
           >
@@ -86,7 +139,7 @@ const styles = StyleSheet.create({
     marginHorizontal: hp(2.5),
     marginVertical: hp(2.5),
     alignItems: "center",
-    gap: 25,
+    gap:18,
     display: "flex",
     flexDirection: "column",
     // justifyContent: "space-between",
@@ -96,7 +149,7 @@ const styles = StyleSheet.create({
     // backgroundColor: theme.colors.ui.screenbg,
   },
   gradient: {
-    paddingVertical: hp(1),
+    paddingVertical: hp(0.45),
     paddingHorizontal: hp(2),
     justifyContent: "center",
     alignItems: "center",
@@ -121,7 +174,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     width: wp(90),
-    height: hp(7),
+    paddingVertical: hp(1.2),
   },
   input: {
     height: hp("7%"),

@@ -7,7 +7,7 @@ import {
   View,
 } from "react-native";
 import React, { useState } from "react";
-import { Ionicons, MaterialIcons } from "@expo/vector-icons";
+import { MaterialIcons } from "@expo/vector-icons";
 import { theme } from "@/infrastructure/themes";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
@@ -16,72 +16,67 @@ import {
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
 import { useTranslation } from "react-i18next";
-import CustomAlert from "@/components/General/AlterBox";
-import axios from "axios";
 import { ActivityIndicator } from "react-native-paper";
+import axiosInstance from "@/utils/axionsInstance";
+
 const UserOTPScreen = () => {
-  const [showAlert, setShowAlert] = useState(false);
-  const [number, onChangeNumber] = React.useState("");
+  const [number, onChangeNumber] = useState("");
+  const [referral, setReferral] = useState("");
   const [loading, setLoading] = useState(false);
-  const SubmitNumber = () => {
-    number.length === 11
-      ? router.replace("/(screens)/otpConfirmationScreen")
-      : Alert.alert("Invalid Number", "Please enter a valid number", [
-          {
-            text: "OK",
-            onPress: () => console.log("OK Pressed"),
-          },
-        ]);
+  const { t } = useTranslation();
+
+  const SubmitNumber = async () => {
+    if (number.length !== 11) {
+      Alert.alert("Invalid Number", "Please enter a valid number", [
+        { text: "OK", onPress: () => console.log("OK Pressed") },
+      ]);
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const formattedNumber = number.replace("-", "");
+
+      const response = await axiosInstance.post("/user-login-request-otp.php", {
+        mobile: formattedNumber,
+        referral_code: referral || undefined,
+      });
+
+      console.log("Response", response.data, formattedNumber);
+
+      if (response.status === 200) {
+        router.push({
+          pathname: "/(screens)/otpConfirmationScreen",
+          params: { number: formattedNumber },
+        });
+      }
+    } catch (error) {
+      Alert.alert("Something went wrong");
+    } finally {
+      setLoading(false);
+    }
   };
-  // const SubmitNumber = async () => {
-  //   number.length === 11;
-  //   if (number.length !== 11) {
-  //     Alert.alert("Invalid Number", "Please enter a valid number", [
-  //       { text: "OK", onPress: () => console.log("OK Pressed") },
-  //     ]);
-  //     return;
-  //   }
-  //   try {
-  //     setLoading(true);
-  //     const response = await axios.post("", { number });
-  //     if (response.data.success) {
-  //       router.replace{
-  // ("/(screens)/otpConfirmationScreen"),params: { number } });
-  //     }
-  //   } catch (error) {
-  //     Alert.alert("Something went wrong");
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
+
   const formateNumber = (text: string) => {
     let cleanText = text.replace(/[^0-9]/g, "");
-    if (!/^([6789])/.test(cleanText)) {
-      return; // Don't update state if invalid
-    }
-    if (cleanText.length > 10) {
-      cleanText = cleanText.slice(0, 10);
-    }
-    if (cleanText.length > 5) {
+    if (!/^([6789])/.test(cleanText)) return;
+    if (cleanText.length > 10) cleanText = cleanText.slice(0, 10);
+    if (cleanText.length > 5)
       cleanText = cleanText.slice(0, 5) + "-" + cleanText.slice(5);
-    }
     onChangeNumber(cleanText);
   };
-  const { t } = useTranslation();
+
   return (
     <View
       style={{
-        display: "flex",
-        flexDirection: "column",
-        gap: 40,
+        flex: 1,
         justifyContent: "center",
         alignItems: "center",
         width: wp(100),
-        height: "100%",
         paddingHorizontal: hp(5),
+        gap: 40,
       }}
     >
-      {/* {showAlert && <CustomAlert />} */}
       <Text
         style={{
           color: theme.colors.brand.blue,
@@ -91,15 +86,14 @@ const UserOTPScreen = () => {
       >
         {t("Enter Your Number")}
       </Text>
-      <View style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+
+      <View style={{ gap: 12 }}>
         <View
           style={{
-            display: "flex",
             flexDirection: "row",
             alignItems: "center",
             gap: 8,
             borderWidth: 0.1,
-            boxShadow: "2px 2px 10px rgba(72, 72, 72, 0.2)",
             borderRadius: 10,
             paddingHorizontal: hp(2),
           }}
@@ -110,26 +104,18 @@ const UserOTPScreen = () => {
             color={theme.colors.brand.blue}
           />
           <TextInput
-            autoFocus={true}
+            autoFocus
             style={styles.input}
             onChangeText={formateNumber}
             value={number}
-            placeholder={t("+ 91 XXXXX  XXXXX")}
+            placeholder={t("+91 XXXXX XXXXX")}
             keyboardType="numeric"
             maxLength={11}
             placeholderTextColor={theme.colors.ui.black + 70}
           />
         </View>
 
-        <View
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: 10,
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
+        <View style={styles.middleSection}>
           <Text
             style={{
               fontFamily: theme.fontFamily.light,
@@ -150,30 +136,25 @@ const UserOTPScreen = () => {
           </Text>
 
           <TouchableOpacity
-            style={{
-              borderWidth: 1.5,
-              borderRadius: 10,
-              height: 51,
-              width: wp(90),
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              borderColor: theme.colors.brand.blue,
-            }}
+            style={styles.referralBox}
+            activeOpacity={0.9}
           >
             <TextInput
-              placeholder={t("Refferal code (optional)")}
+              value={referral}
+              onChangeText={setReferral}
+              placeholder={t("Referral code (optional)")}
               style={{
                 fontFamily: theme.fontFamily.medium,
                 fontSize: hp(2),
                 color: theme.colors.text.secondary,
               }}
-            ></TextInput>
+            />
           </TouchableOpacity>
         </View>
       </View>
+
       {loading ? (
-        <ActivityIndicator size={"large"} />
+        <ActivityIndicator size="large" />
       ) : (
         <TouchableOpacity onPress={SubmitNumber}>
           <LinearGradient
@@ -210,5 +191,19 @@ const styles = StyleSheet.create({
     fontFamily: theme.fontFamily.semiBold,
     textAlign: "center",
     color: theme.colors.text.primary,
+  },
+  referralBox: {
+    borderWidth: 1.5,
+    borderRadius: 10,
+    height: 51,
+    width: wp(90),
+    justifyContent: "center",
+    paddingHorizontal: hp(2),
+    borderColor: theme.colors.brand.blue,
+  },
+  middleSection: {
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 10,
   },
 });

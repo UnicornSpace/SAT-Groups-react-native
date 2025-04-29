@@ -7,7 +7,10 @@ import {
 } from "react-native";
 import React, { useState } from "react";
 import { theme } from "@/infrastructure/themes";
-import { IconArrowBarToDown } from "@tabler/icons-react-native";
+import {
+  IconArrowBarToDown,
+  IconArrowBarToUp,
+} from "@tabler/icons-react-native";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -27,27 +30,32 @@ const TranscationBtn = ({
       style={{
         backgroundColor: isActive ? color + "20" : "transparent",
         borderColor: color,
-        borderBottomWidth: 2,
-        boxShadow: "2px 4px 5px rgba(0, 0, 0, 0.25)",
+        borderWidth: 0.2,
+        // boxShadow: "2px 4px 5px rgba(0, 0, 0, 0.25)",
         borderRadius: 8,
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
         flexDirection: "row",
         paddingHorizontal: hp(1.8),
-        paddingVertical: hp(1),
+        paddingVertical: hp(0.6),
+        gap: 2,
       }}
     >
       <Text
         style={{
           fontFamily: theme.fontFamily.medium,
-          fontSize: hp(1.8),
+          fontSize: hp(1.5),
           color: color,
         }}
       >
         {name}
       </Text>
-      <IconArrowBarToDown size={20} color={color} />
+      {name === "Received" ? (
+        <IconArrowBarToDown size={14} color={color} />
+      ) : name === "Spent" ? (
+        <IconArrowBarToUp size={14} color={color} />
+      ) : null}
     </TouchableOpacity>
   );
 };
@@ -62,11 +70,10 @@ const TranscationBtnCollection = () => {
       <View
         style={{
           flexDirection: "row",
-          flex: 1, 
-          justifyContent: "space-around",
+          flex: 1,
           alignItems: "center",
           minWidth: wp(90),
-          gap: 15,
+          gap: 6,
         }}
       >
         <TranscationBtn

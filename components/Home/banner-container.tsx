@@ -1,5 +1,5 @@
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { theme } from "@/infrastructure/themes";
 import { Button } from "react-native-paper";
 import {
@@ -7,25 +7,52 @@ import {
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
 import { useTranslation } from "react-i18next";
+import axiosInstance from "@/utils/axionsInstance";
 const BannerContainer = () => {
   const { t } = useTranslation();
+  const [Points, setPoints] = useState("");
+  useEffect(() => {
+    const driver_id = 2;
+    const token =
+      "8ef3cf4ed84148e6a5c9faa3267a0acf57f7320703fd7644785a16342a41e7e2";
+
+    const getPoints = async () => {
+      try {
+        const response = await axiosInstance.post(
+          "/driver-points.php",
+          { driver_id },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        const userPoints = response.data;
+        setPoints(userPoints);
+        console.log("User Details:", userPoints);
+      } catch (error) {
+        console.error("Error fetching user details:", error);
+      }
+    };
+
+    getPoints();
+  }, []);
   return (
     <View style={{ position: "relative" }}>
       <Image
-        style={{ width: wp("90%"), height: hp("22%") }}
+        style={{ width: wp("90%"), height: hp("20%") }}
         source={require("../../assets/images/satgroups/banner.png")}
         resizeMode="stretch"
       />
       <View style={{ position: "absolute", top: hp(4), left: wp(6) }}>
         <View style={{ flexDirection: "column", justifyContent: "flex-start" }}>
-          <Text style={styles.bannerText}>{t("TOTAL POINTS")}</Text>
+          <Text style={styles.bannerText}>{t("Total Points")}</Text>
           <Text style={styles.pointsText}>{t("450")}</Text>
         </View>
         <TouchableOpacity style={styles.bannerBtn}>
           <Text
-
             style={{
-              fontFamily: theme.fontFamily.bold,
+              fontFamily: theme.fontFamily.medium,
               fontSize: hp("1.8%"),
               color: theme.colors.brand.red,
             }}
@@ -44,12 +71,13 @@ const styles = StyleSheet.create({
   bannerText: {
     fontSize: hp("2.2%"),
     color: theme.colors.text.primary,
-    fontFamily: theme.fontFamily.semiBold,
+    fontFamily: theme.fontFamily.regular,
+    marginBottom: hp(-1),
   },
   pointsText: {
     fontSize: hp("3.8%"),
     color: theme.colors.text.primary,
-    fontFamily: theme.fontFamily.bold,
+    fontFamily: theme.fontFamily.semiBold,
   },
   bannerBtn: {
     width: wp("23%"),

@@ -5,7 +5,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import React from "react";
+import React, { useEffect } from "react";
 import { theme } from "@/infrastructure/themes";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
@@ -15,13 +15,20 @@ import {
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
 import { useTranslation } from "react-i18next";
+import axiosInstance from "@/utils/axionsInstance";
 const UserDetails = () => {
   const [userName, setuserName] = React.useState("");
   const [userAge, setuserAge] = React.useState("");
+  const [SateName, setSateName] = React.useState("");
+  const [Address, setAddress] = React.useState("");
   const onSubmitDetails = () => {
-    userAge.length > 0 && userName.length > 0 ? router.push("/(tabs)") : alert("Please fill all the details");
+    userAge.length > 0 && userName.length > 0
+      ? router.push("/(tabs)")
+      : alert("Please fill all the details");
   };
   const { t } = useTranslation();
+  
+ 
   return (
     <View
       style={{
@@ -47,7 +54,7 @@ const UserDetails = () => {
         style={{
           display: "flex",
           flexDirection: "column",
-          gap: 40,
+          gap: 10,
           width: wp("90%"),
         }}
       >
@@ -60,7 +67,7 @@ const UserDetails = () => {
           keyboardType="name-phone-pad"
           placeholderTextColor={theme.colors.ui.black + 70}
         />
-        <TextInput
+         <TextInput
           style={styles.input}
           onChangeText={setuserAge}
           value={userAge}
@@ -68,6 +75,24 @@ const UserDetails = () => {
           keyboardType="number-pad"
           placeholderTextColor={theme.colors.ui.black + 70}
         />
+        <TextInput
+          style={styles.input}
+          onChangeText={setAddress}
+          value={Address}
+          placeholder={t("Enter State name")}
+          keyboardType="name-phone-pad"
+          placeholderTextColor={theme.colors.ui.black + 70}
+        />
+        <TextInput
+          
+          style={styles.input}
+          onChangeText={setSateName}
+          value={SateName}
+          placeholder={t("Addrees")}
+          keyboardType="name-phone-pad"
+          placeholderTextColor={theme.colors.ui.black + 70}
+        />
+       
       </View>
 
       <TouchableOpacity onPress={onSubmitDetails} style={{}}>

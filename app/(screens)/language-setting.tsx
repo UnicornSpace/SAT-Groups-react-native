@@ -10,52 +10,30 @@ import {
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
 import i18next from "i18next";
-import { useTranslation } from "react-i18next";
 type Language = {
   code: string;
   name: string;
-  trans: string;
+  trans:string
 };
 
-const LanguageSeletionScreen = () => {
-  const [error, setError] = useState(null);
+const LanguageSetting = () => {
   const [value, setValue] = React.useState("");
   const [SelectLang, setSelectLang] = useState<string | null>(null);
 
   const languages: Language[] = [
-    { code: "A", name: "ENGLISH", trans: "en" },
-    { code: "அ", name: "தமிழ்", trans: "tam" },
-    { code: "अ", name: "हिन्दी", trans: "hi" },
-    { code: "ಅ", name: "ಕನ್ನಡ", trans: "kan" },
-    { code: "అ", name: "తెలుగు", trans: "tel" },
+    { code: "A", name: "ENGLISH",trans:"en" },
+    { code: "ಅ", name: "ಕನ್ನಡ",trans:"kan" },
+    { code: "अ", name: "हिन्दी",trans:"hi" },
+    { code: "అ", name: "తెలుగు",trans:"tel" },
+    { code: "அ", name: "தமிழ்",trans:"tam" },
   ];
-  const { t, ready,i18n } = useTranslation();
 
-  React.useEffect(() => {
-    try {
-      console.log("i18n initialization status:", i18n.isInitialized);
-      console.log("Current language:", i18n.language);
-      console.log("Available resources:", Object.keys(i18n.options.resources || {}));
-    } catch (err) {
-      console.error("Error checking i18n:", err);
-      // setError(err.message);
-    }
-  }, []);
-
-  if (error) {
-    return (
-      <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-        <Text>Translation Error: {error}</Text>
-      </View>
-    );
-  }
   const SubmitLang = () => {
     if (SelectLang) {
-      i18next.changeLanguage(SelectLang).then(() => {
-        router.replace("/(screens)/otp-screen");
-      });
-      console.log(SelectLang);
+      router.replace("/(tabs)/profile");
     }
+    i18next.changeLanguage(SelectLang!)
+    console.log(SelectLang);
   };
 
   return (
@@ -78,6 +56,7 @@ const LanguageSeletionScreen = () => {
           justifyContent: "center",
           alignItems: "center",
           width: wp(100),
+          
         }}
       >
         <Text
@@ -210,5 +189,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default LanguageSeletionScreen;
-
+export default LanguageSetting;

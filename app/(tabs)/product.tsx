@@ -1,10 +1,11 @@
-import { ScrollView, StyleSheet, View } from "react-native";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
 import Svg, { Path, Defs, LinearGradient, Stop } from "react-native-svg";
 import React from "react";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
+import { MaterialIcons } from "@expo/vector-icons";
 
 const position = {
   step1: {
@@ -22,6 +23,12 @@ const position = {
 };
 
 const Product = (props: any) => {
+  return (
+    <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+      <MaterialIcons name="query-builder" size={24} color="black" />
+      <Text style={{ marginTop: 1 }}>In progress...</Text>
+    </View>
+  );
   return (
     <ScrollView contentContainerStyle={styles.scrollContent}>
       <View style={styles.svgWrapper}>
@@ -53,26 +60,27 @@ const Product = (props: any) => {
             </LinearGradient>
           </Defs>
         </Svg>
-        {
-          Object.entries(position).map(([key, pos], index) => (
-            <View key={key} style={{ position: "absolute", top: pos.top, left: pos.left }}>
-          <Svg
-            xmlns="http://www.w3.org/2000/svg"
-            width={59}
-            height={45}
-            fill="none"
-            {...props}
+        {Object.entries(position).map(([key, pos], index) => (
+          <View
+            key={key}
+            style={{ position: "absolute", top: pos.top, left: pos.left }}
           >
-            <Path
-              fill="#fff"
-              stroke="#26456C"
-              strokeWidth={5}
-              d="M29.071 2.5c15.31 0 26.573 9.512 26.573 20s-11.264 20-26.573 20C13.763 42.5 2.5 32.987 2.5 22.5c0-10.488 11.263-20 26.571-20Z"
-            />
-          </Svg>
-        </View>
-          ))
-        }
+            <Svg
+              xmlns="http://www.w3.org/2000/svg"
+              width={59}
+              height={45}
+              fill="none"
+              {...props}
+            >
+              <Path
+                fill="#fff"
+                stroke="#26456C"
+                strokeWidth={5}
+                d="M29.071 2.5c15.31 0 26.573 9.512 26.573 20s-11.264 20-26.573 20C13.763 42.5 2.5 32.987 2.5 22.5c0-10.488 11.263-20 26.571-20Z"
+              />
+            </Svg>
+          </View>
+        ))}
       </View>
     </ScrollView>
   );
