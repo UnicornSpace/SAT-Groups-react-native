@@ -24,6 +24,8 @@ import axiosInstance from "@/utils/axionsInstance";
 import ReferalCard from "@/components/Profile/referalCard";
 import { Badge } from "react-native-paper";
 import EditButton from "@/components/Profile/edit";
+import CustomizedBadge from "@/components/Home/CustomizedBadge";
+import { fontSize, size } from "react-native-responsive-sizes";
 
 const profile = () => {
   const [userInfo, setuserInfo] = useState<{ id?: number; name?: string }>({});
@@ -63,7 +65,6 @@ const profile = () => {
   return (
     <ScrollView>
       <View style={styles.container}>
-      
         <View>
           {/* <Image
             source={require("@/assets/images/satgroups/profilePic.png")}
@@ -72,7 +73,19 @@ const profile = () => {
             height={hp("12%")}
           /> */}
           <View>
-            <Badge
+            <View style={styles.badge}>
+              <Text
+                style={{
+                  color: theme.colors.text.primary,
+                  fontFamily: theme.fontFamily.semiBold,
+                  fontSize: fontSize(32),
+                }}
+              >
+                {" "}
+                {userInfo.name?.charAt(0)}
+              </Text>
+            </View>
+            {/* <Badge
               style={{
                 width: wp("31%"),
                 height: hp("15%"),
@@ -85,7 +98,7 @@ const profile = () => {
               }}
             >
               {userInfo.name?.charAt(0)}
-            </Badge>
+            </Badge> */}
           </View>
           <View
             style={{
@@ -139,7 +152,7 @@ const styles = StyleSheet.create({
     marginHorizontal: hp(2.5),
     marginVertical: hp(2.5),
     alignItems: "center",
-    gap:18,
+    gap: 18,
     display: "flex",
     flexDirection: "column",
     // justifyContent: "space-between",
@@ -186,5 +199,14 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     borderColor: theme.colors.brand.blue,
     // paddingHorizontal: hp("2%"),
+  },
+  badge: {
+    width: size(100),
+    height: size(100),
+    borderRadius: 50,
+    backgroundColor: theme.colors.brand.blue,
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
   },
 });

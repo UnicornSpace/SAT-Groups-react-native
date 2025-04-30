@@ -33,7 +33,7 @@ const LanguageSetting = () => {
       router.replace("/(tabs)/profile");
     }
     i18next.changeLanguage(SelectLang!)
-    console.log(SelectLang);
+    // console.log(SelectLang);
   };
 
   return (

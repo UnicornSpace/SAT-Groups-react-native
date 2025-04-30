@@ -6,6 +6,7 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
+import { width, height, size, fontSize } from "react-native-responsive-sizes";
 import { useTranslation } from "react-i18next";
 import axiosInstance from "@/utils/axionsInstance";
 const BannerContainer = () => {
@@ -53,7 +54,8 @@ const BannerContainer = () => {
           <Text
             style={{
               fontFamily: theme.fontFamily.medium,
-              fontSize: hp("1.8%"),
+              // fontSize: hp("1.8%"),
+              fontSize: fontSize(12),
               color: theme.colors.brand.red,
             }}
           >
@@ -69,13 +71,15 @@ export default BannerContainer;
 
 const styles = StyleSheet.create({
   bannerText: {
-    fontSize: hp("2.2%"),
+    fontSize: fontSize(15),
+    // fontSize: hp("2.2%"),
     color: theme.colors.text.primary,
     fontFamily: theme.fontFamily.regular,
     marginBottom: hp(-1),
   },
   pointsText: {
-    fontSize: hp("3.8%"),
+    // fontSize: hp("3.8%"),
+    fontSize: fontSize(25),
     color: theme.colors.text.primary,
     fontFamily: theme.fontFamily.semiBold,
   },

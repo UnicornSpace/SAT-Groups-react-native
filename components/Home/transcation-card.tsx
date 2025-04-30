@@ -6,6 +6,7 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
+import { width, height, size, fontSize } from "react-native-responsive-sizes";
 
 const TransactionCard = () => {
   const { t } = useTranslation();
@@ -63,13 +64,15 @@ const styles = StyleSheet.create({
     gap: hp("-1%"),
   },
   heading: {
-    fontSize: hp("2.3%"),
+    fontSize: fontSize(16),
+    // fontSize: hp("2.3%"),
     marginBottom: hp("-0.5%"),
     fontFamily: theme.fontFamily.semiBold,
     color: theme.colors.brand.blue,
   },
   place: {
-    fontSize: hp("1.6%"),
+    // fontSize: hp("1.6%"),
+    fontSize: fontSize(10),
     marginTop: hp("-0.5%"),
     color: theme.colors.text.secondary,
     fontFamily: theme.fontFamily.regular,

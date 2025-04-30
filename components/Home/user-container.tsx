@@ -7,8 +7,10 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
+import { width, height, size, fontSize } from "react-native-responsive-sizes";
 import { useTranslation } from "react-i18next";
 import axiosInstance from "@/utils/axionsInstance";
+import CustomizedBadge from "./CustomizedBadge";
 const getGreetingMessage = () => {
   const currentHour = new Date().toLocaleString("en-IN", {
     hour: "numeric",
@@ -77,7 +79,8 @@ const UserContainer = () => {
           <Text style={styles.userNametext}>{userInfo.name}</Text>
         </View>
         <View>
-          <Badge style={styles.badge}>{userInfo.name?.charAt(0)}</Badge>
+          <CustomizedBadge userInfo={userInfo.name?.charAt(0)}/>
+          {/* <Badge size={30} style={styles.badge}>{userInfo.name?.charAt(0)}</Badge> */}
         </View>
       </View>
     </View>
@@ -89,28 +92,30 @@ export default UserContainer;
 const styles = StyleSheet.create({
   cardText: {
     fontFamily: theme.fontFamily.regular,
-    fontSize: hp("1.65%"),
+    fontSize: fontSize(11),
+    // fontSize: hp("1.65%"),
     color: theme.colors.text.secondary,
   },
   userNametext: {
     fontFamily: theme.fontFamily.medium,
-    fontSize: hp("2.5%"),
+    // fontSize: hp("2.5%"),
+    fontSize: fontSize(16),
     color: theme.colors.ui.black,
     marginTop: hp(-0.6),
   },
   badge: {
-    width: wp("10%"),
-    height: hp("5%"),
-    borderRadius: 50,
+    
     backgroundColor: theme.colors.brand.blue,
     color: theme.colors.text.primary,
     fontFamily: theme.fontFamily.bold,
-    fontSize: hp("2.5%"),
-    lineHeight: 40,
+    fontSize: fontSize(16),
+    textAlign: "center",
   },
   userContainer: {
     width: wp("90%"),
-    height: hp(9),
+    // height: hp(9),
+    // width:width(90),
+    // height: height(8),
     backgroundColor: theme.colors.ui.screenbg,
     // boxShadow: "0px 3px 3px rgba(0, 0, 0, 0.10)",
     borderRadius: 8,
