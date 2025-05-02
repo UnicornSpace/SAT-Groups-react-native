@@ -29,13 +29,16 @@ const LanguageSeletionScreen = () => {
     { code: "ಅ", name: "ಕನ್ನಡ", trans: "kan" },
     { code: "అ", name: "తెలుగు", trans: "tel" },
   ];
-  const { t, ready,i18n } = useTranslation();
+  const { t, ready, i18n } = useTranslation();
 
   React.useEffect(() => {
     try {
       console.log("i18n initialization status:", i18n.isInitialized);
       console.log("Current language:", i18n.language);
-      console.log("Available resources:", Object.keys(i18n.options.resources || {}));
+      console.log(
+        "Available resources:",
+        Object.keys(i18n.options.resources || {})
+      );
     } catch (err) {
       console.error("Error checking i18n:", err);
       // setError(err.message);
@@ -44,7 +47,7 @@ const LanguageSeletionScreen = () => {
 
   if (error) {
     return (
-      <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
         <Text>Translation Error: {error}</Text>
       </View>
     );
@@ -103,7 +106,7 @@ const LanguageSeletionScreen = () => {
         style={{
           display: "flex",
           flexDirection: "column",
-          gap: 18,
+          gap: 8,
           alignItems: "center",
         }}
       >
@@ -141,7 +144,7 @@ const LanguageSeletionScreen = () => {
               <Text
                 style={{
                   fontFamily: theme.fontFamily.medium,
-                  fontSize: hp(2.5),
+                  fontSize: hp(2.2),
                 }}
               >
                 {lang.name}
@@ -149,7 +152,7 @@ const LanguageSeletionScreen = () => {
               {SelectLang == lang.trans && (
                 <MaterialIcons
                   name="check-circle"
-                  size={20}
+                  size={24}
                   color={theme.colors.brand.blue}
                 />
               )}
@@ -189,11 +192,11 @@ const styles = StyleSheet.create({
   text: {
     color: theme.colors.text.primary,
     fontFamily: theme.fontFamily.medium,
-    fontSize: hp(2.6),
+    fontSize: hp(2.2),
   },
   buttonText: {
     fontSize: theme.fontSize.medium,
-    fontFamily: theme.fontFamily.semiBold,
+    fontFamily: theme.fontFamily.medium,
     textAlign: "center",
     color: theme.colors.text.primary,
   },
@@ -211,4 +214,3 @@ const styles = StyleSheet.create({
 });
 
 export default LanguageSeletionScreen;
-

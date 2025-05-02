@@ -8,6 +8,7 @@ import {
 } from "react-native-responsive-screen";
 import { router } from "expo-router";
 import ReferralSteps from "@/components/Profile/referalSteps";
+import { width, height, size, fontSize } from "react-native-responsive-sizes";
 const ReferalCard = () => {
   return (
     <TouchableOpacity
@@ -16,7 +17,7 @@ const ReferalCard = () => {
       }}
       style={styles.container}
     >
-      <View style={{ flexDirection: "row", gap: hp(8), alignItems: "center" }}>
+      <View style={{ flexDirection: "row", gap: hp(8), alignItems: "center",justifyContent:"space-between" ,width:width(82)}}>
         <View
           style={{
             flexDirection: "row",
@@ -47,7 +48,6 @@ const styles = StyleSheet.create({
     borderColor: "#D5D5D7",
     backgroundColor: theme.colors.ui.cardbg,
     display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
+  
   },
 });

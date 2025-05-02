@@ -4,10 +4,18 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
+import { width, height, size, fontSize } from "react-native-responsive-sizes";
 import { theme } from "@/infrastructure/themes";
 const UserBentogrids = () => {
   return (
-    <View style={{ flexDirection: "row", gap: hp(2), width: wp(90),justifyContent:"center",  }}>
+    <View
+      style={{
+        flexDirection: "row",
+        // gap: hp(2),
+        width: width(90),
+        justifyContent: "space-between",
+      }}
+    >
       <View style={styles.box1}>
         <Text
           style={{
@@ -60,8 +68,8 @@ export default UserBentogrids;
 
 const styles = StyleSheet.create({
   box1: {
-    height: hp(12),
-    width: wp(45),
+    height: height(10),
+    width: width(45),
     borderRadius: 10,
     borderWidth: 0.7,
     borderColor: "#D5D5D7",
@@ -71,8 +79,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   box2: {
-    height: hp(12),
-    width: wp(30),
+    height: height(10),
+    width: width(39),
     borderRadius: 10,
 
     borderWidth: 0.7,

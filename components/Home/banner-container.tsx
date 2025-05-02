@@ -41,11 +41,11 @@ const BannerContainer = () => {
   return (
     <View style={{ position: "relative" }}>
       <Image
-        style={{ width: wp("90%"), height: hp("20%") }}
+        style={{ width: width(90), height: height(20) }}
         source={require("../../assets/images/satgroups/banner.png")}
         resizeMode="stretch"
       />
-      <View style={{ position: "absolute", top: hp(4), left: wp(6) }}>
+      <View style={{ position: "absolute", top: size(15), left: size(22) }}>
         <View style={{ flexDirection: "column", justifyContent: "flex-start" }}>
           <Text style={styles.bannerText}>{t("Total Points")}</Text>
           <Text style={styles.pointsText}>{t("450")}</Text>
@@ -55,7 +55,7 @@ const BannerContainer = () => {
             style={{
               fontFamily: theme.fontFamily.medium,
               // fontSize: hp("1.8%"),
-              fontSize: fontSize(12),
+              fontSize: fontSize(10),
               color: theme.colors.brand.red,
             }}
           >
@@ -79,13 +79,13 @@ const styles = StyleSheet.create({
   },
   pointsText: {
     // fontSize: hp("3.8%"),
-    fontSize: fontSize(25),
+    fontSize: fontSize(22),
     color: theme.colors.text.primary,
     fontFamily: theme.fontFamily.semiBold,
   },
   bannerBtn: {
-    width: wp("23%"),
-    height: hp("4.5%"),
+    width: width(25),
+    height: height(4),
     borderRadius: 4,
     display: "flex",
     justifyContent: "center",

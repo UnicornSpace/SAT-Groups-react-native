@@ -6,7 +6,7 @@ export const fontSize = {
   h2: 40, // 16 * 1.618
   h3: 28, // 16 * 1.2
   p: 16,
-  medium: 19,
+  medium: 18,
   p2: 14,
   caption: 12,
 }

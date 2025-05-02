@@ -38,7 +38,8 @@ export default TransactionCard;
 
 const styles = StyleSheet.create({
   card: {
-    width: wp("90%"),
+    width: width(90),
+    
     backgroundColor: "#F2F3F5",
     borderRadius: 8,
     borderColor: "#C5C5C5",
@@ -46,25 +47,25 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingVertical: hp(1.5),
-    paddingHorizontal: hp(1.8),
+    paddingVertical: size(8),
+    paddingHorizontal: size(10),
   },
   cardLeft: {
     flexDirection: "row",
     alignItems: "flex-start",
-    gap: wp("3%"),
+    gap: size(10),
   },
   logo: {
-    width: 50,
-    height: 50,
+    width: width(14),
+    // height: height(10),
     resizeMode: "contain",
   },
   detailsContainer: {
     flexDirection: "column",
-    gap: hp("-1%"),
+    // gap: hp("-1%"),
   },
   heading: {
-    fontSize: fontSize(16),
+    fontSize: fontSize(13),
     // fontSize: hp("2.3%"),
     marginBottom: hp("-0.5%"),
     fontFamily: theme.fontFamily.semiBold,
@@ -72,28 +73,28 @@ const styles = StyleSheet.create({
   },
   place: {
     // fontSize: hp("1.6%"),
-    fontSize: fontSize(10),
+    fontSize: fontSize(8),
     marginTop: hp("-0.5%"),
     color: theme.colors.text.secondary,
     fontFamily: theme.fontFamily.regular,
   },
   dateContainer: {
     borderRadius: 5,
-    width: wp("20%"),
+    width: size(70),
     backgroundColor: theme.colors.brand.blue,
-    paddingVertical: hp("0.2%"),
+    paddingVertical: size(2),
     // paddingHorizontal: hp("0.1%"),
     justifyContent: "center",
     alignItems: "center",
-    marginTop: hp("0.5%"),
+    marginTop: size(4),
   },
   date: {
-    fontSize: hp("1.3%"),
+    fontSize: size(8),
     color: theme.colors.text.primary,
     fontFamily: theme.fontFamily.medium,
   },
   points: {
-    fontSize: hp("2.2%"),
+    fontSize: size(15),
     color: theme.colors.brand.green,
     fontFamily: theme.fontFamily.medium,
   },

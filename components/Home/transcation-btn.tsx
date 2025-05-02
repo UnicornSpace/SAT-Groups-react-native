@@ -15,6 +15,7 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
+import { width, height, size, fontSize } from "react-native-responsive-sizes";
 import { useTranslation } from "react-i18next";
 const TranscationBtn = ({
   name,
@@ -37,15 +38,15 @@ const TranscationBtn = ({
         justifyContent: "center",
         alignItems: "center",
         flexDirection: "row",
-        paddingHorizontal: hp(1.8),
-        paddingVertical: hp(0.6),
-        gap: 2,
+        paddingHorizontal: size(12),
+        paddingVertical: size(5),
+        gap: 5,
       }}
     >
       <Text
         style={{
           fontFamily: theme.fontFamily.medium,
-          fontSize: hp(1.5),
+          fontSize: fontSize(9),
           color: color,
         }}
       >

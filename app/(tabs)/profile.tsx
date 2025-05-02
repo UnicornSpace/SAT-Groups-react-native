@@ -25,7 +25,7 @@ import ReferalCard from "@/components/Profile/referalCard";
 import { Badge } from "react-native-paper";
 import EditButton from "@/components/Profile/edit";
 import CustomizedBadge from "@/components/Home/CustomizedBadge";
-import { fontSize, size } from "react-native-responsive-sizes";
+import { width, height, size, fontSize } from "react-native-responsive-sizes";
 
 const profile = () => {
   const [userInfo, setuserInfo] = useState<{ id?: number; name?: string }>({});
@@ -64,41 +64,30 @@ const profile = () => {
 
   return (
     <ScrollView>
-      <View style={styles.container}>
-        <View>
+      <View>
+      
+        <View style={{display:"flex",flexDirection:"column",justifyContent:"space-between",alignItems:"center"}}>
           {/* <Image
             source={require("@/assets/images/satgroups/profilePic.png")}
             resizeMode="cover"
             width={wp("25%")}
             height={hp("12%")}
           /> */}
-          <View>
+          <View >
             <View style={styles.badge}>
               <Text
                 style={{
                   color: theme.colors.text.primary,
                   fontFamily: theme.fontFamily.semiBold,
                   fontSize: fontSize(32),
+                  
                 }}
               >
                 {" "}
                 {userInfo.name?.charAt(0)}
               </Text>
             </View>
-            {/* <Badge
-              style={{
-                width: wp("31%"),
-                height: hp("15%"),
-                borderRadius: 100,
-                backgroundColor: theme.colors.brand.blue,
-                color: theme.colors.text.primary,
-                fontFamily: theme.fontFamily.bold,
-                fontSize: hp("5%"),
-                lineHeight: 40,
-              }}
-            >
-              {userInfo.name?.charAt(0)}
-            </Badge> */}
+            
           </View>
           <View
             style={{
@@ -122,7 +111,8 @@ const profile = () => {
             </LinearGradient>
           </View>
         </View>
-
+      </View>
+      <View style={styles.container}>
         <UserBentogrids />
         <ReferalCard />
         <UserDetails data={userInfo} />
@@ -151,14 +141,14 @@ const styles = StyleSheet.create({
     flex: 1,
     marginHorizontal: hp(2.5),
     marginVertical: hp(2.5),
-    alignItems: "center",
+    alignItems: "flex-start",
     gap: 18,
     display: "flex",
     flexDirection: "column",
-    // justifyContent: "space-between",
+    justifyContent: "flex-start",
     height: "100%",
     width: "90%",
-    alignContent: "center",
+
     // backgroundColor: theme.colors.ui.screenbg,
   },
   gradient: {

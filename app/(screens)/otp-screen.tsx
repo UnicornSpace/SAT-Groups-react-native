@@ -124,32 +124,6 @@ const UserOTPScreen = () => {
           >
             {t("We will send an SMS code to verify your number")}
           </Text>
-
-          <Text
-            style={{
-              color: theme.colors.brand.blue,
-              fontFamily: theme.fontFamily.semiBold,
-              fontSize: hp(2.5),
-            }}
-          >
-            {t("OR")}
-          </Text>
-
-          <TouchableOpacity
-            style={styles.referralBox}
-            activeOpacity={0.9}
-          >
-            <TextInput
-              value={referral}
-              onChangeText={setReferral}
-              placeholder={t("Referral code (optional)")}
-              style={{
-                fontFamily: theme.fontFamily.medium,
-                fontSize: hp(2),
-                color: theme.colors.text.secondary,
-              }}
-            />
-          </TouchableOpacity>
         </View>
       </View>
 

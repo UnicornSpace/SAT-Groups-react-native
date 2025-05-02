@@ -1,21 +1,22 @@
 {
   "expo": {
-    "name": "satGroups",
+    "name": "SAT Groups",
     "slug": "satGroups",
     "version": "1.0.0",
-    "orientation": "default",
-    "icon": "./assets/images/icon.png",
+    "orientation": "portrait",
+    "icon": "./assets/images/satGroups/logo.png",
     "scheme": "myapp",
-    "userInterfaceStyle": "automatic",
+    "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
+        // "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
+      // TODO: change before release
       "package": "com.likitha.n.satGroups"
     },
     "web": {

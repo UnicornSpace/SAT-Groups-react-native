@@ -63,7 +63,7 @@ const location = () => {
           >
             {t("Our Branches").trim()}
           </Title>
-          <Text style={styles.description}>
+          <Text   style={styles.description}>
             {t("Find the branches near you")}
           </Text>
         </View>

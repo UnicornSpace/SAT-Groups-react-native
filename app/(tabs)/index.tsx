@@ -16,7 +16,8 @@ import {
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
 import { useTranslation } from "react-i18next";
-
+import { width, height, size, fontSize } from "react-native-responsive-sizes";
+import TabsComponent from "@/components/Home/tabs";
 const Home = () => {
   const { t } = useTranslation();
 
@@ -25,14 +26,12 @@ const Home = () => {
       <View style={styles.container}>
         <UserContainer />
         <BannerContainer />
-        <View style={{ width: wp("90%"), alignItems: "flex-start", gap: 10 }}>
+        <View style={{ width: width(90), alignItems: "flex-start", gap: 10 }}>
           <Title>{t("Recent_Transcation")}</Title>
-          <TranscationBtnCollection />
+          {/* <TranscationBtnCollection /> */}
+          <TabsComponent/>
         </View>
-        <View style={{display: "flex",flexDirection: "column", gap: 8}}>
-          <TranscationCard />
-          <TranscationCard />
-        </View>
+        
       </View>
     </ScrollView>
   );

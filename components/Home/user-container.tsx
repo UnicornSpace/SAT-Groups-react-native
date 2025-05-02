@@ -79,7 +79,7 @@ const UserContainer = () => {
           <Text style={styles.userNametext}>{userInfo.name}</Text>
         </View>
         <View>
-          <CustomizedBadge userInfo={userInfo.name?.charAt(0)}/>
+          <CustomizedBadge userInfo={userInfo.name?.charAt(0)} />
           {/* <Badge size={30} style={styles.badge}>{userInfo.name?.charAt(0)}</Badge> */}
         </View>
       </View>
@@ -92,37 +92,33 @@ export default UserContainer;
 const styles = StyleSheet.create({
   cardText: {
     fontFamily: theme.fontFamily.regular,
-    fontSize: fontSize(11),
-    // fontSize: hp("1.65%"),
+    fontSize: fontSize(10),
     color: theme.colors.text.secondary,
   },
   userNametext: {
     fontFamily: theme.fontFamily.medium,
     // fontSize: hp("2.5%"),
-    fontSize: fontSize(16),
+    fontSize: fontSize(12),
     color: theme.colors.ui.black,
-    marginTop: hp(-0.6),
+    marginTop: hp(-0.5),
   },
   badge: {
-    
     backgroundColor: theme.colors.brand.blue,
     color: theme.colors.text.primary,
     fontFamily: theme.fontFamily.bold,
-    fontSize: fontSize(16),
+    fontSize: fontSize(14),
     textAlign: "center",
   },
   userContainer: {
-    width: wp("90%"),
-    // height: hp(9),
-    // width:width(90),
-    // height: height(8),
+    width: width(90),
+
     backgroundColor: theme.colors.ui.screenbg,
     // boxShadow: "0px 3px 3px rgba(0, 0, 0, 0.10)",
     borderRadius: 8,
     borderColor: "#C5C5C5",
     borderWidth: 0.3,
     display: "flex",
-    paddingHorizontal: hp(1.5),
+    paddingHorizontal: size(10),
     paddingVertical: hp(1.5),
   },
 });
