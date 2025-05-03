@@ -13,15 +13,15 @@ import {
 } from "react-native-responsive-screen";
 import { useTranslation } from "react-i18next";
 import axiosInstance from "@/utils/axionsInstance";
+import { useAuth } from "@/utils/AuthContext";
 
 const location = () => {
   const { t } = useTranslation();
   const [getBranches, setgetBranches] = useState([]);
+  const {token, driverId} = useAuth()
   useEffect(() => {
-    const driver_id = 2;
-    const token =
-      "8ef3cf4ed84148e6a5c9faa3267a0acf57f7320703fd7644785a16342a41e7e2";
-
+    const driver_id = driverId;
+    const usertoken =token
     const getBranchesList = async () => {
       try {
         const response = await axiosInstance.get(
@@ -29,14 +29,14 @@ const location = () => {
 
           {
             headers: {
-              Authorization: `Bearer ${token}`,
+              Authorization: `Bearer ${usertoken}`,
             },
           }
         );
         const Branches = response.data;
         setgetBranches(Branches.data);
 
-        console.log("User Details:", Branches.data);
+        // console.log("User Details:", Branches.data);
       } catch (error) {
         console.error("Error fetching user details:", error);
       }

@@ -9,28 +9,32 @@ import {
 import { width, height, size, fontSize } from "react-native-responsive-sizes";
 import { useTranslation } from "react-i18next";
 import axiosInstance from "@/utils/axionsInstance";
+import { useAuth } from "@/utils/AuthContext";
 const BannerContainer = () => {
   const { t } = useTranslation();
   const [Points, setPoints] = useState("");
+  const {token, driverId} = useAuth()
+  const { myDynamicPoints, setMyDynamicPoints } = useAuth();
   useEffect(() => {
-    const driver_id = 2;
-    const token =
-      "8ef3cf4ed84148e6a5c9faa3267a0acf57f7320703fd7644785a16342a41e7e2";
+    const driver_id = driverId;
+    const usertoken =token
 
     const getPoints = async () => {
       try {
         const response = await axiosInstance.post(
           "/driver-points.php",
-          { driver_id },
+          { driver_id, take: 10, skip: 0 },
           {
             headers: {
-              Authorization: `Bearer ${token}`,
+              Authorization: `Bearer ${usertoken}`,
             },
           }
         );
         const userPoints = response.data;
-        setPoints(userPoints);
-        console.log("User Details:", userPoints);
+        setPoints(userPoints.total_points);
+        setMyDynamicPoints(Math.ceil(Number(userPoints.total_points) || 0));  
+        // console.log("User Details:", userPoints.total_points);
+        return userPoints.total_points;
       } catch (error) {
         console.error("Error fetching user details:", error);
       }
@@ -41,21 +45,22 @@ const BannerContainer = () => {
   return (
     <View style={{ position: "relative" }}>
       <Image
-        style={{ width: width(90), height: height(20) }}
+        style={{ width: width(90), height: height(18) }}
         source={require("../../assets/images/satgroups/banner.png")}
         resizeMode="stretch"
       />
-      <View style={{ position: "absolute", top: size(15), left: size(22) }}>
+      <View style={{ position: "absolute", top: size(28), left: size(22) }}>
         <View style={{ flexDirection: "column", justifyContent: "flex-start" }}>
           <Text style={styles.bannerText}>{t("Total Points")}</Text>
-          <Text style={styles.pointsText}>{t("450")}</Text>
+          <Text style={styles.pointsText}>{Math.ceil(Number(Points) || 0)}</Text>
+
         </View>
         <TouchableOpacity style={styles.bannerBtn}>
           <Text
             style={{
-              fontFamily: theme.fontFamily.medium,
+              fontFamily: theme.fontFamily.semiBold,
               // fontSize: hp("1.8%"),
-              fontSize: fontSize(10),
+              fontSize: fontSize(12),
               color: theme.colors.brand.red,
             }}
           >

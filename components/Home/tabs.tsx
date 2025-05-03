@@ -1,37 +1,118 @@
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import TranscationCard from '@/components/Home/transcation-card';
+// TabsComponent.tsx
+import React, { useEffect, useState } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, FlatList } from 'react-native';
+import TransactionCard from '@/components/Home/transcation-card';
 import { theme } from '@/infrastructure/themes';
+import axiosInstance from '@/utils/axionsInstance';
+import { width } from 'react-native-responsive-sizes';
+import { useAuth } from '@/utils/AuthContext';
+
+// Define the transaction type
+interface Transaction {
+  points: string;
+  type: string; // "Received" or "Redeemed"
+  referred_date: string;
+  // Add any other fields from your API response
+}
+
 export default function TabsComponent() {
   const [activeTab, setActiveTab] = useState('Received');
+  const [transactionsData, setTransactionsData] = useState<Transaction[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [totalPoints, setTotalPoints] = useState(0);
+  const {token, driverId} = useAuth()
+  useEffect(() => {
+    const fetchTransactions = async () => {
+      try {
+        setLoading(true);
+        
+        const driver_id = driverId;
+        const usertoken = token;
 
-  const renderTabContent = () => {
+        const response = await axiosInstance.post(
+          "/driver-points.php",
+          { 
+            driver_id,  
+            take: 10,
+            skip: 0 
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${usertoken}`,
+            },
+          }
+        );
+
+        console.log("API Response:", response.data);
+        
+        if (response.data.status === "success") {
+          setTransactionsData(response.data.transactions || []);
+          setTotalPoints(response.data.total_points || 0);
+        } else {
+          console.error("API returned error:", response.data);
+        }
+      } catch (error) {
+        console.error("Error fetching transactions:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTransactions();
+  }, []);
+
+  // Filter transactions based on active tab
+  const getFilteredTransactions = () => {
+    if (!transactionsData || transactionsData.length === 0) {
+      return [];
+    }
+
     switch (activeTab) {
       case 'Received':
-        return (
-          <View style={styles.tabContent}>
-            <TranscationCard />
-            {/* <Text style={styles.tabContentText}>Content for Tab 1</Text> */}
-          </View>
-        );
+        return transactionsData.filter(transaction => 
+          transaction.type === 'Received');
       case 'Spent':
-        return (
-          <View style={styles.tabContent}>
-            <TranscationCard />
-            {/* <Text style={styles.tabContentText}>Content for Tab 2</Text> */}
-          </View>
-        );
+        return transactionsData.filter(transaction => 
+          transaction.type === 'Redeemed' || parseFloat(transaction.points) < 0);
       case 'All':
-        return (
-          <View style={styles.tabContent}>
-            <TranscationCard />
-            {/* <Text style={styles.tabContentText}>Content for Tab 3</Text> */}
-          </View>
-        );
+        return transactionsData;
       default:
-        return null;
+        return [];
     }
   };
+
+  const renderItem = ({ item }: { item: Transaction }) => {
+    // Format the date from "YYYY-MM-DD" to a more readable format
+    const formatDate = (dateString: string) => {
+      const date = new Date(dateString);
+      return date.toLocaleDateString('en-US', { 
+        day: 'numeric', 
+        month: 'long'
+      });
+    };
+
+    // Determine if it's a positive or negative transaction
+    const isPositive = parseFloat(item.points) >= 0;
+    const pointsDisplay = isPositive ? `+${item.points}` : item.points;
+
+    return (
+      <TransactionCard
+        companyName="Nox Solution" // You might want to replace this with actual data
+        location="Perundurai" // You might want to replace this with actual data
+        date={formatDate(item.referred_date)}
+        points={pointsDisplay}
+        transactionType={item.type}
+      />
+    );
+  };
+
+  const renderEmptyList = () => (
+    <View style={styles.emptyContainer}>
+      <Text style={styles.emptyText}>No transactions found</Text>
+    </View>
+  );
+
+  const filteredTransactions = getFilteredTransactions();
 
   return (
     <View style={styles.container}>
@@ -85,48 +166,82 @@ export default function TabsComponent() {
           </Text>
         </TouchableOpacity>
       </View>
-      {renderTabContent()}
+
+      <View style={styles.transactionsContainer}>
+        {loading ? (
+          <Text style={styles.loadingText}>Loading transactions...</Text>
+        ) : (
+          <FlatList
+          nestedScrollEnabled={true}
+          keyboardShouldPersistTaps="handled"
+            data={filteredTransactions}
+            renderItem={renderItem}
+            keyExtractor={(item, index) => `transaction-${index}`}
+            contentContainerStyle={styles.listContainer}
+            ListEmptyComponent={renderEmptyList}
+            ItemSeparatorComponent={() => <View style={styles.separator} />}
+          />
+        )}
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    alignItems: 'flex-start',
+    width: width(90),
+    alignItems: 'center',
   },
   tabsList: {
     flexDirection: 'row',
     gap: 4,
     backgroundColor: theme.colors.text.primary,
     borderWidth: 1,
-    borderColor: '#E0E0E0', // border color
-    borderRadius: 9999, // rounded-full
-    padding: 3, // p-1
+    borderColor: '#E0E0E0',
+    borderRadius: 9999,
+    padding: 3,
+    marginBottom: 10,
   },
   tabsTrigger: {
-    paddingVertical: 5                                             ,
-    paddingHorizontal: 30,
-    borderRadius: 9999, // rounded-full
+    paddingVertical: 5,
+    paddingHorizontal: width(9),
+    borderRadius: 9999,
   },
   activeTabsTrigger: {
-    backgroundColor: "#36629A", // primary color, adjust to match your theme
-    shadowOpacity: 0, // shadow-none
+    backgroundColor: "#36629A",
+    shadowOpacity: 0,
   },
   tabsTriggerText: {
-    fontSize: 14,
-    color: '#666', // default text color
+    fontSize: 12,
+    color: '#666',
     fontFamily: theme.fontFamily.regular,
   },
   activeTabsTriggerText: {
-    color: '#fff', // primary-foreground color
+    color: '#fff',
   },
-  tabContent: {
-    paddingVertical: 16,
+  transactionsContainer: {
+    width: '100%',
+    paddingHorizontal: 10,
+  },
+  listContainer: {
+    paddingVertical: 10,
+  },
+  separator: {
+    height: 10,
+  },
+  emptyContainer: {
+    padding: 20,
     alignItems: 'center',
   },
-  tabContentText: {
-    fontSize: 12,
-    color: '#666', // muted-foreground color
-    textAlign: 'center',
+  emptyText: {
+    color: theme.colors.text.secondary,
+    fontFamily: theme.fontFamily.regular,
+    fontSize: 14,
+  },
+  loadingText: {
+    color: theme.colors.text.secondary,
+    fontFamily: theme.fontFamily.regular,
+    fontSize: 14,
+    padding: 20,
   },
 });

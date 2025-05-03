@@ -15,17 +15,21 @@ import {
 } from "react-native-responsive-screen";
 import { useTranslation } from "react-i18next";
 import axiosInstance from "@/utils/axionsInstance";
+import { useAuth } from "@/utils/AuthContext";
 
 const OtpConfirmationScreen = () => {
-  const { number } = useLocalSearchParams<{ number: string }>();
+  const { number, UserExist } = useLocalSearchParams<{
+    number: string;
+    UserExist: any;
+  }>();
   const [count, setCount] = useState(60);
   const [loading, setLoading] = useState(false);
   const [otpArray, setOtpArray] = useState(["", "", "", "", ""]);
-
   const inputs = useRef<TextInput[]>([]);
-
+  
   const { t } = useTranslation();
-
+  const { setAuthData } = useAuth();
+  
   // Countdown timer
   useEffect(() => {
     if (count <= 0) return;
@@ -62,16 +66,39 @@ const OtpConfirmationScreen = () => {
       setLoading(true);
       const response = await axiosInstance.post("/user-login-verify-otp.php", {
         mobile: number,
-        otp: finalOtp,
+        otp: otpArray.join(""),
       });
-      router.push("/(screens)/userDetails");
-      // if (response.data?.success) {
-      //   router.push("/(screens)/userDetails");
-      // } else {
-      //   Alert.alert("Error", "Invalid OTP ❌");
-      // }
+      
+      console.log("API Response: ✅✅🤣", response.data);
+      console.log("🤣",UserExist );
+      
+      const token = response.data.token;
+      const driverId = response.data.driver?.id;
+      
+      if (token) {
+        // Save authentication data
+        setAuthData(token, driverId);
+        
+        // Check if user is new and route accordingly
+        if (UserExist === "true") {
+          console.log("Routing to userDetails page for new user");
+          router.push({
+            pathname: "/(screens)/userDetails",
+            params: { response: token, isNewUser: "true" },
+          });
+        } else {
+          console.log("Routing to tabs for existing user");
+          router.push({
+            pathname: "/(tabs)",
+            params: { response: token },
+          });
+        }
+      } else {
+        Alert.alert("Error", "Invalid response from server");
+      }
     } catch (error: any) {
-      Alert.alert("Something went wrong", error.message);
+      console.error("OTP Verification Error:", error);
+      Alert.alert("Something went wrong", error.message || "Failed to verify OTP");
     } finally {
       setLoading(false);
     }
@@ -121,8 +148,8 @@ const OtpConfirmationScreen = () => {
             fontSize: hp(1.9),
           }}
         >
-          {t("We sent a confirmation code to")} +91{" "}
-          {String(number).slice(0, 3)}XX XXXXX
+          {t("We sent a confirmation code to")} +91 {String(number).slice(0, 3)}
+          XX XXXXX
         </Text>
       </View>
 

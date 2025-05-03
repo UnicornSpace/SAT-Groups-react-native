@@ -39,15 +39,18 @@ const UserOTPScreen = () => {
 
       const response = await axiosInstance.post("/user-login-request-otp.php", {
         mobile: formattedNumber,
-        referral_code: referral || undefined,
+        // referral_code: referral || undefined,
       });
 
-      console.log("Response", response.data, formattedNumber);
+      console.log("Response:", response.data);
+      console.log("Response:", number);
 
       if (response.status === 200) {
         router.push({
           pathname: "/(screens)/otpConfirmationScreen",
-          params: { number: formattedNumber },
+          params: { number: formattedNumber,
+            UserExist:response.data.is_new_user
+           },
         });
       }
     } catch (error) {
@@ -119,7 +122,8 @@ const UserOTPScreen = () => {
           <Text
             style={{
               fontFamily: theme.fontFamily.light,
-              fontSize: hp(1.9),
+              fontSize: hp(1.8),
+              lineHeight:hp(2),
             }}
           >
             {t("We will send an SMS code to verify your number")}
@@ -148,7 +152,7 @@ export default UserOTPScreen;
 const styles = StyleSheet.create({
   input: {
     height: hp(7),
-    width: wp(50),
+    width: wp(70),
     fontSize: hp(2),
     fontFamily: theme.fontFamily.semiBold,
     color: theme.colors.ui.black,

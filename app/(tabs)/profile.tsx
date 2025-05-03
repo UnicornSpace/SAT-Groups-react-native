@@ -26,23 +26,26 @@ import { Badge } from "react-native-paper";
 import EditButton from "@/components/Profile/edit";
 import CustomizedBadge from "@/components/Home/CustomizedBadge";
 import { width, height, size, fontSize } from "react-native-responsive-sizes";
+import { useAuth } from "@/utils/AuthContext";
+
 
 const profile = () => {
   const [userInfo, setuserInfo] = useState<{ id?: number; name?: string }>({});
-
+  const { token, driverId } = useAuth();
   useEffect(() => {
-    const driver_id = 2;
-    const token =
-      "8ef3cf4ed84148e6a5c9faa3267a0acf57f7320703fd7644785a16342a41e7e2";
-
+    const driver_id = driverId;
+    const usertoken =token
+   
+ 
     const getUserDetails = async () => {
       try {
+        
         const response = await axiosInstance.post(
           "/user-details.php",
           { driver_id },
           {
             headers: {
-              Authorization: `Bearer ${token}`,
+              Authorization: `Bearer ${usertoken}`,
             },
           }
         );
@@ -126,7 +129,7 @@ const profile = () => {
               fontSize: hp(2.5),
             }}
           >
-            {t("LogOut")}
+            {t("Logout")}
           </Text>
         </TouchableOpacity>
       </View>

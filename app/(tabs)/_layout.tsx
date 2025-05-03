@@ -9,6 +9,13 @@ import {
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
 import EditButton from "@/components/Profile/edit";
+const TextComponent = Text as any
+if (TextComponent.defaultProps == null) {
+  TextComponent.defaultProps = {}
+}
+
+TextComponent.defaultProps.allowFontScaling = false
+
 function LogoTitle() {
   return (
     <View
@@ -31,88 +38,8 @@ function LogoTitle() {
 }
 const TabLayout = () => {
   return (
-    // <Tabs
-    //   backBehavior="order"
-    //   screenOptions={{
-    //     sceneStyle: { backgroundColor: '#F8F9FA' },
-    //     tabBarActiveTintColor: theme.colors.brand.blue,
-    //     tabBarShowLabel: false,
-    //     tabBarStyle: {
-    //       paddingTop: 10,
-    //       height: 60,
-    //     },
-    //     header: () => <LogoTitle />,
-
-    //   }}
-    // >
-    //   <Tabs.Screen
-    //     name="index"
-    //     options={{
-
-    //       // header: () => <LogoTitle />,
-    //       tabBarIcon: ({ focused, size, color }) => (
-    //         <View style={[styles.iconContainer, focused && styles.activeIcon]}>
-    //           <Ionicons
-    //             name={focused ? "home-sharp" : "home-outline"}
-    //             size={focused ? 18 : 23}
-    //             color={focused ? "white" : "black"}
-    //           />
-    //           {/* <Image
-    //             style={{ width: 34, height: 34 }}
-    //             source={require("../../assets/images/icons/home.png")}
-    //             resizeMode="contain"
-    //           /> */}
-    //         </View>
-    //       ),
-    //     }}
-    //   />
-    //   <Tabs.Screen
-    //     name="location"
-    //     options={{
-    //       tabBarIcon: ({ focused, size, color }) => (
-    //         <View style={[styles.iconContainer, focused && styles.activeIcon]}>
-    //           <Ionicons
-    //             name={focused ? "location-sharp" : "location-outline"}
-    //             size={focused ? 18 : 23}
-    //             color={focused ? "white" : "black"}
-    //           />
-    //         </View>
-    //       ),
-    //     }}
-    //   />
-    //   <Tabs.Screen
-    //     name="product"
-    //     options={{
-
-    //       tabBarIcon: ({ focused, size, color }) => (
-    //         <View style={[styles.iconContainer, focused && styles.activeIcon]}>
-    //           <Ionicons
-    //             name={focused ? "gift" : "gift-outline"}
-    //             size={focused ? 18 : 23}
-    //             color={focused ? "white" : "black"}
-    //           />
-    //         </View>
-    //       ),
-    //     }}
-    //   />
-
-    //   <Tabs.Screen
-    //     name="profile"
-
-    //     options={{
-
-    //       tabBarIcon: ({ focused, size, color }) => (
-    //         <View style={[styles.iconContainer, focused && styles.activeIcon]}>
-    //           <Ionicons
-    //             name={focused ? "person-sharp" : "person-outline"}
-    //             size={focused ? 18 : 23}
-    //             color={focused ? "white" : "black"}
-    //           />
-    //         </View>
-    //       ),
-    //     }}
-    //   />
-    // </Tabs>
+ 
+   
     <Tabs
       screenOptions={{
         sceneStyle: { backgroundColor: "#F8F9FA" },

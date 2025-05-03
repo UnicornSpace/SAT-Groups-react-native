@@ -40,7 +40,7 @@ const Branches = ({ data }: any) => {
 
   const openInGoogleMaps = async (lat: string, lng: string) => {
 
-    console.log("User Location:", userLocation);
+    // console.log("User Location:", userLocation);
     const { status } = await Location.requestForegroundPermissionsAsync();
 
     if (status !== "granted") {

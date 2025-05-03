@@ -33,12 +33,12 @@ const LanguageSeletionScreen = () => {
 
   React.useEffect(() => {
     try {
-      console.log("i18n initialization status:", i18n.isInitialized);
-      console.log("Current language:", i18n.language);
-      console.log(
-        "Available resources:",
-        Object.keys(i18n.options.resources || {})
-      );
+      // console.log("i18n initialization status:", i18n.isInitialized);
+      // console.log("Current language:", i18n.language);
+      // console.log(
+      //   "Available resources:",
+      //   Object.keys(i18n.options.resources || {})
+      // );
     } catch (err) {
       console.error("Error checking i18n:", err);
       // setError(err.message);
@@ -48,7 +48,7 @@ const LanguageSeletionScreen = () => {
   if (error) {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <Text>Translation Error: {error}</Text>
+        <Text >Translation Error: {error}</Text>
       </View>
     );
   }
@@ -57,7 +57,7 @@ const LanguageSeletionScreen = () => {
       i18next.changeLanguage(SelectLang).then(() => {
         router.replace("/(screens)/otp-screen");
       });
-      console.log(SelectLang);
+      // console.log(SelectLang);
     }
   };
 

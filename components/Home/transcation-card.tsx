@@ -1,3 +1,4 @@
+// TransactionCard.tsx
 import { Image, StyleSheet, Text, View } from "react-native";
 import React from "react";
 import { useTranslation } from "react-i18next";
@@ -8,8 +9,30 @@ import {
 } from "react-native-responsive-screen";
 import { width, height, size, fontSize } from "react-native-responsive-sizes";
 
-const TransactionCard = () => {
+interface TransactionCardProps {
+  companyName: string;
+  location: string;
+  date: string;
+  points: string;
+  transactionType: string;
+}
+
+const TransactionCard = ({
+  companyName = "Nox Solution",
+  location = "Perundurai",
+  date = "9th march",
+  points = "+50",
+  transactionType = "Received"
+}: TransactionCardProps) => {
   const { t } = useTranslation();
+  
+  // Determine if points are positive or negative
+  const isPositive = !points.startsWith('-');
+  
+  // Set color based on transaction type
+  const pointsColor = isPositive 
+    ? theme.colors.brand.green 
+    : theme.colors.brand.red || '#FF4D4F';
 
   return (
     <View style={styles.card}>
@@ -20,16 +43,23 @@ const TransactionCard = () => {
         />
 
         <View style={styles.detailsContainer}>
-          <Text style={styles.heading}>{t("Nox Solution").trim()}</Text>
-          <Text style={styles.place}>{t("Perundurai")}</Text>
+          <Text style={styles.heading}>{t(companyName).trim()}</Text>
+          <Text style={styles.place}>{t(location)}</Text>
 
           <View style={styles.dateContainer}>
-            <Text style={styles.date}>{t("9th march")}</Text>
+            <Text style={styles.date}>{t(date)}</Text>
           </View>
         </View>
       </View>
 
-      <Text style={styles.points}>{t("+50")}</Text>
+      <View style={styles.rightContainer}>
+        <Text style={[styles.points, { color: pointsColor }]}>
+          {t(points)}
+        </Text>
+        <Text style={styles.transactionType}>
+          {t(transactionType)}
+        </Text>
+      </View>
     </View>
   );
 };
@@ -38,8 +68,7 @@ export default TransactionCard;
 
 const styles = StyleSheet.create({
   card: {
-    width: width(90),
-    
+    // width: width(100),
     backgroundColor: "#F2F3F5",
     borderRadius: 8,
     borderColor: "#C5C5C5",
@@ -47,32 +76,30 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingVertical: size(8),
+    // paddingVertical: size(8),
     paddingHorizontal: size(10),
   },
   cardLeft: {
     flexDirection: "row",
-    alignItems: "flex-start",
+    alignItems: "center",
+    display: "flex",
+    
     gap: size(10),
   },
   logo: {
     width: width(14),
-    // height: height(10),
     resizeMode: "contain",
   },
   detailsContainer: {
     flexDirection: "column",
-    // gap: hp("-1%"),
   },
   heading: {
     fontSize: fontSize(13),
-    // fontSize: hp("2.3%"),
     marginBottom: hp("-0.5%"),
     fontFamily: theme.fontFamily.semiBold,
     color: theme.colors.brand.blue,
   },
   place: {
-    // fontSize: hp("1.6%"),
     fontSize: fontSize(8),
     marginTop: hp("-0.5%"),
     color: theme.colors.text.secondary,
@@ -80,10 +107,9 @@ const styles = StyleSheet.create({
   },
   dateContainer: {
     borderRadius: 5,
-    width: size(70),
+    width: size(50),
     backgroundColor: theme.colors.brand.blue,
     paddingVertical: size(2),
-    // paddingHorizontal: hp("0.1%"),
     justifyContent: "center",
     alignItems: "center",
     marginTop: size(4),
@@ -93,9 +119,17 @@ const styles = StyleSheet.create({
     color: theme.colors.text.primary,
     fontFamily: theme.fontFamily.medium,
   },
+  rightContainer: {
+    alignItems: 'flex-end',
+  },
   points: {
     fontSize: size(15),
-    color: theme.colors.brand.green,
     fontFamily: theme.fontFamily.medium,
+  },
+  transactionType: {
+    fontSize: fontSize(8),
+    color: theme.colors.text.secondary,
+    fontFamily: theme.fontFamily.regular,
+    marginTop: 2,
   },
 });

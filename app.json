@@ -4,7 +4,7 @@
     "slug": "satGroups",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/satGroups/logo.png",
+    // "icon": "./assets/images/satGroups/Logo.png",
     "scheme": "myapp",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,

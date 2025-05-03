@@ -9,22 +9,39 @@ import React, { useEffect } from "react";
 import { theme } from "@/infrastructure/themes";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
 import { useTranslation } from "react-i18next";
 import axiosInstance from "@/utils/axionsInstance";
+import ReferalCard from "@/components/Profile/referalCard";
 const UserDetails = () => {
+  const { isNewUser} = useLocalSearchParams<{ isNewUser:any }>();
   const [userName, setuserName] = React.useState("");
   const [userAge, setuserAge] = React.useState("");
   const [SateName, setSateName] = React.useState("");
   const [Address, setAddress] = React.useState("");
-  const onSubmitDetails = () => {
-    userAge.length > 0 && userName.length > 0
+  const [formattedNumber, setFormattedNumber] = React.useState("");
+  const onSubmitDetails =async () => {
+
+    
+    if(isNewUser){
+      userAge.length > 0 && userName.length > 0
       ? router.push("/(tabs)")
       : alert("Please fill all the details");
+    }
+
+    try {
+      const response = await axiosInstance.post("/user-login-request-otp.php", {
+        mobile: formattedNumber,
+        // referral_code: referral || undefined,
+      });
+    } catch (error) {
+      
+    }
+    
   };
   const { t } = useTranslation();
   
@@ -94,6 +111,7 @@ const UserDetails = () => {
         />
        
       </View>
+      
 
       <TouchableOpacity onPress={onSubmitDetails} style={{}}>
         <LinearGradient

@@ -16,7 +16,13 @@ import {
 } from "@expo-google-fonts/poppins";
 import { PaperProvider } from "react-native-paper";
 import { I18nextProvider } from "react-i18next";
+import { AuthProvider } from "@/utils/AuthContext";
+const TextComponent = Text as any;
+if (TextComponent.defaultProps == null) {
+  TextComponent.defaultProps = {};
+}
 
+TextComponent.defaultProps.allowFontScaling = false;
 const _layout = () => {
   let [poppinsLoaded] = useFonts({
     Poppins_300Light,
@@ -33,7 +39,8 @@ const _layout = () => {
   }
 
   return (
-    <I18nextProvider i18n={i18n}>
+    <AuthProvider>
+      <I18nextProvider i18n={i18n}>
       <ThemeProvider theme={theme}>
         <PaperProvider>
           <Stack screenOptions={{ headerShown: false }}>
@@ -47,6 +54,7 @@ const _layout = () => {
         </PaperProvider>
       </ThemeProvider>
     </I18nextProvider>
+    </AuthProvider>
   );
 };
 
