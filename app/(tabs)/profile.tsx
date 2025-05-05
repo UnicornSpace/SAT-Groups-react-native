@@ -1,4 +1,5 @@
 import {
+  Animated,
   Image,
   ScrollView,
   StyleSheet,
@@ -7,7 +8,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { theme } from "@/infrastructure/themes";
 import Button from "@/components/General/button";
 import { router } from "expo-router";
@@ -31,7 +32,9 @@ import { useAuth } from "@/utils/AuthContext";
 
 const profile = () => {
   const [userInfo, setuserInfo] = useState<{ id?: number; name?: string }>({});
+  const [userPoints, setuserPoints] = useState([]);
   const { token, driverId } = useAuth();
+  const { isAuthenticated, logout } = useAuth();
   useEffect(() => {
     const driver_id = driverId;
     const usertoken =token
@@ -49,9 +52,20 @@ const profile = () => {
             },
           }
         );
+        const response2 = await axiosInstance.post(
+          "/driver-points.php",
+          { driver_id, take: 10, skip: 0 },
+          {
+            headers: {
+              Authorization: `Bearer ${usertoken}`,
+            },
+          }
+        )
         const userDetails = response.data;
+        const PointsDetails = response2.data;
         setuserInfo(userDetails.driver);
-        console.log("User Details:", userDetails.driver);
+        setuserPoints(response2.data);
+        // console.log("User 🏅:", PointsDetails);
       } catch (error) {
         console.error("Error fetching user details:", error);
       }
@@ -61,21 +75,92 @@ const profile = () => {
   }, []);
 
   const logot = () => {
-    router.push("/(screens)/LanguageSeletionScreen");
+    logout()
+    router.replace("/(screens)/LanguageSeletionScreen");
   };
+   const [isLoading, setIsLoading] = useState(true);
   const { t } = useTranslation();
+  // Simulate loading
+  useEffect(() => {
+    setTimeout(() => {
+      setIsLoading(false);
+    }, 2000);
+  }, []);
 
+  // Simple DIY Skeleton component
+  const Skeleton = ({ width, height, style }:any) => {
+    const opacity = useRef(new Animated.Value(0.3)).current;
+    
+    useEffect(() => {
+      Animated.loop(
+        Animated.sequence([
+          Animated.timing(opacity, {
+            toValue: 0.5,
+            duration: 800,
+            useNativeDriver: true,
+          }),
+          Animated.timing(opacity, {
+            toValue: 0.3,
+            duration: 800,
+            useNativeDriver: true,
+          }),
+        ])
+      ).start();
+    }, []);
+
+    return (
+      <Animated.View
+        style={[
+          {
+            width,
+            height,
+            backgroundColor: '#E0E0E0',
+            borderRadius: 4,
+            opacity,
+          },
+          style,
+        ]}
+      />
+    );
+  };
+   const renderSkeleton = () => {
+      return (
+        <View style={{display:"flex",flexDirection:"column",justifyContent:"space-between",alignItems:"center"}}>
+          
+          <View style={{ flexDirection: 'column', alignItems: 'center',justifyContent:"center" ,gap:10 }}>
+            <Skeleton width={100} height={100} style={{ borderRadius: 100 }} />
+            <View style={{ display:"flex",flexDirection:"column",alignItems:"center" }}>
+              <Skeleton width={120} height={20} />
+              <Skeleton width={80} height={20} style={{ margin: 6 }} />
+            </View>
+          </View>
+  
+     
+          <View style={{  alignItems: "center", gap: 10,display:"flex",flexDirection:"row",justifyContent:"space-evenly" ,marginTop:10 }}>
+            <Skeleton width={width(40)} height={hp(12)} style={{ borderRadius: 8 }} />
+            <Skeleton width={width(40)} height={hp(12)} style={{ borderRadius: 8 }} />
+          </View>
+          <Skeleton width={width(82)} height={hp(12)} style={{ borderRadius: 10,marginTop:10 }} />
+         
+          {/* Recent Transaction Title Skeleton */}
+          <View style={{ width: width(82), alignItems: "flex-start", gap: 10 ,}} >
+            <Skeleton width={width(40)} height={24} style={{ marginTop:10 }} />
+            <Skeleton width={width(80)} height={hp(15)} style={{ borderRadius: 8 }} />
+          
+           
+          </View>
+        </View>
+      );
+    };
+  
   return (
     <ScrollView>
-      <View>
+      
+      {isLoading ? renderSkeleton() : (
+        <View><View>
       
         <View style={{display:"flex",flexDirection:"column",justifyContent:"space-between",alignItems:"center"}}>
-          {/* <Image
-            source={require("@/assets/images/satgroups/profilePic.png")}
-            resizeMode="cover"
-            width={wp("25%")}
-            height={hp("12%")}
-          /> */}
+          
           <View >
             <View style={styles.badge}>
               <Text
@@ -105,7 +190,7 @@ const profile = () => {
             >
               {userInfo.name}
             </Text>
-
+  
             <LinearGradient
               colors={["#4A86D2", theme.colors.brand.blue]}
               style={styles.gradient}
@@ -116,10 +201,10 @@ const profile = () => {
         </View>
       </View>
       <View style={styles.container}>
-        <UserBentogrids />
+        <UserBentogrids points={userPoints} />
         <ReferalCard />
         <UserDetails data={userInfo} />
-
+  
         <LanguageSetting />
         <TouchableOpacity onPress={logot} style={styles.btn}>
           <Text
@@ -132,7 +217,8 @@ const profile = () => {
             {t("Logout")}
           </Text>
         </TouchableOpacity>
-      </View>
+      </View></View>
+      )}
     </ScrollView>
   );
 };

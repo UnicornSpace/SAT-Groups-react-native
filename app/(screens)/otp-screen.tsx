@@ -132,7 +132,7 @@ const UserOTPScreen = () => {
       </View>
 
       {loading ? (
-        <ActivityIndicator size="large" />
+        <ActivityIndicator color={theme.colors.brand.blue} size="large" />
       ) : (
         <TouchableOpacity onPress={SubmitNumber}>
           <LinearGradient

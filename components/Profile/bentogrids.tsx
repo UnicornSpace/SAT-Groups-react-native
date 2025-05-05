@@ -6,7 +6,8 @@ import {
 } from "react-native-responsive-screen";
 import { width, height, size, fontSize } from "react-native-responsive-sizes";
 import { theme } from "@/infrastructure/themes";
-const UserBentogrids = () => {
+const UserBentogrids = ({points}:any) => {
+  console.log("points😑", points);
   return (
     <View
       style={{
@@ -25,7 +26,7 @@ const UserBentogrids = () => {
             color: theme.colors.brand.blue,
           }}
         >
-          150
+          {Math.ceil(Number(points?.total_points) || 0)}
         </Text>
         <Text
           style={{

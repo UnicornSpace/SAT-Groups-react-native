@@ -18,6 +18,8 @@ import { useTranslation } from "react-i18next";
 import axiosInstance from "@/utils/axionsInstance";
 import ReferalCard from "@/components/Profile/referalCard";
 const UserDetails = () => {
+
+  // use react form hook here,
   const { isNewUser} = useLocalSearchParams<{ isNewUser:any }>();
   const [userName, setuserName] = React.useState("");
   const [userAge, setuserAge] = React.useState("");

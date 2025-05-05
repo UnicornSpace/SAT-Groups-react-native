@@ -16,6 +16,7 @@ import {
 import { useTranslation } from "react-i18next";
 import axiosInstance from "@/utils/axionsInstance";
 import { useAuth } from "@/utils/AuthContext";
+import { ActivityIndicator } from "react-native-paper";
 
 const OtpConfirmationScreen = () => {
   const { number, UserExist } = useLocalSearchParams<{
@@ -26,10 +27,11 @@ const OtpConfirmationScreen = () => {
   const [loading, setLoading] = useState(false);
   const [otpArray, setOtpArray] = useState(["", "", "", "", ""]);
   const inputs = useRef<TextInput[]>([]);
-  
+  const [errorMessage, setErrorMessage] = useState("");
+
   const { t } = useTranslation();
   const { setAuthData } = useAuth();
-  
+  const { isAuthenticated, login } = useAuth();
   // Countdown timer
   useEffect(() => {
     if (count <= 0) return;
@@ -68,18 +70,20 @@ const OtpConfirmationScreen = () => {
         mobile: number,
         otp: otpArray.join(""),
       });
-      
-      console.log("API Response: ✅✅🤣", response.data);
-      console.log("🤣",UserExist );
-      
+
+      // console.log("API Response: ✅✅🤣", response.data);
+      // console.log("🤣",UserExist );
+
       const token = response.data.token;
       const driverId = response.data.driver?.id;
-      
+
       if (token) {
         // Save authentication data
+        login(token);
         setAuthData(token, driverId);
-        
+
         // Check if user is new and route accordingly
+        //TODO: convert this to boolean, before manipulating it
         if (UserExist === "true") {
           console.log("Routing to userDetails page for new user");
           router.push({
@@ -94,11 +98,17 @@ const OtpConfirmationScreen = () => {
           });
         }
       } else {
-        Alert.alert("Error", "Invalid response from server");
+        if (response.data.status === "invalid_otp")
+          // Alert.alert("Error", "Invalid OTP. Please try again.");
+          setErrorMessage("Invalid OTP. Please try again.");
+        else setErrorMessage("Something went wrong. Please try again.");
       }
     } catch (error: any) {
       console.error("OTP Verification Error:", error);
-      Alert.alert("Something went wrong", error.message || "Failed to verify OTP");
+      Alert.alert(
+        "Something went wrong",
+        error.message || "Failed to verify OTP"
+      );
     } finally {
       setLoading(false);
     }
@@ -114,16 +124,30 @@ const OtpConfirmationScreen = () => {
         gap: 40,
       }}
     >
-      <Text
-        style={{
-          fontFamily: theme.fontFamily.semiBold,
-          color: theme.colors.brand.blue,
-          fontSize: hp(3.2),
-        }}
-      >
-        {t("OTP Code")}
-      </Text>
-
+      <View>
+        <Text
+          style={{
+            fontFamily: theme.fontFamily.semiBold,
+            color: theme.colors.brand.blue,
+            fontSize: hp(3.2),
+          }}
+        >
+          {t("OTP Code")}
+        </Text>
+        <Text
+          style={{
+            fontFamily: theme.fontFamily.regular,
+            color: theme.colors.text.secondary,
+            fontSize: hp(1.9),
+            marginTop: -5,
+          }}
+        >
+          {t("We sent a confirmation code to")}
+          <Text style={{ fontFamily: theme.fontFamily.semiBold }}>
+            +91 {String(number)}
+          </Text>
+        </Text>
+      </View>
       <View style={{ alignItems: "center", gap: 15, width: wp("90%") }}>
         <View style={styles.otpInputContainer}>
           {otpArray.map((digit, i) => (
@@ -141,30 +165,24 @@ const OtpConfirmationScreen = () => {
             />
           ))}
         </View>
-        <Text
-          style={{
-            fontFamily: theme.fontFamily.regular,
-            color: theme.colors.text.secondary,
-            fontSize: hp(1.9),
-          }}
-        >
-          {t("We sent a confirmation code to")} +91 {String(number).slice(0, 3)}
-          XX XXXXX
-        </Text>
       </View>
 
       <View style={{ alignItems: "center", gap: 15, width: wp("90%") }}>
-        <TouchableOpacity
-          onPress={otpVerified}
-          style={[
-            styles.btn,
-            { opacity: otpArray.includes("") || loading ? 0.5 : 1 },
-          ]}
-          disabled={otpArray.includes("") || loading}
-        >
-          <Text style={styles.buttonText}>{t("Continue")}</Text>
-        </TouchableOpacity>
-
+        {/* TODO: disable this for 30 sec and then when clicked it hits the route "/user-login-request-otp.php" where we get request one more OTP
+        and then we set the count to 60 again 
+        - show a message "OTP resent successfully" and then start the countdown again 
+        */}
+        {errorMessage && (
+          <Text
+            style={{
+              fontFamily: theme.fontFamily.regular,
+              color: theme.colors.brand.red,
+              fontSize: hp(1.8),
+            }}
+          >
+            {errorMessage}
+          </Text>
+        )}
         <Text
           style={{
             fontFamily: theme.fontFamily.regular,
@@ -183,6 +201,32 @@ const OtpConfirmationScreen = () => {
             {count} {t("sec")}
           </Text>
         </Text>
+        <TouchableOpacity
+          onPress={otpVerified}
+          style={[
+            styles.btn,
+            { opacity: otpArray.includes("") || loading ? 0.5 : 1 },
+          ]}
+          disabled={otpArray.includes("") || loading}
+        >
+          <Text
+            style={{
+              ...styles.buttonText,
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "center",
+            }}
+          >
+            {t("Continue")}
+
+            {loading && (
+              <ActivityIndicator
+                color={theme.colors.text.primary}
+                size="small"
+              />
+            )}
+          </Text>
+        </TouchableOpacity>
       </View>
     </View>
   );

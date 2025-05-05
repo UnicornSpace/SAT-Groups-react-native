@@ -1,20 +1,20 @@
-import { Image, StyleSheet, View, Text } from "react-native";
-import { Tabs } from "expo-router";
-import { FontAwesome, Ionicons } from "@expo/vector-icons";
-import React from "react";
-import '@/app/language-selectiom'
+import { Image, StyleSheet, View, Text, BackHandler } from "react-native";
+import { Tabs, useRouter } from "expo-router";
+import { FontAwesome } from "@expo/vector-icons";
+import React, { useEffect } from "react";
+import '@/app/language-selectiom';
 import { theme } from "@/infrastructure/themes";
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from "react-native-responsive-screen";
+
 import EditButton from "@/components/Profile/edit";
-const TextComponent = Text as any
+import { useAuth } from "@/utils/AuthContext";
+import ProtectedRoute from "@/components/General/proteted-route";
+
+const TextComponent = Text as any;
 if (TextComponent.defaultProps == null) {
-  TextComponent.defaultProps = {}
+  TextComponent.defaultProps = {};
 }
 
-TextComponent.defaultProps.allowFontScaling = false
+TextComponent.defaultProps.allowFontScaling = false;
 
 function LogoTitle() {
   return (
@@ -24,7 +24,7 @@ function LogoTitle() {
         justifyContent: "space-between",
         alignItems: "center",
         backgroundColor: "#F8F9FA",
-        paddingHorizontal: hp(2.5),
+        paddingHorizontal: 20,
       }}
     >
       <Image
@@ -32,65 +32,78 @@ function LogoTitle() {
         source={require("../../assets/images/satgroups/Logo.png")}
         resizeMode="contain"
       />
-      {/* <LanguageSelection/> */}
     </View>
   );
 }
+
 const TabLayout = () => {
+  const { logout } = useAuth();
+  const router = useRouter();
+
+  // Prevent back button from navigating to auth screens
+  useEffect(() => {
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+      // Return true to prevent default behavior (going back)
+      return true;
+    });
+
+    return () => backHandler.remove();
+  }, []);
+
   return (
- 
-   
-    <Tabs
-      screenOptions={{
-        sceneStyle: { backgroundColor: "#F8F9FA" },
-        tabBarActiveTintColor: theme.colors.brand.blue,
-        tabBarStyle: { paddingTop: 5, height: 60, paddingHorizontal: 16 },
-        header: () => <LogoTitle />,
-      }}
-    >
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: "Home",
-          tabBarIcon: ({ color }) => (
-            <FontAwesome size={24} name="home" color={color} />
-          ),
+    <ProtectedRoute>
+      <Tabs
+        screenOptions={{
+          sceneStyle: { backgroundColor: "#F8F9FA" },
+          tabBarActiveTintColor: theme.colors.brand.blue,
+          tabBarStyle: { paddingTop: 5, height: 60, paddingHorizontal: 16 },
+          header: () => <LogoTitle />,
         }}
-      />
-      <Tabs.Screen
-        name="location"
-        options={{
-          title: "Branches",
-          tabBarIcon: ({ color }) => (
-            <FontAwesome size={24} name="map-marker" color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="milestone"
-        options={{
-          title: "Milestone",
-          tabBarIcon: ({ color }) => (
-            <FontAwesome size={24} name="gift" color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="profile"
-        options={{
-          header: () => (
-            <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between"}}>
-              <LogoTitle />
-              <EditButton />
-            </View>
-          ),
-          title: "Profile",
-          tabBarIcon: ({ color }) => (
-            <FontAwesome size={24} name="user" color={color} />
-          ),
-        }}
-      />
-    </Tabs>
+      >
+        <Tabs.Screen
+          name="index"
+          options={{
+            title: "Home",
+            tabBarIcon: ({ color }) => (
+              <FontAwesome size={24} name="home" color={color} />
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="location"
+          options={{
+            title: "Branches",
+            tabBarIcon: ({ color }) => (
+              <FontAwesome size={24} name="map-marker" color={color} />
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="milestone"
+          options={{
+            title: "Milestone",
+            tabBarIcon: ({ color }) => (
+              <FontAwesome size={24} name="gift" color={color} />
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="profile"
+          options={{
+            header: () => (
+              <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between"}}>
+                <LogoTitle />
+                <EditButton />
+              </View>
+            ),
+            title: "Profile",
+            tabBarIcon: ({ color }) => (
+              <FontAwesome size={24} name="user" color={color} />
+            ),
+          }}
+        />
+      </Tabs>
+    </ProtectedRoute>
   );
 };
 
@@ -103,9 +116,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   activeIcon: {
-    // width: 55,
-    // height: 35,
     backgroundColor: theme.colors.brand.blue,
-    // borderRadius: 20,
   },
 });

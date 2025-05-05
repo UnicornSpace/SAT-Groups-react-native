@@ -3,21 +3,21 @@ import { useAuth } from "@/utils/AuthContext";
 import { useRouter } from "expo-router";
 import { ActivityIndicator, View } from "react-native";
 
-interface AuthRedirectProps {
+interface ProtectedRouteProps {
   children: React.ReactNode;
 }
 
 /**
- * A wrapper component for auth screens to prevent authenticated users
- * from accessing login/registration screens
+ * A wrapper component to protect routes that require authentication
+ * Redirects to language selection screen if not authenticated
  */
-const AuthRedirect: React.FC<AuthRedirectProps> = ({ children }) => {
+const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   const { isAuthenticated, isLoading } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
-    if (!isLoading && isAuthenticated) {
-      router.replace("/(tabs)");
+    if (!isLoading && !isAuthenticated) {
+      router.replace("/(screens)/LanguageSeletionScreen");
     }
   }, [isAuthenticated, isLoading, router]);
 
@@ -29,7 +29,7 @@ const AuthRedirect: React.FC<AuthRedirectProps> = ({ children }) => {
     );
   }
 
-  return !isAuthenticated ? <>{children}</> : null;
+  return isAuthenticated ? <>{children}</> : null;
 };
 
-export default AuthRedirect;
+export default ProtectedRoute;

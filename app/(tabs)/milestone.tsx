@@ -427,7 +427,7 @@ const SvgComponent: React.FC<MilestonePathProps> = ({
                   <Path
                     stroke="#26456C"
                     strokeLinecap="round"
-                    strokeWidth={18}
+                    strokeWidth={25}
                     d={completedPath}
                   />
                 )}
@@ -437,7 +437,7 @@ const SvgComponent: React.FC<MilestonePathProps> = ({
                   <Path
                     stroke="#DBDBDB"
                     strokeLinecap="round"
-                    strokeWidth={18}
+                    strokeWidth={25}
                     d={remainingPath}
                   />
                 )}
@@ -445,7 +445,7 @@ const SvgComponent: React.FC<MilestonePathProps> = ({
                 {/* Milestone circles and labels */}
                 {points.map((point, index) => {
                   const isStart = index === 0; // First point is start
-                  const circleRadius = isStart ? 35 : 22;
+                  const circleRadius = isStart ? 40 : 25;
                   const labelOffset = isStart ? 5 : 35;
                   const isEven = index % 2 === 0;
                   const labelX = isStart
@@ -458,7 +458,7 @@ const SvgComponent: React.FC<MilestonePathProps> = ({
                     <React.Fragment key={index}>
                       {/* Circle */}
                       <Circle
-                        cx={point.x}
+                        cx={point.x }
                         cy={point.y}
                         r={circleRadius}
                         fill={
