@@ -17,6 +17,7 @@ import { router } from "expo-router";
 
 
 const PersonDetails = ({ icon, title, subtitle }: any) => {
+  
   return (
     <TouchableOpacity
       style={{
@@ -63,6 +64,22 @@ const PersonDetails = ({ icon, title, subtitle }: any) => {
 
 const UserDetails = ({ data }: any) => {
   const { t } = useTranslation();
+  
+  const calculateAge = (dateString: string): number => {
+    const birthDate = new Date(dateString);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const m = today.getMonth() - birthDate.getMonth();
+  
+    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+  
+    return age;
+  };
+  
+
+
   return (
     <View style={{}}>
       <View
@@ -86,12 +103,13 @@ const UserDetails = ({ data }: any) => {
         
       </View>
       <View style={styles.container}>
-        <PersonDetails icon={"calendar"} title="Age" subtitle={` ${data.dob} `} />
-        <PersonDetails icon={"email"} title="email" subtitle={` ${data.email} `} />
+      <PersonDetails icon={"calendar"} title="Age" subtitle={`${calculateAge(data.created_at)} years`} />
+
+        <PersonDetails icon={"email"} title="email" subtitle={ `${data.email}` } />
         <PersonDetails
           icon={"map-marker"}
           title="Address"
-          subtitle={` ${data.state} `}
+          subtitle={` ${data.state}` }
         />
         <PersonDetails icon={"map-outline"} title="State" subtitle={` ${data.city} `} />
       </View>
@@ -106,7 +124,6 @@ const styles = StyleSheet.create({
     width: wp(85),
     display: "flex",
     flexDirection: "column",
-
     gap: hp(2),
   },
   

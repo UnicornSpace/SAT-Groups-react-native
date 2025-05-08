@@ -5,6 +5,9 @@ import {
   TextInput,
   TouchableOpacity,
   View,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
 } from "react-native";
 import React, { useEffect, useRef, useState } from "react";
 import { theme } from "@/infrastructure/themes";
@@ -28,9 +31,11 @@ const OtpConfirmationScreen = () => {
   const [count, setCount] = useState(60);
   const [loading, setLoading] = useState(false);
   const [otpArray, setOtpArray] = useState(["", "", "", "", ""]);
+  const [referralCode, setReferralCode] = useState("");
   const inputs = useRef<TextInput[]>([]);
 
   const { t } = useTranslation();
+  const isNewUser = UserExist === "true";
 
   // Countdown timer
   useEffect(() => {
@@ -69,23 +74,26 @@ const OtpConfirmationScreen = () => {
       const response = await axiosInstance.post("/user-login-verify-otp.php", {
         mobile: number,
         otp: otpArray.join(""),
+        referral_code: isNewUser ? referralCode : undefined, // Include referral code only for new users
       });
-
-      // console.log("API Response: ", response.data);
-      // console.log("🤣",UserExist );
 
       const token = response.data.token;
       const driverId = response.data.driver?.id;
 
       if (token) {
-        
         await setAuthData(token, driverId);
         // Check if user is new and route accordingly
-        if (UserExist === "true") {
+        if (isNewUser) {
           console.log("Routing to userDetails page for new user");
           router.replace({
             pathname: "/(screens)/userDetails",
-            params: { response: token, isNewUser: "true", driverId, token },
+            params: { 
+              response: token, 
+              isNewUser: "true", 
+              driverId, 
+              token,
+              referralCode // Pass referral code to next screen if needed
+            },
           });
         } else {
           console.log("Routing to tabs for existing user");
@@ -107,6 +115,7 @@ const OtpConfirmationScreen = () => {
       setLoading(false);
     }
   };
+
   const resendOtpHandler = async () => {
     try {
       setLoading(true);
@@ -128,134 +137,160 @@ const OtpConfirmationScreen = () => {
     }
   };
 
+  // Check if user can proceed (valid OTP and referral code if new user)
+  const canProceed = () => {
+    const isOtpComplete = !otpArray.includes("");
+    // For new users, require both OTP and referral code
+    // For existing users, only require OTP
+    return isOtpComplete && (!isNewUser || (isNewUser ));
+  };
+
   return (
-    <View
-      style={{
-        width: wp("100%"),
-        height: hp("100%"),
-        alignItems: "center",
-        justifyContent: "center",
-        gap: 40,
-      }}
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={{ flex: 1 }}
     >
-      <View
-        style={{
-          position: "absolute",
-          top: hp(5),
-          left: hp(2),
-        }}
-      >
-        <TouchableOpacity onPress={() => router.back()}>
-          <Ionicons
-            name="arrow-back"
-            size={24}
-            color={theme.colors.brand.blue}
-          />
-        </TouchableOpacity>
-      </View>
-      <Text
-        style={{
-          fontFamily: theme.fontFamily.semiBold,
-          color: theme.colors.brand.blue,
-          fontSize: hp(3.2),
-        }}
-      >
-        {t("OTP Code")}
-      </Text>
-
-      <View style={{ alignItems: "center", gap: 15, width: wp("90%") }}>
-        <View style={styles.otpInputContainer}>
-          {otpArray.map((digit, i) => (
-            <TextInput
-              autoFocus={i === 0}
-              key={i}
-              ref={(ref) => (inputs.current[i] = ref!)}
-              style={styles.input}
-              value={digit}
-              onChangeText={(text) => handleOtpChange(text, i)}
-              maxLength={1}
-              keyboardType="numeric"
-              placeholder="-"
-              placeholderTextColor={theme.colors.text.secondary}
-            />
-          ))}
-        </View>
-        <Text
+      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+        <View
           style={{
-            fontFamily: theme.fontFamily.regular,
-            color: theme.colors.text.secondary,
-            fontSize: hp(1.9),
+            width: wp("100%"),
+            height: hp("100%"),
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 30,
           }}
         >
-          {t("We sent a confirmation code to")} +91 {String(number).slice(0, 3)}
-          XX XXXXX
-        </Text>
-      </View>
-
-      <View style={{ alignItems: "center", gap: 15, width: wp("90%") }}>
-        <TouchableOpacity
-          onPress={otpVerified}
-          style={[
-            styles.btn,
-            { opacity: otpArray.includes("") || loading ? 0.5 : 1 },
-          ]}
-          disabled={otpArray.includes("") || loading}
-        >
-          <Text style={styles.buttonText}>{t("Continue")}</Text>
-        </TouchableOpacity>
-        {count > 0 ? (
-          <Text
+          <View
             style={{
-              fontFamily: theme.fontFamily.regular,
-              color: theme.colors.text.secondary,
-              fontSize: hp(1.9),
+              position: "absolute",
+              top: hp(5),
+              left: hp(2),
             }}
           >
-            {t("Resend code in")}{" "}
+            <TouchableOpacity onPress={() => router.back()}>
+              <Ionicons
+                name="arrow-back"
+                size={24}
+                color={theme.colors.brand.blue}
+              />
+            </TouchableOpacity>
+          </View>
+          <Text
+            style={{
+              fontFamily: theme.fontFamily.semiBold,
+              color: theme.colors.brand.blue,
+              fontSize: hp(3.2),
+            }}
+          >
+            {t("OTP Code")}
+          </Text>
+
+          <View style={{ alignItems: "center", gap: 15, width: wp("90%") }}>
+            <View style={styles.otpInputContainer}>
+              {otpArray.map((digit, i) => (
+                <TextInput
+                  autoFocus={i === 0}
+                  key={i}
+                  ref={(ref) => (inputs.current[i] = ref!)}
+                  style={styles.input}
+                  value={digit}
+                  onChangeText={(text) => handleOtpChange(text, i)}
+                  maxLength={1}
+                  keyboardType="numeric"
+                  placeholder="-"
+                  placeholderTextColor={theme.colors.text.secondary}
+                />
+              ))}
+            </View>
             <Text
               style={{
-                fontWeight: "bold",
-                fontSize: hp(1.9),
                 fontFamily: theme.fontFamily.regular,
-              }}
-            >
-              {count} {t("sec")}
-            </Text>
-          </Text>
-        ) : (
-          <TouchableOpacity onPress={resendOtpHandler}>
-            <Text
-              style={{
-                fontFamily: theme.fontFamily.semiBold,
-                color: theme.colors.brand.blue,
+                color: theme.colors.text.secondary,
                 fontSize: hp(1.9),
-                textDecorationLine: "underline",
               }}
             >
-              {t("Resend Code")}
+              {t("We sent a confirmation code to")} +91 {String(number).slice(0, 3)}
+              XX XXXXX
             </Text>
-          </TouchableOpacity>
-        )}
-        {/* <Text
-          style={{
-            fontFamily: theme.fontFamily.regular,
-            color: theme.colors.text.secondary,
-            fontSize: hp(1.9),
-          }}
-        >
-          {t("Resend code in")}{" "}
-          <Text
-            style={{
-              fontWeight: "bold",
-              fontSize: hp(1.9),
-              fontFamily: theme.fontFamily.regular,
-            }}
-          >
-            {count} {t("sec")}
-          </Text>
-        </Text> */}
-      </View>
-    </View>
+          </View>
+
+          {/* Referral Code Input - Only shown for new users */}
+          {isNewUser && (
+            <View style={{ alignItems: "center", width: wp("90%") }}>
+              <Text
+                style={{
+                  fontFamily: theme.fontFamily.semiBold,
+                  color: theme.colors.brand.blue,
+                  fontSize: hp(2),
+                  marginBottom: 8,
+                  alignSelf: "flex-start",
+                }}
+              >
+                {t("Referral Code")}
+              </Text>
+              <TextInput
+                style={styles.referralInput}
+                value={referralCode}
+                onChangeText={setReferralCode}
+                placeholder={t("Enter referral code (if any)")}
+                placeholderTextColor={theme.colors.text.secondary}
+                autoCapitalize="characters"
+              />
+            </View>
+          )}
+
+          <View style={{ alignItems: "center", gap: 15, width: wp("90%"), marginTop: isNewUser ? 0 : 20 }}>
+            <TouchableOpacity
+              onPress={otpVerified}
+              style={[
+                styles.btn,
+                { opacity: canProceed() && !loading ? 1 : 0.5 },
+              ]}
+              disabled={!canProceed() || loading}
+            >
+              <Text style={styles.buttonText}>{t("Continue")}</Text>
+            </TouchableOpacity>
+            <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "center" }}>
+              <Text
+                style={{
+                  fontFamily: theme.fontFamily.regular,
+                  color: theme.colors.text.secondary,
+                  fontSize: hp(1.9),
+                }}
+              >
+                {t("Resend code in")} {" "}
+                <Text
+                  style={{
+                    fontWeight: "bold",
+                    fontSize: hp(1.9),
+                    fontFamily: theme.fontFamily.regular,
+                  }}
+                >
+                  {count} {t("sec")}
+                </Text>
+              </Text>
+              <View style={{ width: 8 }} />
+              <TouchableOpacity 
+                onPress={resendOtpHandler}
+                disabled={count > 0}
+              >
+                <Text
+                  style={{
+                    fontFamily: theme.fontFamily.semiBold,
+                    color: count > 0 ? theme.colors.text.secondary : theme.colors.brand.blue,
+                    fontSize: hp(1.9),
+                    textDecorationLine: "underline",
+                    opacity: count > 0 ? 0.5 : 1,
+                  }}
+                >
+                  {t("Resend Code")}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
 
@@ -278,6 +313,17 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     gap: 15,
+  },
+  referralInput: {
+    height: hp(7),
+    width: wp(90),
+    borderWidth: 1,
+    borderColor: theme.colors.brand.blue,
+    borderRadius: 10,
+    paddingHorizontal: 15,
+    fontFamily: theme.fontFamily.regular,
+    fontSize: theme.fontSize.p,
+    color: theme.colors.ui.black,
   },
   buttonText: {
     fontSize: theme.fontSize.medium,

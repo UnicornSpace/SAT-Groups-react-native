@@ -23,7 +23,9 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [token, setToken] = useState<string | null>(null);
   const [driverId, setDriverId] = useState<number | null>(null);
-  const [myDynamicPoints, setMyDynamicPointsState] = useState<number | null>(null);
+  const [myDynamicPoints, setMyDynamicPointsState] = useState<number | null>(
+    null
+  );
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
@@ -71,7 +73,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const clearAuthData = async () => {
     try {
-      await AsyncStorage.multiRemove([AUTH_TOKEN_KEY, DRIVER_ID_KEY, POINTS_KEY]);
+      await AsyncStorage.multiRemove([
+        AUTH_TOKEN_KEY,
+        DRIVER_ID_KEY,
+        POINTS_KEY,
+      ]);
 
       setToken(null);
       setDriverId(null);
@@ -99,6 +105,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         clearAuthData,
         setMyDynamicPoints,
         logout,
+
       }}
     >
       {children}
