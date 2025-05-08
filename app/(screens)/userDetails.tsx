@@ -4,8 +4,9 @@ import {
   TextInput,
   TouchableOpacity,
   View,
+  ScrollView,
 } from "react-native";
-import React, { useEffect } from "react";
+import React, { useState } from "react";
 import { theme } from "@/infrastructure/themes";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
@@ -17,103 +18,108 @@ import {
 import { useTranslation } from "react-i18next";
 import axiosInstance from "@/utils/axionsInstance";
 import ReferalCard from "@/components/Profile/referalCard";
+import SimpleDatePicker from "@/components/General/dob-input";
+
 const UserDetails = () => {
-  const { isNewUser} = useLocalSearchParams<{ isNewUser:any }>();
-  const [userName, setuserName] = React.useState("");
-  const [userAge, setuserAge] = React.useState("");
-  const [SateName, setSateName] = React.useState("");
-  const [Address, setAddress] = React.useState("");
-  const [formattedNumber, setFormattedNumber] = React.useState("");
-  const onSubmitDetails =async () => {
+  const { isNewUser, driverId, token } = useLocalSearchParams<{
+    isNewUser: any;
+    driverId: any;
+    token: any;
+  }>();
 
-    
-    if(isNewUser){
-      userAge.length > 0 && userName.length > 0
-      ? router.push("/(tabs)")
-      : alert("Please fill all the details");
-    }
-
-    try {
-      const response = await axiosInstance.post("/user-login-request-otp.php", {
-        mobile: formattedNumber,
-        // referral_code: referral || undefined,
-      });
-    } catch (error) {
-      
-    }
-    
-  };
+  const [userName, setUserName] = useState("");
+  const [dob, setDob] = useState(""); // Store date as a string in format YYYY-MM-DD
+  const [email, setEmail] = useState("");
+  const [stateName, setStateName] = useState("");
+  const [address, setAddress] = useState("");
   const { t } = useTranslation();
-  
- 
+
+  const onSubmitDetails = async () => {
+    try {
+      if (!dob) {
+        alert("Please enter your date of birth");
+        return;
+      }
+      
+      const response = await axiosInstance.put(
+        "/user-update-details.php",
+        {
+          driver_id: driverId,
+          name: userName,
+          age: dob, // Send formatted date string directly
+          email: email,
+          state: stateName,
+          city: address,
+          profile_pic: "new_base64encodedstring",
+          // referral_code: referral || undefined,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      console.log("Response:", response.data);
+      router.push("/(tabs)");
+    } catch (error) {
+      console.error("Error submitting details:", error);
+    }
+  };
+
+  // Handle date change from SimpleDatePicker
+  const handleDateChange = (dateString:any) => {
+    setDob(dateString);
+  };
+
   return (
-    <View
-      style={{
-        width: wp("100%"),
-        height: "100%",
-        display: "flex",
-        gap: 40,
-        justifyContent: "center",
-        alignItems: "center",
-        paddingHorizontal: 30,
-      }}
-    >
-      <Text
-        style={{
-          fontFamily: theme.fontFamily.semiBold,
-          color: theme.colors.brand.blue,
-          fontSize: hp("3.5%"),
-        }}
-      >
+    <ScrollView contentContainerStyle={styles.container}>
+      <Text style={styles.headerText}>
         {t("Personal Details")}
       </Text>
-      <View
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: 10,
-          width: wp("90%"),
-        }}
-      >
+      <View style={styles.formContainer}>
         <TextInput
           autoFocus={true}
           style={styles.input}
-          onChangeText={setuserName}
+          onChangeText={setUserName}
           value={userName}
           placeholder={t("Enter your Full Name")}
           keyboardType="name-phone-pad"
-          placeholderTextColor={theme.colors.ui.black + 70}
+          placeholderTextColor={theme.colors.ui.black + '70'}
         />
-         <TextInput
+        
+        {/* Using the SimpleDatePicker */}
+        <SimpleDatePicker
+          onDateChange={handleDateChange}
+          placeholder={t("Date of Birth")}
+        />
+        
+        <TextInput
           style={styles.input}
-          onChangeText={setuserAge}
-          value={userAge}
-          placeholder={t("Enter your Age")}
-          keyboardType="number-pad"
-          placeholderTextColor={theme.colors.ui.black + 70}
+          onChangeText={setEmail}
+          value={email}
+          placeholder={t("Enter your Email")}
+          keyboardType="email-address"
+          placeholderTextColor={theme.colors.ui.black + '70'}
+        />
+        <TextInput
+          style={styles.input}
+          onChangeText={setStateName}
+          value={stateName}
+          placeholder={t("Enter State name")}
+          keyboardType="name-phone-pad"
+          placeholderTextColor={theme.colors.ui.black + '70'}
         />
         <TextInput
           style={styles.input}
           onChangeText={setAddress}
-          value={Address}
-          placeholder={t("Enter State name")}
+          value={address}
+          placeholder={t("Address")}
           keyboardType="name-phone-pad"
-          placeholderTextColor={theme.colors.ui.black + 70}
+          placeholderTextColor={theme.colors.ui.black + '70'}
         />
-        <TextInput
-          
-          style={styles.input}
-          onChangeText={setSateName}
-          value={SateName}
-          placeholder={t("Addrees")}
-          keyboardType="name-phone-pad"
-          placeholderTextColor={theme.colors.ui.black + 70}
-        />
-       
       </View>
-      
 
-      <TouchableOpacity onPress={onSubmitDetails} style={{}}>
+      <TouchableOpacity onPress={onSubmitDetails}>
         <LinearGradient
           colors={["#26456C", "#4073B4", "#4073B4"]}
           style={styles.gradient2}
@@ -126,23 +132,43 @@ const UserDetails = () => {
           />
         </LinearGradient>
       </TouchableOpacity>
-    </View>
+    </ScrollView>
   );
 };
 
 export default UserDetails;
 
 const styles = StyleSheet.create({
+  container: {
+    width: wp("100%"),
+    minHeight: hp("100%"),
+    display: "flex",
+    gap: 40,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 30,
+    paddingVertical: 20,
+  },
+  headerText: {
+    fontFamily: theme.fontFamily.semiBold,
+    color: theme.colors.brand.blue,
+    fontSize: hp("3.5%"),
+  },
+  formContainer: {
+    display: "flex",
+    flexDirection: "column",
+    gap: 10,
+    width: wp("90%"),
+  },
   input: {
     height: hp("7%"),
     width: wp("90%"),
     borderWidth: 0.2,
-    boxShadow: "2px 2px 10px rgba(72, 72, 72, 0.2)",
+    borderColor: theme.colors.brand.blue,
     color: theme.colors.ui.black,
     fontFamily: theme.fontFamily.semiBold,
     borderRadius: 5,
-    borderColor: theme.colors.brand.blue,
-    paddingHorizontal: hp("2%"),
+    paddingHorizontal: hp("2.3%"),
   },
   gradient2: {
     width: wp("90%"),

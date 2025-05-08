@@ -19,6 +19,7 @@ import * as Linking from "expo-linking";
 import { getDistance } from "geolib"; // Import geolib to calculate distance
 import { FontAwesome, MaterialCommunityIcons } from "@expo/vector-icons";
 import LocationIcon from "./locationIcon";
+import { useAuth } from "@/utils/AuthContext";
 
 const Branches = ({ data }: any) => {
   const [userLocation, setUserLocation] = useState<{
@@ -174,10 +175,9 @@ const Branches = ({ data }: any) => {
 const NearBranchList = () => {
   const { t } = useTranslation();
   const [nearBranch, setnearBranch] = useState([]);
+  const {token , driverId} = useAuth()
   useEffect(() => {
-    const driver_id = 2;
-    const token =
-      "8ef3cf4ed84148e6a5c9faa3267a0acf57f7320703fd7644785a16342a41e7e2";
+   
 
     const getNearestBranch = async () => {
       try {

@@ -9,7 +9,6 @@ import {
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { theme } from "@/infrastructure/themes";
-import Button from "@/components/General/button";
 import { router } from "expo-router";
 import {
   widthPercentageToDP as wp,
@@ -22,21 +21,16 @@ import UserDetails from "@/components/Profile/UserDetails";
 import LanguageSetting from "@/components/Profile/languageSetting";
 import axiosInstance from "@/utils/axionsInstance";
 import ReferalCard from "@/components/Profile/referalCard";
-import { Badge } from "react-native-paper";
-import EditButton from "@/components/Profile/edit";
-import CustomizedBadge from "@/components/Home/CustomizedBadge";
-import { width, height, size, fontSize } from "react-native-responsive-sizes";
+import {  size, fontSize } from "react-native-responsive-sizes";
 import { useAuth } from "@/utils/AuthContext";
 
 
 const profile = () => {
-  const [userInfo, setuserInfo] = useState<{ id?: number; name?: string }>({});
-  const { token, driverId } = useAuth();
+const [userInfo, setuserInfo] = useState<{ id?: number; name?: string }>({});
+  const { token, driverId, logout } = useAuth();
   useEffect(() => {
     const driver_id = driverId;
-    const usertoken =token
-   
- 
+    const usertoken = token
     const getUserDetails = async () => {
       try {
         
@@ -60,8 +54,9 @@ const profile = () => {
     getUserDetails();
   }, []);
 
-  const logot = () => {
-    router.push("/(screens)/LanguageSeletionScreen");
+  const logot = async() => {
+    console.log("Logout function called");
+    await logout();
   };
   const { t } = useTranslation();
 

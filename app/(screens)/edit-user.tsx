@@ -16,26 +16,41 @@ import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
 import axiosInstance from "@/utils/axionsInstance";
 import { useRouter } from "expo-router";
+import { useAuth } from "@/utils/AuthContext";
 
 const EditUser = () => {
+  const { token, driverId } = useAuth();
   const { t } = useTranslation();
   const router = useRouter();
 
   const [userName, setUserName] = useState("");
   const [userAge, setUserAge] = useState("");
   const [address, setAddress] = useState("");
+  const [email, setemail] = useState("");
   const [stateName, setStateName] = useState("");
 
-  const driver_id = 2;
-  const token =
-    "8ef3cf4ed84148e6a5c9faa3267a0acf57f7320703fd7644785a16342a41e7e2";
+  const calculateAgeFromDob = (dob: string): string => {
+    const birthDate = new Date(dob);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDifference = today.getMonth() - birthDate.getMonth();
+
+    if (
+      monthDifference < 0 ||
+      (monthDifference === 0 && today.getDate() < birthDate.getDate())
+    ) {
+      age--;
+    }
+
+    return age.toString();
+  };
 
   useEffect(() => {
     const getUserDetails = async () => {
       try {
-        const response = await axiosInstance.post(
+        const getUserDetails = await axiosInstance.post(
           "/user-details.php",
-          { driver_id },
+          { driver_id: driverId },
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -43,29 +58,36 @@ const EditUser = () => {
           }
         );
 
-        const user = response.data.driver;
-        setUserName(user.name || "");
-        setUserAge(user.age || "");
-        setAddress(user.address || "");
-        setStateName(user.state || "");
+        const user = getUserDetails.data.driver;
+        console.log("User Details:", user);
+
+        if (user) {
+          setUserName(user.name || "");
+          setUserAge(user.dob || "");
+          // setUserAge(calculateAgeFromDob(user.dob) || "");
+          setAddress(user.city || "");
+          setemail(user.email || "");
+          setStateName(user.state || "");
+        }
       } catch (error) {
         console.error("Error fetching user:", error);
       }
     };
-
     getUserDetails();
   }, []);
 
   const handleUpdate = async () => {
     try {
-      const response = await axiosInstance.put(
+      const updateUserDetails = await axiosInstance.put(
         "/user-update-details.php",
         {
-          driver_id,
+          driver_id: driverId,
           name: userName,
-          age: userAge,
-          address,
+          email: email,
           state: stateName,
+          dob: "2004-08-12",
+          city: address,
+          profile_pic: "new_base64encodedstring",
         },
         {
           headers: {
@@ -73,8 +95,8 @@ const EditUser = () => {
           },
         }
       );
-console.log(response.data);
-      if (response.data.success) {
+      console.log(updateUserDetails.data);
+      if (updateUserDetails.data.success === "success") {
         alert("Profile updated successfully!");
         router.back();
       } else {
@@ -137,7 +159,14 @@ console.log(response.data);
           keyboardType="default"
           placeholderTextColor={theme.colors.ui.black + "70"}
         />
-
+        <TextInput
+          style={styles.input}
+          onChangeText={setemail}
+          value={email}
+          placeholder={t("Enter your Email")}
+          keyboardType="email-address"
+          placeholderTextColor={theme.colors.ui.black + 70}
+        />
         <TextInput
           style={styles.input}
           onChangeText={setStateName}

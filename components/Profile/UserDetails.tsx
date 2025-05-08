@@ -10,7 +10,7 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
-import { FontAwesome, FontAwesome5, Ionicons } from "@expo/vector-icons";
+import { FontAwesome, FontAwesome5, Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
 import { theme } from "@/infrastructure/themes";
 import { router } from "expo-router";
@@ -29,7 +29,12 @@ const PersonDetails = ({ icon, title, subtitle }: any) => {
     >
       <TouchableOpacity style={styles.userbtn}>
         {/* <Ionicons name="pencil" size={20} color="black" /> */}
-        <FontAwesome name={icon} size={18} color={theme.colors.brand.blue} />
+        {/* <FontAwesome name={icon} size={18} color={theme.colors.brand.blue} /> */}
+        <MaterialCommunityIcons
+          name={icon}
+          size={20}
+          color={theme.colors.brand.blue}
+        />
         {/* <FontAwesome5 name="user" size={16} color={theme.colors.brand.blue} /> */}
       </TouchableOpacity>
       <View style={{ display: "flex", flexDirection: "column" }}>
@@ -81,13 +86,14 @@ const UserDetails = ({ data }: any) => {
         
       </View>
       <View style={styles.container}>
-        {/* <PersonDetails icon={"user"} title="Age" subtitle={"35 years"} /> */}
+        <PersonDetails icon={"calendar"} title="Age" subtitle={` ${data.dob} `} />
+        <PersonDetails icon={"email"} title="email" subtitle={` ${data.email} `} />
         <PersonDetails
-          icon={"map-pin"}
+          icon={"map-marker"}
           title="Address"
-          subtitle={`${data.address}, ${data.city} `}
+          subtitle={` ${data.state} `}
         />
-        <PersonDetails icon={"map-pin"} title="State" subtitle={"karnataka"} />
+        <PersonDetails icon={"map-outline"} title="State" subtitle={` ${data.city} `} />
       </View>
     </View>
   );

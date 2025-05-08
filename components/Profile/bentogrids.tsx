@@ -6,7 +6,9 @@ import {
 } from "react-native-responsive-screen";
 import { width, height, size, fontSize } from "react-native-responsive-sizes";
 import { theme } from "@/infrastructure/themes";
+import { useAuth } from "@/utils/AuthContext";
 const UserBentogrids = () => {
+   const { myDynamicPoints } = useAuth();
   return (
     <View
       style={{
@@ -25,7 +27,7 @@ const UserBentogrids = () => {
             color: theme.colors.brand.blue,
           }}
         >
-          150
+         {myDynamicPoints}
         </Text>
         <Text
           style={{
@@ -47,7 +49,7 @@ const UserBentogrids = () => {
             color: theme.colors.brand.blue,
           }}
         >
-          3
+          0
         </Text>
         <Text
           style={{

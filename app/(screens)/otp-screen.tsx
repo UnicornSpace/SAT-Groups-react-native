@@ -7,7 +7,7 @@ import {
   View,
 } from "react-native";
 import React, { useState } from "react";
-import { MaterialIcons } from "@expo/vector-icons";
+import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { theme } from "@/infrastructure/themes";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
@@ -48,9 +48,10 @@ const UserOTPScreen = () => {
       if (response.status === 200) {
         router.push({
           pathname: "/(screens)/otpConfirmationScreen",
-          params: { number: formattedNumber,
-            UserExist:response.data.is_new_user
-           },
+          params: {
+            number: formattedNumber,
+            UserExist: response.data.is_new_user,
+          },
         });
       }
     } catch (error) {
@@ -80,6 +81,7 @@ const UserOTPScreen = () => {
         gap: 40,
       }}
     >
+    
       <Text
         style={{
           color: theme.colors.brand.blue,
@@ -123,7 +125,7 @@ const UserOTPScreen = () => {
             style={{
               fontFamily: theme.fontFamily.light,
               fontSize: hp(1.8),
-              lineHeight:hp(2),
+              lineHeight: hp(2),
             }}
           >
             {t("We will send an SMS code to verify your number")}
