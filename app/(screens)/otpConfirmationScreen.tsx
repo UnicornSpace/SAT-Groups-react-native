@@ -22,7 +22,7 @@ import { useAuth } from "@/utils/AuthContext";
 import { Ionicons } from "@expo/vector-icons";
 
 const OtpConfirmationScreen = () => {
-  const { setAuthData, logout, token, isAuthenticated } = useAuth();
+  const { setAuthData, token } = useAuth();
 
   const { number, UserExist } = useLocalSearchParams<{
     number: string;

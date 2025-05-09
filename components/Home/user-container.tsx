@@ -49,6 +49,7 @@ const UserContainer = () => {
           }
         );
         const userDetails = response.data;
+        console.log("User Details Responseeeee:", userDetails);
         setuserInfo(userDetails.driver);
         console.log("User Details:", userDetails.driver);
       } catch (error) {
