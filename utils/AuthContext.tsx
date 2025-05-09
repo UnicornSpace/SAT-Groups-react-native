@@ -119,8 +119,6 @@
 //   return context;
 // };
 
-
-
 import React, { createContext, useContext, useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -132,6 +130,7 @@ type AuthContextType = {
   clearAuthData: () => void;
   setMyDynamicPoints: (points: number) => void;
   loading: boolean;
+  logout:any
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -139,7 +138,9 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [token, setToken] = useState<string | null>(null);
   const [driverId, setDriverId] = useState<number | null>(null);
-  const [myDynamicPoints, setMyDynamicPointsState] = useState<number | null>(null);
+  const [myDynamicPoints, setMyDynamicPointsState] = useState<number | null>(
+    null
+  );
   const [loading, setLoading] = useState(true);
 
   // Load auth state from AsyncStorage
@@ -161,7 +162,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     loadAuthData();
   }, []);
-
+  const logout = async () => {
+    await clearAuthData();
+  };
   const setAuthData = async (token: string, driverId: number) => {
     setToken(token);
     setDriverId(driverId);
@@ -190,6 +193,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setAuthData,
         clearAuthData,
         setMyDynamicPoints,
+        logout,
         loading,
       }}
     >

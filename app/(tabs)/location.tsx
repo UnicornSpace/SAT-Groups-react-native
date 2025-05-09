@@ -133,7 +133,7 @@ const location = () => {
         const Branches = response.data;
         setgetBranches(Branches.data);
         setLoading(false);
-        console.log("User Details😑😑:", Branches.data);
+        // console.log("User Details😑😑:", Branches.data);
       } catch (error) {
         console.error("Error fetching user details:", error);
         setLoading(false);

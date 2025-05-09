@@ -7,6 +7,7 @@ import {
 import { width, height, size, fontSize } from "react-native-responsive-sizes";
 import { theme } from "@/infrastructure/themes";
 import { useAuth } from "@/utils/AuthContext";
+import { t } from "i18next";
 const UserBentogrids = () => {
    const { myDynamicPoints } = useAuth();
   return (
@@ -37,7 +38,7 @@ const UserBentogrids = () => {
             color: "#8E8F8F",
           }}
         >
-          Total Points
+          {t("Total Points")}
         </Text>
       </View>
       <View style={styles.box2}>
@@ -59,7 +60,7 @@ const UserBentogrids = () => {
             color: "#8E8F8F",
           }}
         >
-          Referal
+          {t("Referal")}
         </Text>
       </View>
     </View>

@@ -103,15 +103,15 @@ const UserDetails = ({ data }: any) => {
         
       </View>
       <View style={styles.container}>
-      <PersonDetails icon={"calendar"} title="Age" subtitle={`${(data.dob)} years`} />
+      <PersonDetails icon={"calendar"} title={t("Age")} subtitle={`${(data.dob)} `} />
 
-        <PersonDetails icon={"email"} title="email" subtitle={ `${data.email}` } />
+        <PersonDetails icon={"email"} title={t("email")} subtitle={ `${data.email}` } />
         <PersonDetails
           icon={"map-marker"}
-          title="State"
+          title={t("State")}
           subtitle={` ${data.state}` }
         />
-        <PersonDetails icon={"map-outline"} title="Address" subtitle={` ${data.city} `} />
+        <PersonDetails icon={"map-outline"} title={t("Address")} subtitle={` ${data.city} `} />
       </View>
     </View>
   );

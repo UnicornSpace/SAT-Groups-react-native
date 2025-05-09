@@ -493,8 +493,9 @@ const profile = () => {
     getUserDetails();
   }, []);
 
-  const logout = () => {
-    router.push("/(screens)/LanguageSeletionScreen");
+  const logout = async() => {
+    await logout()
+    router.replace("/(screens)/LanguageSeletionScreen");
     // console.log("Logout function called");
     // clearAuthData().then((res) => {
     //   console.log("Logout function called", res);

@@ -1,3 +1,4 @@
+import { theme } from '@/infrastructure/themes';
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 
@@ -55,15 +56,16 @@ const styles = StyleSheet.create({
   },
   text: {
     flex: 1,
-    fontSize: 16,
+    fontSize: theme.fontSize.p2 ,
     color: '#000',
     lineHeight: 22,
+    fontFamily:theme.fontFamily.medium
   },
   lineContainer: {
     position: 'absolute',
-    top: 32,
+    top: 45,
     left: 15,
-    height: 40,
+    height: 5,
     justifyContent: 'center',
     alignItems: 'center',
   },

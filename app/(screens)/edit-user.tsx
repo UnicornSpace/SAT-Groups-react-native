@@ -860,7 +860,7 @@ const handleUpdate = async () => {
       }
       
       // Navigate back to profile
-      router.back();
+      router.replace("/(tabs)/profile");
     } else {
       // More detailed error message
       const errorMsg = response.data && response.data.message 

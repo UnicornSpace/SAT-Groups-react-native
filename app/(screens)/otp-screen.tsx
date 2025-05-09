@@ -47,7 +47,7 @@ const UserOTPScreen = () => {
       console.log("Response:", number);
 
       if (response.status === 200) {
-        router.push({
+        router.replace({
           pathname: "/(screens)/otpConfirmationScreen",
           params: {
             number: formattedNumber,
@@ -148,7 +148,7 @@ const UserOTPScreen = () => {
         </View>
 
         {loading ? (
-          <ActivityIndicator size="large" />
+          <ActivityIndicator size="large" color={theme.colors.brand.blue} />
         ) : (
           <TouchableOpacity onPress={SubmitNumber}>
             <LinearGradient

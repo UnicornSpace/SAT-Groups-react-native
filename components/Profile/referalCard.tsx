@@ -9,6 +9,7 @@ import {
 import { router } from "expo-router";
 import ReferralSteps from "@/components/Profile/referalSteps";
 import { width, height, size, fontSize } from "react-native-responsive-sizes";
+import { t } from "i18next";
 const ReferalCard = () => {
   return (
     <TouchableOpacity
@@ -28,7 +29,7 @@ const ReferalCard = () => {
         >
           <Ionicons name="people" size={20} color={theme.colors.brand.blue} />
           <Text style={{ fontSize: 16, fontFamily: theme.fontFamily.regular }}>
-            Refer your friend
+            {t("Refer your friend")}
           </Text>
         </View>
         <Ionicons name="arrow-forward" size={24} color="black" />

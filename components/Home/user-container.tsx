@@ -12,6 +12,7 @@ import { useTranslation } from "react-i18next";
 import axiosInstance from "@/utils/axionsInstance";
 import CustomizedBadge from "./CustomizedBadge";
 import { useAuth } from "@/utils/AuthContext";
+import { t } from "i18next";
 const getGreetingMessage = () => {
   const currentHour = new Date().toLocaleString("en-IN", {
     hour: "numeric",
@@ -21,11 +22,11 @@ const getGreetingMessage = () => {
   const hour = parseInt(currentHour);
 
   if (hour >= 5 && hour < 12) {
-    return "Good Morning ";
+    return t("Good Morning");
   } else if (hour >= 12 && hour < 17) {
-    return "Good Afternoon ";
+    return t("Good Afternoon");
   } else {
-    return "Good Evening ";
+    return t("Good Evening");
   }
 };
 
@@ -49,9 +50,9 @@ const UserContainer = () => {
           }
         );
         const userDetails = response.data;
-        console.log("User Details Responseeeee:", userDetails);
+        // console.log("User Details Responseeeee:", userDetails);
         setuserInfo(userDetails.driver);
-        console.log("User Details:", userDetails.driver);
+        // console.log("User Details:", userDetails.driver);
       } catch (error) {
         console.error("Error fetching user details:", error);
       }
