@@ -208,7 +208,7 @@ const UserDetails = () => {
         {
           driver_id: driverId,
           name: userName,
-          age: dob,
+          dob: dob,
           email: email,
           state: stateName,
           city: address,

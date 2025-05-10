@@ -1,16 +1,15 @@
+
 // import {
-//   Image,
 //   ScrollView,
 //   StyleSheet,
 //   Text,
-//   TextInput,
 //   TouchableOpacity,
 //   View,
 //   Animated,
 // } from "react-native";
-// import React, { useEffect, useState, useRef } from "react";
+// import React, { useEffect, useState, useRef, useCallback } from "react";
 // import { theme } from "@/infrastructure/themes";
-// import { router } from "expo-router";
+// import { router, useFocusEffect } from "expo-router"; // Add useFocusEffect
 // import {
 //   widthPercentageToDP as wp,
 //   heightPercentageToDP as hp,
@@ -25,7 +24,7 @@
 // import { size, fontSize } from "react-native-responsive-sizes";
 // import { useAuth } from "@/utils/AuthContext";
 
-// // Skeleton Component
+// // Skeleton Component (unchanged)
 // const SkeletonLoader = ({ width, height, style }:any) => {
 //   const opacity = useRef(new Animated.Value(0.3)).current;
 
@@ -66,7 +65,7 @@
 //   );
 // };
 
-// // Profile Skeleton Screen
+// // Profile Skeleton Screen (unchanged)
 // const ProfileSkeleton = () => {
 //   const { t } = useTranslation();
   
@@ -137,43 +136,52 @@
 //   const { token, driverId, clearAuthData } = useAuth();
 //   const { t } = useTranslation();
   
-//   useEffect(() => {
-//     const driver_id = driverId;
-//     const usertoken = token;
-    
-//     const getUserDetails = async () => {
-//       try {
-//         setLoading(true);
-//         const response = await axiosInstance.post(
-//           "/user-details.php",
-//           { driver_id },
-//           {
-//             headers: {
-//               Authorization: `Bearer ${usertoken}`,
-//             },
-//           }
-//         );
-//         const userDetails = response.data;
-//         setuserInfo(userDetails.driver);
-//         setLoading(false);
-//         console.log("User Details:", userDetails.driver);
-//       } catch (error) {
-//         console.error("Error fetching user details:", error);
-//         setLoading(false);
-//       }
-//     };
+//   // Extract getUserDetails as a separate function so we can call it multiple times
+//   const getUserDetails = async () => {
+//     try {
+//       setLoading(true);
+//       const response = await axiosInstance.post(
+//         "/user-details.php",
+//         { driver_id: driverId },
+//         {
+//           headers: {
+//             Authorization: `Bearer ${token}`,
+//           },
+//         }
+//       );
+//       const userDetails = response.data;
+//       setuserInfo(userDetails.driver);
+//       console.log("User Details refreshed:", userDetails.driver);
+//     } catch (error) {
+//       console.error("Error fetching user details:", error);
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
 
+//   // Use this hook to refresh data when screen comes into focus
+//   useFocusEffect(
+//     useCallback(() => {
+//       console.log("Profile screen focused - refreshing data");
+//       getUserDetails();
+//       return () => {
+//         // Cleanup if needed
+//       };
+//     }, [driverId, token])
+//   );
+  
+//   // Initial data loading
+//   useEffect(() => {
 //     getUserDetails();
 //   }, []);
 
-//   const logout =  () => {
-//     router.push("/(screens)/LanguageSeletionScreen");
+//   const logout = async() => {
+//     await logout()
+//     router.replace("/(screens)/LanguageSeletionScreen");
 //     // console.log("Logout function called");
 //     // clearAuthData().then((res) => {
 //     //   console.log("Logout function called", res);
-      
 //     // });
-//     // await logout();
 //   };
 
 //   if (loading) {
@@ -315,7 +323,7 @@
 
 
 
-// Key fix - added a focused event listener to refresh profile data when screen gains focus
+// Fixed profile component with proper logout functionality
 
 import {
   ScrollView,
@@ -327,7 +335,7 @@ import {
 } from "react-native";
 import React, { useEffect, useState, useRef, useCallback } from "react";
 import { theme } from "@/infrastructure/themes";
-import { router, useFocusEffect } from "expo-router"; // Add useFocusEffect
+import { router, useFocusEffect } from "expo-router";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -451,7 +459,7 @@ const ProfileSkeleton = () => {
 const profile = () => {
   const [userInfo, setuserInfo] = useState<{ id?: string; name?: string }>({ id: undefined, name: undefined });
   const [loading, setLoading] = useState(true);
-  const { token, driverId, clearAuthData } = useAuth();
+  const { token, driverId, clearAuthData, logout: authLogout } = useAuth();
   const { t } = useTranslation();
   
   // Extract getUserDetails as a separate function so we can call it multiple times
@@ -493,13 +501,17 @@ const profile = () => {
     getUserDetails();
   }, []);
 
-  const logout = async() => {
-    await logout()
-    router.replace("/(screens)/LanguageSeletionScreen");
-    // console.log("Logout function called");
-    // clearAuthData().then((res) => {
-    //   console.log("Logout function called", res);
-    // });
+  // Fixed logout function that properly calls the logout from AuthContext
+  const handleLogout = async () => {
+    try {
+      console.log("Logging out user");
+      // Use the logout function from AuthContext
+      await authLogout();
+      // Then navigate to language selection screen
+      router.replace("/(screens)/LanguageSeletionScreen");
+    } catch (error) {
+      console.error("Error during logout:", error);
+    }
   };
 
   if (loading) {
@@ -559,7 +571,7 @@ const profile = () => {
         <UserDetails data={userInfo} />
 
         <LanguageSetting />
-        <TouchableOpacity onPress={logout} style={styles.btn}>
+        <TouchableOpacity onPress={handleLogout} style={styles.btn}>
           <Text
             style={{
               color: theme.colors.text.primary,
