@@ -243,7 +243,7 @@ const profile = () => {
         </View>
       </View>
       <View style={styles.container}>
-        <UserBentogrids points={userInfo.points || 0} />
+        <UserBentogrids  />
         <ReferalCard />
         <UserDetails data={userInfo} />
   
