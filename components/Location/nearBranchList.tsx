@@ -387,8 +387,9 @@ const Branches = ({ data }: any) => {
               >
                 <Text
                   style={{
-                    fontFamily: theme.fontFamily.medium,
+                    fontFamily: theme.fontFamily.semiBold,
                     fontSize: hp(2),
+                    color: theme.colors.brand.blue,
                   }}
                 >
                   {sentenceCase(item.location_name) || t("Branch")}

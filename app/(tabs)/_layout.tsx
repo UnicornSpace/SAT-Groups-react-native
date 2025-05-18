@@ -1,5 +1,5 @@
 import { Image, StyleSheet, View, Text } from "react-native";
-import { Tabs } from "expo-router";
+import { Link, Tabs } from "expo-router";
 import { FontAwesome, Ionicons } from "@expo/vector-icons";
 import React from "react";
 import '@/app/language-selectiom'
@@ -18,6 +18,7 @@ TextComponent.defaultProps.allowFontScaling = false
 
 function LogoTitle() {
   return (
+   <Link href={"/(tabs)"}>
     <View
       style={{
         flexDirection: "row",
@@ -33,7 +34,7 @@ function LogoTitle() {
         resizeMode="contain"
       />
       {/* <LanguageSelection/> */}
-    </View>
+    </View></Link>
   );
 }
 const TabLayout = () => {

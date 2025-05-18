@@ -169,27 +169,7 @@ const location = () => {
             {t("Find the branches near you")}
           </Text>
         </View>
-        {/* <TextInput
-          mode="outlined"
-          placeholder={t("Search the near branches")}
-          cursorColor={theme.colors.brand.blue}
-          outlineColor={theme.colors.text.secondary + 20}
-          activeOutlineColor={theme.colors.brand.blue}
-          style={styles.input}
-          left={
-            <TextInput.Icon
-              size={20}
-              color={theme.colors.text.secondary}
-              icon="magnify"
-            />
-          }
-          placeholderTextColor={theme.colors.text.secondary}
-          contentStyle={{
-            color: theme.colors.ui.black,
-            fontFamily: theme.fontFamily.medium,
-            fontSize: hp(2),
-          }}
-        /> */}
+    
         <NearBranchList />
 
         <AllBranches branch={getBranches} />

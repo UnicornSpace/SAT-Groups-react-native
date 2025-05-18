@@ -1,4 +1,11 @@
-import { Alert, Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  Alert,
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import React, { useEffect, useState } from "react";
 import { theme } from "@/infrastructure/themes";
 import { Ionicons } from "@expo/vector-icons";
@@ -81,7 +88,7 @@ const AllBranches = ({ branch }: any) => {
       },
       { latitude: cleanLat, longitude: cleanLng }
     );
-    
+
     return `${(distance / 1000).toFixed(1)} KM`;
   };
 
@@ -118,7 +125,7 @@ const AllBranches = ({ branch }: any) => {
           const branchName = locationName[0] || "";
           const branchLocation = locationName[1] || "";
           const distance = calculateDistance(item.lat, item.lng);
-          
+
           return (
             <TouchableOpacity
               key={item.id || item.location_code}
@@ -133,12 +140,14 @@ const AllBranches = ({ branch }: any) => {
                 <Text style={styles.branchName}>
                   {sentenceCase(branchName)}
                 </Text>
-                <View style={styles.dateContainer}>
-                  <Text style={styles.date}>{t(sentenceCase(branchLocation))}</Text>
-                </View>
-                <Text style={styles.distanceText}>
-                  {distance}
-                </Text>
+                {branchLocation && (
+                  <View style={styles.dateContainer}>
+                    <Text style={styles.date}>
+                      {t(sentenceCase(branchLocation))}
+                    </Text>
+                  </View>
+                )}
+                <Text style={styles.distanceText}>{distance}</Text>
               </View>
             </TouchableOpacity>
           );
@@ -152,8 +161,8 @@ export default AllBranches;
 
 const styles = StyleSheet.create({
   branchesContainer: {
-    display: "flex", 
-    flexDirection: "row", 
+    display: "flex",
+    flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "space-between",
     width: "100%",
@@ -185,8 +194,8 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   branchInfo: {
-    display: "flex", 
-    alignItems: "center", 
+    display: "flex",
+    alignItems: "center",
     width: "100%",
     marginTop: 4,
   },
