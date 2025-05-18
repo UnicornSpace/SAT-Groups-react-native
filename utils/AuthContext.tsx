@@ -1,17 +1,22 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useContext, useState, useEffect } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+
+// Storage keys - using consistent naming
+const AUTH_TOKEN_KEY = "authToken";
+const DRIVER_ID_KEY = "driverId";
+const POINTS_KEY = "dynamicPoints";
 
 type AuthContextType = {
   token: string | null;
   driverId: number | null;
-  setAuthData: (token: string, driverId: number) => void;
-  clearAuthData: () => void;
-  setMyDynamicPoints: (points: number) => void;
   myDynamicPoints: number | null;
+  isLoading: boolean;
   isAuthenticated: boolean;
+  setAuthData: (token: string, driverId: number) => Promise<void>;
+  clearAuthData: () => Promise<void>;
+  setMyDynamicPoints: (points: number) => Promise<void>;
   login: (token: string, driverId: number, points?: number) => Promise<void>;
   logout: () => Promise<void>;
-  isLoading: boolean;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -20,64 +25,80 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [token, setToken] = useState<string | null>(null);
   const [driverId, setDriverId] = useState<number | null>(null);
   const [myDynamicPoints, setMyDynamicPointsState] = useState<number | null>(null);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
 
-  // Initialize auth state from AsyncStorage
+  // Load auth state from AsyncStorage
   useEffect(() => {
-    const loadAuthState = async () => {
+    const loadAuthData = async () => {
       try {
-        const [storedToken, storedDriverId, storedPoints] = await Promise.all([
-          AsyncStorage.getItem("authToken"),
-          AsyncStorage.getItem("driverId"),
-          AsyncStorage.getItem("dynamicPoints")
-        ]);
+        const storedToken = await AsyncStorage.getItem(AUTH_TOKEN_KEY);
+        const storedDriverId = await AsyncStorage.getItem(DRIVER_ID_KEY);
+        const storedPoints = await AsyncStorage.getItem(POINTS_KEY);
+
+        if (storedToken) setToken(storedToken);
+        if (storedDriverId) setDriverId(Number(storedDriverId));
+        if (storedPoints) setMyDynamicPointsState(Number(storedPoints));
         
-        if (storedToken && storedDriverId) {
-          setToken(storedToken);
-          setDriverId(parseInt(storedDriverId));
-          if (storedPoints) {
-            setMyDynamicPointsState(parseInt(storedPoints));
-          }
-          setIsAuthenticated(true);
-        }
+        // Update authentication status based on token presence
+        setIsAuthenticated(!!storedToken);
+        
+        console.log("Loaded user data from AsyncStorage");
       } catch (error) {
-        console.error("Failed to load authentication state:", error);
+        console.error("Failed to load authentication data:", error);
       } finally {
         setIsLoading(false);
       }
     };
-    
-    loadAuthState();
+
+    loadAuthData();
   }, []);
 
-  const setAuthData = (token: string, driverId: number) => {
-    setToken(token);
-    setDriverId(driverId);
-    setIsAuthenticated(true);
-  };
+  const setAuthData = async (token: string, driverId: number) => {
+    try {
+      await AsyncStorage.setItem(AUTH_TOKEN_KEY, token);
+      await AsyncStorage.setItem(DRIVER_ID_KEY, driverId.toString());
 
-  const clearAuthData = () => {
-    setToken(null);
-    setDriverId(null);
-    setMyDynamicPointsState(null);
-    setIsAuthenticated(false);
+      setToken(token);
+      setDriverId(driverId);
+      setIsAuthenticated(true);
+    } catch (error) {
+      console.error("Failed to save authentication data:", error);
+      throw error;
+    }
   };
 
   const setMyDynamicPoints = async (points: number) => {
-    setMyDynamicPointsState(points);
-    await AsyncStorage.setItem("dynamicPoints", points.toString());
+    try {
+      await AsyncStorage.setItem(POINTS_KEY, points.toString());
+      setMyDynamicPointsState(points);
+    } catch (error) {
+      console.error("Failed to save points:", error);
+      throw error;
+    }
+  };
+
+  const clearAuthData = async () => {
+    try {
+      setToken(null);
+      setDriverId(null);
+      setMyDynamicPointsState(null);
+      setIsAuthenticated(false);
+    } catch (error) {
+      console.error("Failed to clear authentication data:", error);
+      throw error;
+    }
   };
 
   const login = async (token: string, driverId: number, points?: number) => {
     try {
       const storageOperations = [
-        AsyncStorage.setItem("authToken", token),
-        AsyncStorage.setItem("driverId", driverId.toString())
+        AsyncStorage.setItem(AUTH_TOKEN_KEY, token),
+        AsyncStorage.setItem(DRIVER_ID_KEY, driverId.toString())
       ];
       
       if (points !== undefined) {
-        storageOperations.push(AsyncStorage.setItem("dynamicPoints", points.toString()));
+        storageOperations.push(AsyncStorage.setItem(POINTS_KEY, points.toString()));
         setMyDynamicPointsState(points);
       }
       
@@ -95,12 +116,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const logout = async () => {
     try {
       await Promise.all([
-        AsyncStorage.removeItem("authToken"),
-        AsyncStorage.removeItem("driverId"),
-        AsyncStorage.removeItem("dynamicPoints")
+        AsyncStorage.removeItem(AUTH_TOKEN_KEY),
+        AsyncStorage.removeItem(DRIVER_ID_KEY),
+        AsyncStorage.removeItem(POINTS_KEY)
       ]);
       
-      clearAuthData();
+      await clearAuthData();
     } catch (error) {
       console.error("Failed to clear authentication data:", error);
       throw error;
@@ -113,13 +134,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         token,
         driverId,
         myDynamicPoints,
+        isLoading,
+        isAuthenticated,
         setAuthData,
         clearAuthData,
         setMyDynamicPoints,
-        isAuthenticated,
         login,
         logout,
-        isLoading,
       }}
     >
       {children}

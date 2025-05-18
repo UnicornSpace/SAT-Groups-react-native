@@ -13,7 +13,7 @@ import i18next from "i18next";
 type Language = {
   code: string;
   name: string;
-  trans:string
+  trans: string;
 };
 
 const LanguageSetting = () => {
@@ -21,18 +21,18 @@ const LanguageSetting = () => {
   const [SelectLang, setSelectLang] = useState<string | null>(null);
 
   const languages: Language[] = [
-    { code: "A", name: "ENGLISH",trans:"en" },
-    { code: "ಅ", name: "ಕನ್ನಡ",trans:"kan" },
-    { code: "अ", name: "हिन्दी",trans:"hi" },
-    { code: "అ", name: "తెలుగు",trans:"tel" },
-    { code: "அ", name: "தமிழ்",trans:"tam" },
+    { code: "A", name: "ENGLISH", trans: "en" },
+    { code: "அ", name: "தமிழ்", trans: "tam" },
+    { code: "अ", name: "हिन्दी", trans: "hi" },
+    { code: "ಅ", name: "ಕನ್ನಡ", trans: "kan" },
+    { code: "అ", name: "తెలుగు", trans: "tel" },
   ];
 
   const SubmitLang = () => {
     if (SelectLang) {
       router.replace("/(tabs)/profile");
     }
-    i18next.changeLanguage(SelectLang!)
+    i18next.changeLanguage(SelectLang!);
     // console.log(SelectLang);
   };
 
@@ -56,7 +56,6 @@ const LanguageSetting = () => {
           justifyContent: "center",
           alignItems: "center",
           width: wp(100),
-          
         }}
       >
         <Text

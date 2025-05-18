@@ -23,7 +23,7 @@
   "$50": "$50",
   "Buy now": "ఇప్పుడు కొనండి",
   "1000L": "1000 లీ",
-  "Driver ID : 1063": "డ్రైవర్ ఐడి : 1063",
+  "Driver ID": "డ్రైవర్ ఐడి",
   "Logout": "లాగ్ అవుట్",
   "Received": "స్వీకరించబడింది",
   "Spent": "ఖర్చు చేయబడింది",
@@ -40,5 +40,26 @@
   "Next": "తదుపరి",
   "Enter your Full Name": "మీ పూర్తి పేరును నమోదు చేయండి",
   "Enter your Age": "మీ వయస్సును నమోదు చేయండి",
-  "Referral code (optional)": "రిఫరల్ కోడ్ (ఐచ్చికం)"
+  "Referral code (optional)": "రిఫరల్ కోడ్ (ఐచ్చికం)",
+  
+  "Good Morning": "శుభోదయం",
+  "Good Afternoon": "శుభ మద్యాహ్నం",
+  "Good Evening": "శుభ సాయంత్రం",
+  "Your Points": "మీ పాయింట్లు",
+  "All milestones achieved": "అన్ని మైలురాళ్లు పూర్తయ్యాయి",
+  "Referal": "సూచన",
+  "Refer your friend": "మీ మిత్రుని సూచించండి",
+  "Age": "వయస్సు",
+  "email": "ఇమెయిల్",
+  "Address": "చిరునామా",
+  "State": "రాష్ట్రం",
+  "Account Settings": "ఖాతా సెట్టింగ్‌లు",
+  "Language": "భాష",
+  "Refer a friends and earn 100 points": "స్నేహితులను సూచించి 100 పాయింట్లు సంపాదించండి",
+  "Invite Friends": "స్నేహితులను ఆహ్వానించండి",
+  "How to earn 100 points": "100 పాయింట్లు ఎలా సంపాదించాలి",
+  "Follow the steps below and get rewards and points": "క్రింద ఇవ్వబడిన దశలను అనుసరించి బహుమతులు మరియు పాయింట్లు పొందండి",
+  "Scan the QR code to get 100 points": "100 పాయింట్ల కోసం QR కోడ్ స్కాన్ చేయండి"
+
+
 }

@@ -1,17 +1,14 @@
 import {
-  Animated,
-  Image,
   ScrollView,
   StyleSheet,
   Text,
-  TextInput,
   TouchableOpacity,
   View,
+  Animated,
 } from "react-native";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
 import { theme } from "@/infrastructure/themes";
-import Button from "@/components/General/button";
-import { router } from "expo-router";
+import { router, useFocusEffect } from "expo-router";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -23,159 +20,204 @@ import UserDetails from "@/components/Profile/UserDetails";
 import LanguageSetting from "@/components/Profile/languageSetting";
 import axiosInstance from "@/utils/axionsInstance";
 import ReferalCard from "@/components/Profile/referalCard";
-import { Badge } from "react-native-paper";
-import EditButton from "@/components/Profile/edit";
-import CustomizedBadge from "@/components/Home/CustomizedBadge";
-import { width, height, size, fontSize } from "react-native-responsive-sizes";
+import { size, fontSize } from "react-native-responsive-sizes";
 import { useAuth } from "@/utils/AuthContext";
 
+// Skeleton Component
+const SkeletonLoader = ({ width, height, style }:any) => {
+  const opacity = useRef(new Animated.Value(0.3)).current;
 
-const profile = () => {
-  const [userInfo, setuserInfo] = useState<{ id?: number; name?: string }>({});
-  const [userPoints, setuserPoints] = useState([]);
-  const { token, driverId } = useAuth();
-  const { isAuthenticated, logout } = useAuth();
   useEffect(() => {
-    const driver_id = driverId;
-    const usertoken =token
-   
- 
-    const getUserDetails = async () => {
-      try {
-        
-        const response = await axiosInstance.post(
-          "/user-details.php",
-          { driver_id },
-          {
-            headers: {
-              Authorization: `Bearer ${usertoken}`,
-            },
-          }
-        );
-        const response2 = await axiosInstance.post(
-          "/driver-points.php",
-          { driver_id, take: 10, skip: 0 },
-          {
-            headers: {
-              Authorization: `Bearer ${usertoken}`,
-            },
-          }
-        )
-        const userDetails = response.data;
-        const PointsDetails = response2.data;
-        setuserInfo(userDetails.driver);
-        setuserPoints(response2.data);
-        // console.log("User 🏅:", PointsDetails);
-      } catch (error) {
-        console.error("Error fetching user details:", error);
-      }
-    };
-
-    getUserDetails();
-  }, []);
-
-  const logot = () => {
-    logout()
-    router.replace("/(screens)/LanguageSeletionScreen");
-  };
-   const [isLoading, setIsLoading] = useState(true);
-  const { t } = useTranslation();
-  // Simulate loading
-  useEffect(() => {
-    setTimeout(() => {
-      setIsLoading(false);
-    }, 2000);
-  }, []);
-
-  // Simple DIY Skeleton component
-  const Skeleton = ({ width, height, style }:any) => {
-    const opacity = useRef(new Animated.Value(0.3)).current;
-    
-    useEffect(() => {
-      Animated.loop(
-        Animated.sequence([
-          Animated.timing(opacity, {
-            toValue: 0.5,
-            duration: 800,
-            useNativeDriver: true,
-          }),
-          Animated.timing(opacity, {
-            toValue: 0.3,
-            duration: 800,
-            useNativeDriver: true,
-          }),
-        ])
-      ).start();
-    }, []);
-
-    return (
-      <Animated.View
-        style={[
-          {
-            width,
-            height,
-            backgroundColor: '#E0E0E0',
-            borderRadius: 4,
-            opacity,
-          },
-          style,
-        ]}
-      />
+    const animation = Animated.loop(
+      Animated.sequence([
+        Animated.timing(opacity, {
+          toValue: 1,
+          duration: 800,
+          useNativeDriver: true,
+        }),
+        Animated.timing(opacity, {
+          toValue: 0.3,
+          duration: 800,
+          useNativeDriver: true,
+        }),
+      ])
     );
-  };
-   const renderSkeleton = () => {
-      return (
-        <View style={{display:"flex",flexDirection:"column",justifyContent:"space-between",alignItems:"center"}}>
-          
-          <View style={{ flexDirection: 'column', alignItems: 'center',justifyContent:"center" ,gap:10 }}>
-            <Skeleton width={100} height={100} style={{ borderRadius: 100 }} />
-            <View style={{ display:"flex",flexDirection:"column",alignItems:"center" }}>
-              <Skeleton width={120} height={20} />
-              <Skeleton width={80} height={20} style={{ margin: 6 }} />
-            </View>
-          </View>
-  
-     
-          <View style={{  alignItems: "center", gap: 10,display:"flex",flexDirection:"row",justifyContent:"space-evenly" ,marginTop:10 }}>
-            <Skeleton width={width(40)} height={hp(12)} style={{ borderRadius: 8 }} />
-            <Skeleton width={width(40)} height={hp(12)} style={{ borderRadius: 8 }} />
-          </View>
-          <Skeleton width={width(82)} height={hp(12)} style={{ borderRadius: 10,marginTop:10 }} />
-         
-          {/* Recent Transaction Title Skeleton */}
-          <View style={{ width: width(82), alignItems: "flex-start", gap: 10 ,}} >
-            <Skeleton width={width(40)} height={24} style={{ marginTop:10 }} />
-            <Skeleton width={width(80)} height={hp(15)} style={{ borderRadius: 8 }} />
-          
-           
-          </View>
-        </View>
-      );
-    };
+
+    animation.start();
+
+    return () => animation.stop();
+  }, [opacity]);
+
+  return (
+    <Animated.View
+      style={[
+        {
+          width: width,
+          height: height,
+          backgroundColor: "#E0E0E0",
+          borderRadius: 8,
+          opacity: opacity,
+        },
+        style,
+      ]}
+    />
+  );
+};
+
+// Profile Skeleton Screen
+const ProfileSkeleton = () => {
+  const { t } = useTranslation();
   
   return (
     <ScrollView>
-      
-      {isLoading ? renderSkeleton() : (
-        <View><View>
-      
-        <View style={{display:"flex",flexDirection:"column",justifyContent:"space-between",alignItems:"center"}}>
+      <View>
+        <View
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginTop: hp(2),
+          }}
+        >
+          {/* Avatar Skeleton */}
+          <SkeletonLoader 
+            width={size(100)} 
+            height={size(100)} 
+            style={{ borderRadius: 50 }}
+          />
           
-          <View >
+          <View
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+              alignItems: "center",
+              marginTop: hp(1.5),
+            }}
+          >
+            {/* Name Skeleton */}
+            <SkeletonLoader width={150} height={24} style={{ marginBottom: 8 }} />
+            
+            {/* Driver ID Skeleton */}
+            <SkeletonLoader width={120} height={22} style={{ borderRadius: 10 }} />
+          </View>
+        </View>
+      </View>
+      
+      <View style={styles.container}>
+        {/* Bentogrids Skeleton */}
+        <View style={{ width: "100%", flexDirection: "row", justifyContent: "space-between" }}>
+          <SkeletonLoader width={wp(28)} height={hp(14)} style={{ borderRadius: 12 }} />
+          <SkeletonLoader width={wp(28)} height={hp(14)} style={{ borderRadius: 12 }} />
+          <SkeletonLoader width={wp(28)} height={hp(14)} style={{ borderRadius: 12 }} />
+        </View>
+        
+        {/* Referal Card Skeleton */}
+        <SkeletonLoader width="100%" height={hp(18)} style={{ borderRadius: 12 }} />
+        
+        {/* User Details Skeleton */}
+        <SkeletonLoader width="100%" height={hp(20)} style={{ borderRadius: 12 }} />
+        
+        {/* Language Setting Skeleton */}
+        <SkeletonLoader width="100%" height={hp(8)} style={{ borderRadius: 8 }} />
+        
+        {/* Logout Button Skeleton */}
+        <SkeletonLoader width="100%" height={hp(6)} style={{ borderRadius: 8 }} />
+      </View>
+    </ScrollView>
+  );
+};
+
+const profile = () => {
+  const [userInfo, setuserInfo] = useState<{ id?: string; name?: string, points?: number }>({ 
+    id: undefined, 
+    name: undefined,
+    points: 0 
+  });
+  const [loading, setLoading] = useState(true);
+  const { token, driverId, clearAuthData, logout: authLogout } = useAuth();
+  const { t } = useTranslation();
+  
+  // Extract getUserDetails as a separate function so we can call it multiple times
+  const getUserDetails = async () => {
+    try {
+      setLoading(true);
+      const response = await axiosInstance.post(
+        "/user-details.php",
+        { driver_id: driverId },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const userDetails = response.data;
+      setuserInfo(userDetails.driver);
+      console.log("User Details refreshed:", userDetails.driver);
+    } catch (error) {
+      console.error("Error fetching user details:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Use this hook to refresh data when screen comes into focus
+  useFocusEffect(
+    useCallback(() => {
+      console.log("Profile screen focused - refreshing data");
+      getUserDetails();
+      return () => {
+        // Cleanup if needed
+      };
+    }, [driverId, token])
+  );
+  
+  // Initial data loading
+  useEffect(() => {
+    getUserDetails();
+  }, []);
+
+  // Fixed logout function that properly calls the logout from AuthContext
+  const handleLogout = async () => {
+    try {
+      console.log("Logging out user");
+      // Use the logout function from AuthContext
+      await authLogout();
+      // Then navigate to language selection screen
+      router.replace("/(screens)/LanguageSeletionScreen");
+    } catch (error) {
+      console.error("Error during logout:", error);
+    }
+  };
+
+  if (loading) {
+    return <ProfileSkeleton />;
+  }
+  
+  return (
+    <ScrollView>
+      <View>
+        <View
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
+          <View>
             <View style={styles.badge}>
               <Text
                 style={{
                   color: theme.colors.text.primary,
                   fontFamily: theme.fontFamily.semiBold,
                   fontSize: fontSize(32),
-                  
                 }}
               >
-                {" "}
                 {userInfo.name?.charAt(0)}
               </Text>
             </View>
-            
           </View>
           <View
             style={{
@@ -201,12 +243,12 @@ const profile = () => {
         </View>
       </View>
       <View style={styles.container}>
-        <UserBentogrids points={userPoints} />
+        <UserBentogrids points={userInfo.points || 0} />
         <ReferalCard />
         <UserDetails data={userInfo} />
   
         <LanguageSetting />
-        <TouchableOpacity onPress={logot} style={styles.btn}>
+        <TouchableOpacity onPress={handleLogout} style={styles.btn}>
           <Text
             style={{
               color: theme.colors.text.primary,
@@ -217,8 +259,7 @@ const profile = () => {
             {t("Logout")}
           </Text>
         </TouchableOpacity>
-      </View></View>
-      )}
+      </View>
     </ScrollView>
   );
 };
@@ -237,8 +278,6 @@ const styles = StyleSheet.create({
     justifyContent: "flex-start",
     height: "100%",
     width: "90%",
-
-    // backgroundColor: theme.colors.ui.screenbg,
   },
   gradient: {
     paddingVertical: hp(0.45),
@@ -277,7 +316,6 @@ const styles = StyleSheet.create({
     fontFamily: theme.fontFamily.semiBold,
     borderRadius: 5,
     borderColor: theme.colors.brand.blue,
-    // paddingHorizontal: hp("2%"),
   },
   badge: {
     width: size(100),

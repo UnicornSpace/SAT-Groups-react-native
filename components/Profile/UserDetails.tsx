@@ -10,13 +10,14 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
-import { FontAwesome, FontAwesome5, Ionicons } from "@expo/vector-icons";
+import { FontAwesome, FontAwesome5, Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
 import { theme } from "@/infrastructure/themes";
 import { router } from "expo-router";
 
 
 const PersonDetails = ({ icon, title, subtitle }: any) => {
+  
   return (
     <TouchableOpacity
       style={{
@@ -29,7 +30,12 @@ const PersonDetails = ({ icon, title, subtitle }: any) => {
     >
       <TouchableOpacity style={styles.userbtn}>
         {/* <Ionicons name="pencil" size={20} color="black" /> */}
-        <FontAwesome name={icon} size={18} color={theme.colors.brand.blue} />
+        {/* <FontAwesome name={icon} size={18} color={theme.colors.brand.blue} /> */}
+        <MaterialCommunityIcons
+          name={icon}
+          size={20}
+          color={theme.colors.brand.blue}
+        />
         {/* <FontAwesome5 name="user" size={16} color={theme.colors.brand.blue} /> */}
       </TouchableOpacity>
       <View style={{ display: "flex", flexDirection: "column" }}>
@@ -58,6 +64,22 @@ const PersonDetails = ({ icon, title, subtitle }: any) => {
 
 const UserDetails = ({ data }: any) => {
   const { t } = useTranslation();
+  
+  const calculateAge = (dateString: string): number => {
+    const birthDate = new Date(dateString);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const m = today.getMonth() - birthDate.getMonth();
+  
+    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+  
+    return age;
+  };
+  
+
+
   return (
     <View style={{}}>
       <View
@@ -81,13 +103,15 @@ const UserDetails = ({ data }: any) => {
         
       </View>
       <View style={styles.container}>
-        {/* <PersonDetails icon={"user"} title="Age" subtitle={"35 years"} /> */}
+      <PersonDetails icon={"calendar"} title={t("Age")} subtitle={`${(data.dob)} `} />
+
+        <PersonDetails icon={"email"} title={t("email")} subtitle={ `${data.email}` } />
         <PersonDetails
-          icon={"map-pin"}
-          title="Address"
-          subtitle={`${data.address}, ${data.city} `}
+          icon={"map-marker"}
+          title={t("State")}
+          subtitle={` ${data.state}` }
         />
-        <PersonDetails icon={"map-pin"} title="State" subtitle={"karnataka"} />
+        <PersonDetails icon={"map-outline"} title={t("Address")} subtitle={` ${data.city} `} />
       </View>
     </View>
   );
@@ -100,7 +124,6 @@ const styles = StyleSheet.create({
     width: wp(85),
     display: "flex",
     flexDirection: "column",
-
     gap: hp(2),
   },
   

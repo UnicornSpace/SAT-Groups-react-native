@@ -8,6 +8,7 @@ import Svg, { Path } from "react-native-svg";
 import { theme } from "@/infrastructure/themes";
 import { Button } from "react-native-paper";
 import RefferalSteps from "@/components/Profile/RefferalSteps";
+import { t } from "i18next";
 const ReferalScreen = (props: any) => {
   return (
     <View style={styles.container}>
@@ -41,6 +42,9 @@ const ReferalScreen = (props: any) => {
       />
       <View style={{ paddingTop: wp(11),paddingLeft:hp(2),display:"flex",justifyContent:"center",gap:hp(2), }}>
         <Text
+        adjustsFontSizeToFit={true}
+        minimumFontScale={0.7}
+        numberOfLines={2}
           style={{
             fontFamily: theme.fontFamily.medium,
             color: theme.colors.text.primary,
@@ -50,7 +54,7 @@ const ReferalScreen = (props: any) => {
           }}
 
         >
-          Refer a friends and earn 100 points
+          {t("Refer a friends and earn 100 points")}
         </Text>
         <Button
           style={{
@@ -68,7 +72,7 @@ const ReferalScreen = (props: any) => {
               fontSize: theme.fontSize.p2,
             }}
           >
-            Invite Friends
+            {t("Invite Friends")}
           </Text>
         </Button>
       </View>

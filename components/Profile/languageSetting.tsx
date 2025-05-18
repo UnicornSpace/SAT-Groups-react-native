@@ -12,7 +12,7 @@ import { router } from "expo-router";
 const LanguageSetting = () => {
   const { t } = useTranslation();
   return (
-    <TouchableOpacity onPress={() => {router.push("/(screens)/language-setting")}}>
+    <TouchableOpacity onPress={() => {router.replace("/(screens)/language-setting")}}>
       <View
         style={{
           display: "flex",
@@ -54,7 +54,7 @@ const LanguageSetting = () => {
               color: theme.colors.brand.blue,
             }}
           >
-            Language
+            {t("Language")}
           </Text>
         </View>
         <LanguageSelection/>

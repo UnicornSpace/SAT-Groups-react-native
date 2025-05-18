@@ -2,6 +2,7 @@
 
 import { theme } from "@/infrastructure/themes";
 import { useAuth } from "@/utils/AuthContext";
+import { t } from "i18next";
 import React, { useEffect, useRef, useMemo } from "react";
 import {
   ScrollView,
@@ -66,6 +67,8 @@ const SvgComponent: React.FC<MilestonePathProps> = ({
     { label: "700 L", points: 700, isAchieved: false, iconType: "coins" },
     { label: "750 L", points: 750, isAchieved: false, iconType: "coins" },
     { label: "1000 L", points: 1000, isAchieved: false, iconType: "gift" },
+    // { label: "1500 L", points: 1500, isAchieved: false, iconType: "gift" },
+    // { label: "1800 L", points: 1800, isAchieved: false, iconType: "gift" },
   ];
 
   // Use provided milestones or defaults
@@ -97,7 +100,7 @@ const SvgComponent: React.FC<MilestonePathProps> = ({
   const verticalSpacing = 100;
   const leftPosition = 60;
   const rightPosition = 240;
-  const startY = 100; // Starting position (will be adjusted by total height calculation)
+  const startY = 15; // Starting position (will be adjusted by total height calculation)
 
   // Calculate coordinates for each milestone
   const calculatePoints = (items: Milestone[]) => {
@@ -381,12 +384,12 @@ const SvgComponent: React.FC<MilestonePathProps> = ({
       {/* Fixed Progress Card at Top */}
       <View style={styles.fixedProgressContainer}>
         <View style={styles.progressCard}>
-          <RNText style={styles.pointsText}>Your Points: {userPoints}</RNText>
+          <RNText style={styles.pointsText}>{t("Your Points")}: {userPoints}</RNText>
           <View style={styles.nextMilestoneContainer}>
             <RNText style={styles.milestoneText}>
               {userPoints >=
               (activeMilestones[activeMilestones.length - 1].points ?? 0)
-                ? "All milestones achieved!"
+                ? t("All milestones achieved")
                 : `${progressPercentage}% to ${currentMilestone.label}`}
             </RNText>
             <View style={styles.progressBarContainer}>
@@ -427,7 +430,7 @@ const SvgComponent: React.FC<MilestonePathProps> = ({
                   <Path
                     stroke="#26456C"
                     strokeLinecap="round"
-                    strokeWidth={25}
+                    strokeWidth={30}
                     d={completedPath}
                   />
                 )}
@@ -437,7 +440,7 @@ const SvgComponent: React.FC<MilestonePathProps> = ({
                   <Path
                     stroke="#DBDBDB"
                     strokeLinecap="round"
-                    strokeWidth={25}
+                    strokeWidth={30}
                     d={remainingPath}
                   />
                 )}
@@ -445,7 +448,7 @@ const SvgComponent: React.FC<MilestonePathProps> = ({
                 {/* Milestone circles and labels */}
                 {points.map((point, index) => {
                   const isStart = index === 0; // First point is start
-                  const circleRadius = isStart ? 40 : 25;
+                  const circleRadius = isStart ? 38 : 25;
                   const labelOffset = isStart ? 5 : 35;
                   const isEven = index % 2 === 0;
                   const labelX = isStart
@@ -477,7 +480,7 @@ const SvgComponent: React.FC<MilestonePathProps> = ({
                             ? "#26456C"
                             : "#fff"
                         }
-                        strokeWidth={point.isCurrent ? 3 : 2}
+                        strokeWidth={point.isCurrent ? 5 : 3}
                       />
 
                       {/* Icon inside circle */}
@@ -535,9 +538,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     position: 'relative',
+ 
   },
   scrollContainer: {
     flexGrow: 1,
+   
   },
   topPadding: {
     height: 100, // Height of the fixed progress card plus padding

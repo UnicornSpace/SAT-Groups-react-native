@@ -1,6 +1,12 @@
-import { Image, StyleSheet, Text, View } from "react-native";
-import React from "react";
-import Title from "../General/Title";
+import {
+  Alert,
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import React, { useEffect, useState } from "react";
 import { theme } from "@/infrastructure/themes";
 import { Ionicons } from "@expo/vector-icons";
 import {
@@ -9,16 +15,83 @@ import {
 } from "react-native-responsive-screen";
 import { useTranslation } from "react-i18next";
 import { size } from "react-native-responsive-sizes";
+import * as Location from "expo-location";
+import * as Linking from "expo-linking";
+import { getDistance } from "geolib";
+
 const AllBranches = ({ branch }: any) => {
   const { t } = useTranslation();
-  
+  const [userLocation, setUserLocation] = useState<{
+    latitude: number;
+    longitude: number;
+  }>({ latitude: 0, longitude: 0 });
 
-  // console.log("branch", branch && branch.length > 0 ? branch[0].brand : "No branch data");
+  // Get user location
+  useEffect(() => {
+    const fetchLocation = async () => {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status === "granted") {
+        const location = await Location.getCurrentPositionAsync({});
+        setUserLocation(location.coords);
+      }
+    };
+    fetchLocation();
+  }, []);
+
+  const openInGoogleMaps = async (lat: string, lng: string) => {
+    const { status } = await Location.requestForegroundPermissionsAsync();
+
+    if (status !== "granted") {
+      Alert.alert(
+        "Location Permission Required",
+        "Allow location access to use this feature smoothly.",
+        [
+          { text: "Open Settings", onPress: () => Linking.openSettings() },
+          { text: "Cancel", style: "cancel" },
+        ]
+      );
+      return;
+    }
+
+    // Clean coordinates from any spaces or extra characters
+    const cleanLat = parseFloat(lat.replace(/[^0-9.-]/g, ""));
+    const cleanLng = parseFloat(lng.replace(/[^0-9.-]/g, ""));
+
+    if (isNaN(cleanLat) || isNaN(cleanLng)) {
+      Alert.alert("Error", "Invalid location coordinates");
+      return;
+    }
+
+    const url = `https://www.google.com/maps/dir/?api=1&origin=${userLocation.latitude},${userLocation.longitude}&destination=${cleanLat},${cleanLng}`;
+    Linking.openURL(url);
+  };
+
   const sentenceCase = (str: string): string => {
     return str
       .toLowerCase()
       .replace(/(^\w|\s\w)/g, (match) => match.toUpperCase());
   };
+
+  // Calculate distance between user and branch
+  const calculateDistance = (branchLat: string, branchLng: string): string => {
+    if (!userLocation.latitude || !userLocation.longitude) return "-- KM";
+
+    const cleanLat = parseFloat(branchLat.replace(/[^0-9.-]/g, ""));
+    const cleanLng = parseFloat(branchLng.replace(/[^0-9.-]/g, ""));
+
+    if (isNaN(cleanLat) || isNaN(cleanLng)) return "-- KM";
+
+    const distance = getDistance(
+      {
+        latitude: userLocation.latitude,
+        longitude: userLocation.longitude,
+      },
+      { latitude: cleanLat, longitude: cleanLng }
+    );
+
+    return `${(distance / 1000).toFixed(1)} KM`;
+  };
+
   if (!branch || branch.length === 0) {
     return (
       <View style={{ width: wp("90%"), alignItems: "center", padding: 20 }}>
@@ -26,6 +99,7 @@ const AllBranches = ({ branch }: any) => {
       </View>
     );
   }
+
   return (
     <View
       style={{
@@ -45,60 +119,40 @@ const AllBranches = ({ branch }: any) => {
       >
         {t("All Branch")}
       </Text>
-      <View style={{ display: "flex", flexDirection: "row", gap: 20 }}>
+      <View style={styles.branchesContainer}>
         {branch.map((item: any) => {
+          const locationName = item.location_name.split("-");
+          const branchName = locationName[0] || "";
+          const branchLocation = locationName[1] || "";
+          const distance = calculateDistance(item.lat, item.lng);
+
           return (
-            <View
-              key={item.id}
-              style={{
-                display: "flex",
-                gap: 4,
-                flexDirection: "column",
-                justifyContent: "space-between",
-                alignItems: "center",
-                maxWidth: wp("30%"),
-              }}
+            <TouchableOpacity
+              key={item.id || item.location_code}
+              style={styles.branchItem}
+              onPress={() => openInGoogleMaps(item.lat, item.lng)}
             >
               <Image
-                style={{
-                  width: wp("25%"),
-                  height: hp("12%"),
-                  borderRadius: 100,
-                }}
+                style={styles.branchImage}
                 source={require("@/assets/images/satgroups/branch.png")}
               />
-              <View
-                style={{ display: "flex", alignItems: "center", marginTop: 10 }}
-              >
-                <Text
-                  style={{
-                    fontFamily: theme.fontFamily.semiBold,
-                    fontSize: 14,
-                    color: theme.colors.brand.blue,
-                    textAlign: "center",
-                    lineHeight: 20,
-                  }}
-                >
-                  {sentenceCase(item.location_name.split("-")[0])}
+              <View style={styles.branchInfo}>
+                <Text style={styles.branchName}>
+                  {sentenceCase(branchName)}
                 </Text>
-                <View style={styles.dateContainer}>
-                  <Text style={styles.date}>{t(sentenceCase(item.location_name.split("-")[1]))}</Text>
-                </View>
-                {/* <Text
-                style={{
-                  fontFamily: theme.fontFamily.medium,
-                  fontSize: 14,
-                  color: theme.colors.text.secondary,
-                }}
-              >
-                252 Km
-              </Text> */}
+                {branchLocation && (
+                  <View style={styles.dateContainer}>
+                    <Text style={styles.date}>
+                      {t(sentenceCase(branchLocation))}
+                    </Text>
+                  </View>
+                )}
+                <Text style={styles.distanceText}>{distance}</Text>
               </View>
-            </View>
+            </TouchableOpacity>
           );
         })}
       </View>
-    
     </View>
   );
 };
@@ -106,28 +160,51 @@ const AllBranches = ({ branch }: any) => {
 export default AllBranches;
 
 const styles = StyleSheet.create({
-  card: {
-    backgroundColor: theme.colors.ui.cardbg,
-    boxShadow: "0px 3px 3px rgba(0, 0, 0, 0.25)",
-    borderRadius: 8,
-    borderColor: "#C5C5C5",
-    borderWidth: 0.3,
+  branchesContainer: {
+    display: "flex",
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
+    width: "100%",
+    gap: hp(2),
+  },
+  branchItem: {
     display: "flex",
     flexDirection: "column",
-    justifyContent: "space-around",
     alignItems: "center",
-    padding: wp(5),
-    width: wp("45%"),
+    width: wp("43%"),
+    backgroundColor: theme.colors.ui.cardbg,
+    borderRadius: 12,
+    borderColor: "#E0E0E0",
+    borderWidth: 1,
+    padding: 10,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    // elevation: 1,
   },
-  place: {
-    fontSize: hp(2.2),
+  branchImage: {
+    width: wp("25%"),
+    height: hp("12%"),
+    borderRadius: 100,
+    marginBottom: 8,
+  },
+  branchInfo: {
+    display: "flex",
+    alignItems: "center",
+    width: "100%",
+    marginTop: 4,
+  },
+  branchName: {
     fontFamily: theme.fontFamily.semiBold,
+    fontSize: size(14),
     color: theme.colors.brand.blue,
-  },
-  distance: {
-    fontSize: hp(1.8),
-    fontFamily: theme.fontFamily.medium,
-    color: theme.colors.text.secondary,
+    textAlign: "center",
+    lineHeight: 20,
   },
   dateContainer: {
     borderRadius: 5,
@@ -143,11 +220,10 @@ const styles = StyleSheet.create({
     color: theme.colors.text.primary,
     fontFamily: theme.fontFamily.medium,
   },
-  rightContainer: {
-    alignItems: "flex-end",
-  },
-  points: {
-    fontSize: size(15),
+  distanceText: {
     fontFamily: theme.fontFamily.medium,
+    fontSize: size(12),
+    color: theme.colors.text.secondary,
+    marginTop: size(4),
   },
 });

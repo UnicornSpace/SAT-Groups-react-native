@@ -1,35 +1,31 @@
-import React, { useEffect } from "react";
-import { useAuth } from "@/utils/AuthContext";
-import { useRouter } from "expo-router";
-import { ActivityIndicator, View } from "react-native";
+// import { Redirect } from 'expo-router';
+// import React from 'react';
+// import './language-selectiom'
 
-interface AuthRedirectProps {
-  children: React.ReactNode;
-}
+// export default function Index(): React.JSX.Element {
+//   return <Redirect href="/(screens)/LanguageSeletionScreen" />;
+//   return <Redirect href="/(tabs)" />;
+// }
 
-/**
- * A wrapper component for auth screens to prevent authenticated users
- * from accessing login/registration screens
- */
-const AuthRedirect: React.FC<AuthRedirectProps> = ({ children }) => {
-  const { isAuthenticated, isLoading } = useAuth();
-  const router = useRouter();
 
-  useEffect(() => {
-    if (!isLoading && isAuthenticated) {
-      router.replace("/(tabs)");
-    }
-  }, [isAuthenticated, isLoading, router]);
+import { Redirect } from 'expo-router';
+import { useAuth } from '@/utils/AuthContext';
+import { ActivityIndicator, View } from 'react-native';
 
-  if (isLoading) {
+export default function Index() {
+  const { token, loading } = useAuth();
+
+  if (loading) {
     return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
         <ActivityIndicator size="large" />
       </View>
     );
   }
 
-  return !isAuthenticated ? <>{children}</> : null;
-};
+  if (!token) {
+    return <Redirect href="/(screens)/LanguageSeletionScreen" />;
+  }
 
-export default AuthRedirect;
+  return <Redirect href="/(tabs)" />;
+}

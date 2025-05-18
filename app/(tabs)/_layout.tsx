@@ -1,8 +1,8 @@
 import { Image, StyleSheet, View, Text, BackHandler } from "react-native";
-import { Tabs, useRouter } from "expo-router";
-import { FontAwesome } from "@expo/vector-icons";
+import { Link, Tabs, useRouter } from "expo-router";
+import { FontAwesome, Ionicons } from "@expo/vector-icons";
 import React, { useEffect } from "react";
-import '@/app/language-selectiom';
+import '@/app/language-selectiom'
 import { theme } from "@/infrastructure/themes";
 
 import EditButton from "@/components/Profile/edit";
@@ -18,6 +18,7 @@ TextComponent.defaultProps.allowFontScaling = false;
 
 function LogoTitle() {
   return (
+   <Link href={"/(tabs)"}>
     <View
       style={{
         flexDirection: "row",
@@ -32,7 +33,8 @@ function LogoTitle() {
         source={require("../../assets/images/satgroups/Logo.png")}
         resizeMode="contain"
       />
-    </View>
+      {/* <LanguageSelection/> */}
+    </View></Link>
   );
 }
 

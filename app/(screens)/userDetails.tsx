@@ -4,11 +4,15 @@ import {
   TextInput,
   TouchableOpacity,
   View,
+  ScrollView,
+  KeyboardAvoidingView,
+  Platform,
+  Animated,
 } from "react-native";
-import React, { useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { theme } from "@/infrastructure/themes";
 import { LinearGradient } from "expo-linear-gradient";
-import { Ionicons } from "@expo/vector-icons";
+import { AntDesign, Ionicons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
 import {
   widthPercentageToDP as wp,
@@ -17,134 +21,415 @@ import {
 import { useTranslation } from "react-i18next";
 import axiosInstance from "@/utils/axionsInstance";
 import ReferalCard from "@/components/Profile/referalCard";
-const UserDetails = () => {
+import SimpleDatePicker from "@/components/General/dob-input";
+import RNPickerSelect from "react-native-picker-select";
+import { Dropdown } from "react-native-element-dropdown";
+import { indianStates } from "@/utils/data";
 
-  // use react form hook here,
-  const { isNewUser} = useLocalSearchParams<{ isNewUser:any }>();
-  const [userName, setuserName] = React.useState("");
-  const [userAge, setuserAge] = React.useState("");
-  const [SateName, setSateName] = React.useState("");
-  const [Address, setAddress] = React.useState("");
-  const [formattedNumber, setFormattedNumber] = React.useState("");
-  const onSubmitDetails =async () => {
+// Skeleton Component
+const SkeletonLoader = ({ width, height, style }:any) => {
+  const opacity = useRef(new Animated.Value(0.3)).current;
 
-    
-    if(isNewUser){
-      userAge.length > 0 && userName.length > 0
-      ? router.push("/(tabs)")
-      : alert("Please fill all the details");
-    }
+  useEffect(() => {
+    const animation = Animated.loop(
+      Animated.sequence([
+        Animated.timing(opacity, {
+          toValue: 1,
+          duration: 800,
+          useNativeDriver: true,
+        }),
+        Animated.timing(opacity, {
+          toValue: 0.3,
+          duration: 800,
+          useNativeDriver: true,
+        }),
+      ])
+    );
 
-    try {
-      const response = await axiosInstance.post("/user-login-request-otp.php", {
-        mobile: formattedNumber,
-        // referral_code: referral || undefined,
-      });
-    } catch (error) {
-      
-    }
-    
-  };
-  const { t } = useTranslation();
-  
- 
+    animation.start();
+
+    return () => animation.stop();
+  }, [opacity]);
+
   return (
-    <View
-      style={{
-        width: wp("100%"),
-        height: "100%",
-        display: "flex",
-        gap: 40,
-        justifyContent: "center",
-        alignItems: "center",
-        paddingHorizontal: 30,
-      }}
-    >
-      <Text
-        style={{
-          fontFamily: theme.fontFamily.semiBold,
-          color: theme.colors.brand.blue,
-          fontSize: hp("3.5%"),
-        }}
-      >
-        {t("Personal Details")}
-      </Text>
-      <View
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: 10,
-          width: wp("90%"),
-        }}
-      >
-        <TextInput
-          autoFocus={true}
-          style={styles.input}
-          onChangeText={setuserName}
-          value={userName}
-          placeholder={t("Enter your Full Name")}
-          keyboardType="name-phone-pad"
-          placeholderTextColor={theme.colors.ui.black + 70}
-        />
-         <TextInput
-          style={styles.input}
-          onChangeText={setuserAge}
-          value={userAge}
-          placeholder={t("Enter your Age")}
-          keyboardType="number-pad"
-          placeholderTextColor={theme.colors.ui.black + 70}
-        />
-        <TextInput
-          style={styles.input}
-          onChangeText={setAddress}
-          value={Address}
-          placeholder={t("Enter State name")}
-          keyboardType="name-phone-pad"
-          placeholderTextColor={theme.colors.ui.black + 70}
-        />
-        <TextInput
-          
-          style={styles.input}
-          onChangeText={setSateName}
-          value={SateName}
-          placeholder={t("Addrees")}
-          keyboardType="name-phone-pad"
-          placeholderTextColor={theme.colors.ui.black + 70}
-        />
-       
-      </View>
-      
+    <Animated.View
+      style={[
+        {
+          width: width,
+          height: height,
+          backgroundColor: "#E0E0E0",
+          borderRadius: 8,
+          opacity: opacity,
+        },
+        style,
+      ]}
+    />
+  );
+};
 
-      <TouchableOpacity onPress={onSubmitDetails} style={{}}>
-        <LinearGradient
-          colors={["#26456C", "#4073B4", "#4073B4"]}
-          style={styles.gradient2}
-        >
-          <Text style={styles.buttonText}>{t("Next")}</Text>
-          <Ionicons
-            name="arrow-forward"
-            size={20}
-            color={theme.colors.text.primary}
-          />
-        </LinearGradient>
-      </TouchableOpacity>
-    </View>
+// UserDetails Skeleton
+const UserDetailsSkeleton = () => {
+  return (
+    <ScrollView contentContainerStyle={styles.container}>
+      {/* Header Skeleton */}
+      <SkeletonLoader width={200} height={40} style={{ marginBottom: 20 }} />
+      
+      <View style={styles.formContainer}>
+        {/* Input Fields Skeleton */}
+        <SkeletonLoader width={wp("90%")} height={hp("7%")} style={{ borderRadius: 5 }} />
+        <SkeletonLoader width={wp("90%")} height={hp("7%")} style={{ borderRadius: 5 }} />
+        <SkeletonLoader width={wp("90%")} height={hp("7%")} style={{ borderRadius: 5 }} />
+        <SkeletonLoader width={wp("90%")} height={hp("7%")} style={{ borderRadius: 5 }} />
+        <SkeletonLoader width={wp("90%")} height={hp("7%")} style={{ borderRadius: 5 }} />
+      </View>
+
+      {/* Button Skeleton */}
+      <SkeletonLoader width={wp("90%")} height={hp("7%")} style={{ borderRadius: 10 }} />
+    </ScrollView>
+  );
+};
+
+const UserDetails = () => {
+  const { isNewUser, driverId, token } = useLocalSearchParams<{
+    isNewUser: any;
+    driverId: any;
+    token: any;
+  }>();
+
+  const [userName, setUserName] = useState("");
+  const [dob, setDob] = useState(""); // Store date as a string in format YYYY-MM-DD
+  const [email, setEmail] = useState("");
+  const [stateName, setStateName] = useState("");
+  const [address, setAddress] = useState("");
+  const [loading, setLoading] = useState(true);
+  const { t } = useTranslation();
+
+  // Form validation states
+  const [errors, setErrors] = useState({
+    userName: "",
+    dob: "",
+    email: "",
+    stateName: "",
+    address: "",
+  });
+
+  useEffect(() => {
+    // Simulate loading data
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 1500);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Validation functions
+  const validateName = (name:any) => {
+    if (!name.trim()) {
+      return "Name is required";
+    }
+    if (name.length < 3) {
+      return "Name must be at least 3 characters";
+    }
+    return "";
+  };
+
+  const validateEmail = (email:any) => {
+    if (!email.trim()) {
+      return "Email is required";
+    }
+    if (!email.includes("@gmail.com")) {
+      return "Email must contain @gmail.com";
+    }
+    return "";
+  };
+
+  const validateDob = (dob:any) => {
+    if (!dob) {
+      return "Date of birth is required";
+    }
+    return "";
+  };
+
+  const validateState = (state:any) => {
+    if (!state || state === "empty") {
+      return "Please select a state";
+    }
+    return "";
+  };
+
+  const validateAddress = (address:any) => {
+    if (!address.trim()) {
+      return "Address is required";
+    }
+    if (address.length < 5) {
+      return "Please enter a valid address";
+    }
+    return "";
+  };
+
+  const validateForm = () => {
+    const newErrors = {
+      userName: validateName(userName),
+      dob: validateDob(dob),
+      email: validateEmail(email),
+      stateName: validateState(stateName),
+      address: validateAddress(address),
+    };
+
+    setErrors(newErrors);
+
+    // Form is valid if no error messages exist
+    return !Object.values(newErrors).some(error => error !== "");
+  };
+
+  const onSubmitDetails = async () => {
+    try {
+      // Validate the form
+      const isValid = validateForm();
+      
+      if (!isValid) {
+        return; // Don't proceed if validation fails
+      }
+
+      console.log("Submitting details:", {
+        driver_id: driverId,
+        name: userName,
+        age: dob,
+        email: email,
+        state: stateName,
+        city: address,
+        profile_pic: "new_base64encodedstring",
+      });
+
+      setLoading(true); // Show loading while submitting
+
+      const response = await axiosInstance.put(
+        "/user-update-details.php",
+        {
+          driver_id: driverId,
+          name: userName,
+          dob: dob,
+          email: email,
+          state: stateName,
+          city: address,
+          profile_pic: "new_base64encodedstring", 
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      
+      console.log("Response:", response.data);
+      router.replace("/(tabs)");
+    } catch (error) {
+      setLoading(false);
+      console.error("Error submitting details:", error);
+    }
+  };
+
+  // Handle date change from SimpleDatePicker
+  const handleDateChange = (dateString: any) => {
+    setDob(dateString);
+    setErrors({...errors, dob: validateDob(dateString)});
+  };
+
+  if (loading) {
+    return <UserDetailsSkeleton />;
+  }
+
+  return (
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={{ flex: 1 }}
+    >
+      <ScrollView contentContainerStyle={styles.container}>
+        <Text style={styles.headerText}>{t("Personal Details")}</Text>
+        <View style={styles.formContainer}>
+          <View>
+            <TextInput
+              autoFocus={true}
+              style={[styles.input, errors.userName ? styles.inputError : null]}
+              onChangeText={(text) => {
+                setUserName(text);
+                setErrors({...errors, userName: validateName(text)});
+              }}
+              value={userName}
+              placeholder={t("Enter your Full Name")}
+              keyboardType="name-phone-pad"
+              placeholderTextColor={theme.colors.ui.black + "70"}
+            />
+            {errors.userName ? <Text style={styles.errorText}>{errors.userName}</Text> : null}
+          </View>
+
+          <View>
+            {/* Using the SimpleDatePicker */}
+            <SimpleDatePicker
+              onDateChange={handleDateChange}
+              placeholder={t("Date of Birth")}
+            />
+            {errors.dob ? <Text style={styles.errorText}>{errors.dob}</Text> : null}
+          </View>
+
+          <View>
+            <TextInput
+              style={[styles.input, errors.email ? styles.inputError : null]}
+              onChangeText={(text) => {
+                setEmail(text);
+                setErrors({...errors, email: validateEmail(text)});
+              }}
+              value={email}
+              placeholder={t("Enter your Email")}
+              keyboardType="email-address"
+              placeholderTextColor={theme.colors.ui.black + "70"}
+            />
+            {errors.email ? <Text style={styles.errorText}>{errors.email}</Text> : null}
+          </View>
+
+          <View>
+            <Dropdown
+              style={[styles2.dropdown, errors.stateName ? styles2.dropdownError : null]}
+              placeholderStyle={styles2.placeholderStyle}
+              selectedTextStyle={styles2.selectedTextStyle}
+              inputSearchStyle={styles2.inputSearchStyle}
+              iconStyle={styles2.iconStyle}
+              data={indianStates}
+              maxHeight={300}
+              labelField="label"
+              valueField="value"
+              placeholder="Select state"
+              searchPlaceholder="Search..."
+              value={stateName}
+              onChange={(item) => {
+                console.log(item.label);  
+                setStateName(item.value);
+                setErrors({...errors, stateName: validateState(item.value)});
+              }}
+              renderLeftIcon={() => (
+                <AntDesign
+                  style={styles2.icon}
+                  color={theme.colors.text.secondary}
+                  name="earth"
+                  size={18}
+                />
+              )}
+            />
+            {errors.stateName ? <Text style={styles.errorText}>{errors.stateName}</Text> : null}
+          </View>
+
+          <View>
+            <TextInput
+              style={[styles.input, errors.address ? styles.inputError : null]}
+              onChangeText={(text) => {
+                setAddress(text);
+                setErrors({...errors, address: validateAddress(text)});
+              }}
+              value={address}
+              placeholder={t("Address")}
+              keyboardType="name-phone-pad"
+              placeholderTextColor={theme.colors.ui.black + "70"}
+            />
+            {errors.address ? <Text style={styles.errorText}>{errors.address}</Text> : null}
+          </View>
+        </View>
+
+        <TouchableOpacity onPress={onSubmitDetails}>
+          <LinearGradient
+            colors={["#26456C", "#4073B4", "#4073B4"]}
+            style={styles.gradient2}
+          >
+            <Text style={styles.buttonText}>{t("Next")}</Text>
+            <Ionicons
+              name="arrow-forward"
+              size={20}
+              color={theme.colors.text.primary}
+            />
+          </LinearGradient>
+        </TouchableOpacity>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
 
 export default UserDetails;
 
+const styles2 = StyleSheet.create({
+  dropdown: {
+    height: hp("7%"),
+    width: wp("90%"),
+    borderColor: theme.colors.brand.blue + 50,
+    borderWidth: 0.5,
+    borderRadius: 5,
+    paddingHorizontal: hp("2.3%"),
+  },
+  dropdownError: {
+    borderColor: 'red',
+    borderWidth: 1,
+  },
+  icon: {
+    marginRight: 5,
+  },
+  placeholderStyle: {
+    fontSize: 14,
+  },
+  selectedTextStyle: {
+    fontSize: 14,
+    color: theme.colors.ui.black,
+    fontFamily: theme.fontFamily.medium,
+  },
+  iconStyle: {
+    width: 20,
+    height: 20,
+  },
+  inputSearchStyle: {
+    height: 40,
+    fontSize: 16,
+  },
+});
+
 const styles = StyleSheet.create({
+  container: {
+    width: wp("100%"),
+    minHeight: hp("100%"),
+    display: "flex",
+    gap: 40,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 30,
+    paddingVertical: 20,
+  },
+  headerText: {
+    fontFamily: theme.fontFamily.semiBold,
+    color: theme.colors.brand.blue,
+    fontSize: hp("3.5%"),
+  },
+  formContainer: {
+    display: "flex",
+    flexDirection: "column",
+    gap: 10,
+    width: wp("90%"),
+  },
   input: {
     height: hp("7%"),
     width: wp("90%"),
     borderWidth: 0.2,
-    boxShadow: "2px 2px 10px rgba(72, 72, 72, 0.2)",
+    borderColor: theme.colors.brand.blue,
     color: theme.colors.ui.black,
     fontFamily: theme.fontFamily.semiBold,
     borderRadius: 5,
-    borderColor: theme.colors.brand.blue,
-    paddingHorizontal: hp("2%"),
+    paddingHorizontal: hp("2.3%"),
+  },
+  inputError: {
+    borderColor: 'red',
+    borderWidth: 1,
+  },
+  errorText: {
+    color: 'red',
+    fontSize: hp(1.6),
+    marginTop: 3,
+    marginLeft: 5,
+    fontFamily: theme.fontFamily.regular,
   },
   gradient2: {
     width: wp("90%"),

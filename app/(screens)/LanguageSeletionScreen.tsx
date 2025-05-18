@@ -11,6 +11,7 @@ import {
 } from "react-native-responsive-screen";
 import i18next from "i18next";
 import { useTranslation } from "react-i18next";
+
 type Language = {
   code: string;
   name: string;
@@ -171,6 +172,8 @@ const LanguageSeletionScreen = () => {
           </LinearGradient>
         </TouchableOpacity>
       )}
+
+      {/* <DOB/> */}
     </View>
   );
 };
