@@ -40,3 +40,5 @@ app-example
 @likitha.n__satGroups.jks
 certificate_for_google.pem
 credentials.json
+pnpm-lock.yaml
+bun.lockb
