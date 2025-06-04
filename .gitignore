@@ -31,8 +31,12 @@ yarn-error.*
 
 # local env files
 .env*.local
+.env
 
 # typescript
 *.tsbuildinfo
 
 app-example
+@likitha.n__satGroups.jks
+certificate_for_google.pem
+credentials.json

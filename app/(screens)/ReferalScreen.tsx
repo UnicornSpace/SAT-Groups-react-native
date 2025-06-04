@@ -9,9 +9,23 @@ import { theme } from "@/infrastructure/themes";
 import { Button } from "react-native-paper";
 import RefferalSteps from "@/components/Profile/RefferalSteps";
 import { t } from "i18next";
+import { Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
 const ReferalScreen = (props: any) => {
   return (
     <View style={styles.container}>
+      <Ionicons
+        name="arrow-back"
+        size={24}
+        color="white"
+        style={{
+          position: "absolute",
+          top: hp(3),
+          left: wp(5),
+          zIndex: 1,
+        }}
+        onPress={() => router.push("/(tabs)/profile")}
+      />
       <View
         style={{ position: "absolute", top: hp(8), left: wp(0), zIndex: 0 }}
       >
@@ -25,7 +39,7 @@ const ReferalScreen = (props: any) => {
           <Path
             stroke="#EBEFF5"
             strokeOpacity={0.9}
-            strokeWidth={135}
+            strokeWidth={125}
             d="M-57.338 179.995c93.559-27.108 214.444 25.255 291.558-53.608 77.114-78.862 124.897-59.164 223-48.5"
           />
         </Svg>
@@ -40,7 +54,7 @@ const ReferalScreen = (props: any) => {
         }}
         source={require("../../assets/images/satgroups/referal.png")}
       />
-      <View style={{ paddingTop: wp(11),paddingLeft:hp(2),display:"flex",justifyContent:"center",gap:hp(2), }}>
+      <View style={{ paddingTop: wp(17),paddingLeft:hp(2),display:"flex",justifyContent:"center",gap:hp(2), }}>
         <Text
         adjustsFontSizeToFit={true}
         minimumFontScale={0.7}
@@ -48,13 +62,13 @@ const ReferalScreen = (props: any) => {
           style={{
             fontFamily: theme.fontFamily.medium,
             color: theme.colors.text.primary,
-            maxWidth: wp(60),
-            fontSize: 18,
-            lineHeight: 25,
+            // maxWidth: wp(60),
+            fontSize: 17,
+            // lineHeight: 25,
           }}
 
         >
-          {t("Refer a friends and earn 100 points")}
+          {t("Refer and earn 100 points")}
         </Text>
         <Button
           style={{

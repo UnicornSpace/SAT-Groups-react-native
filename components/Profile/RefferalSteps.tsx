@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from 'react-native'
+import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import React from 'react'
 import {
   widthPercentageToDP as wp,
@@ -7,10 +7,13 @@ import {
 import { theme } from '@/infrastructure/themes';
 import ReferralStepsVisual from './referalSteps';
 import { t } from 'i18next';
+import ReferralQR from './referral-qr';
 const RefferalSteps = () => {
+ 
 
   return (
-    <View style={{padding:wp(5),display:'flex',gap:hp(3) }}>
+    <ScrollView>
+      <View style={{padding:wp(5),display:'flex',gap:hp(3) }}>
       <View style={{}}>
       <Text style={{fontFamily:theme.fontFamily.medium,fontSize:theme.fontSize.medium}}>{t("How to earn 100 points")}</Text>
       <Text style={{fontFamily:theme.fontFamily.regular,fontSize:theme.fontSize.caption+1 }}>{t("Follow the steps below and get rewards and points")}</Text>
@@ -19,8 +22,9 @@ const RefferalSteps = () => {
       <View>
         <Text style={{fontFamily:theme.fontFamily.medium,fontSize:theme.fontSize.medium -1}}>{t("Scan the QR code to get 100 points")}</Text>
       </View>
-      
+      <ReferralQR/>
     </View>
+    </ScrollView>
   )
 }
 

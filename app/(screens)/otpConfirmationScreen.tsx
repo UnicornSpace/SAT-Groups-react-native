@@ -20,6 +20,7 @@ import { useTranslation } from "react-i18next";
 import axiosInstance from "@/utils/axionsInstance";
 import { useAuth } from "@/utils/AuthContext";
 import { Ionicons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const OtpConfirmationScreen = () => {
   const { setAuthData, token } = useAuth();
@@ -32,11 +33,30 @@ const OtpConfirmationScreen = () => {
   const [loading, setLoading] = useState(false);
   const [otpArray, setOtpArray] = useState(["", "", "", "", ""]);
   const [referralCode, setReferralCode] = useState("");
+  const [isReferralDetected, setIsReferralDetected] = useState(false);
   const inputs = useRef<TextInput[]>([]);
 
   const { t } = useTranslation();
   const isNewUser = UserExist === "true";
 
+  useEffect(() => {
+    checkForReferralCode();
+  }, []);
+
+  const checkForReferralCode = async () => {
+    try {
+      const savedReferralCode = await AsyncStorage.getItem('pendingReferralCode');
+      if (savedReferralCode) {
+        setReferralCode(savedReferralCode);
+        setIsReferralDetected(true);
+        // Clear it so it doesn't appear again
+        await AsyncStorage.removeItem('pendingReferralCode');
+      }
+    } catch (error) {
+      console.log('Error loading referral code:', error);
+    }
+  };
+// console.log("REfeal code",referralCode)
   // Countdown timer
   useEffect(() => {
     if (count <= 0) return;
@@ -45,6 +65,23 @@ const OtpConfirmationScreen = () => {
     }, 1000);
     return () => clearInterval(interval);
   }, [count]);
+useEffect(() => {
+    // Check if there's a stored referral code
+    const loadReferralCode = async () => {
+      try {
+        const storedReferralCode = await AsyncStorage.getItem('referralCode');
+        if (storedReferralCode) {
+          setReferralCode(storedReferralCode);
+          // Optionally remove it after setting
+          await AsyncStorage.removeItem('referralCode');
+        }
+      } catch (error) {
+        console.log('Error loading referral code:', error);
+      }
+    };
+
+    loadReferralCode();
+  }, []);
 
   const handleOtpChange = (text: string, i: number) => {
     if (!/^\d+$/.test(text) && text !== "") return;
@@ -74,7 +111,7 @@ const OtpConfirmationScreen = () => {
       const response = await axiosInstance.post("/user-login-verify-otp.php", {
         mobile: number,
         otp: otpArray.join(""),
-        referral_code: isNewUser ? referralCode : undefined, // Include referral code only for new users
+        referral_code: isNewUser ? referralCode.trim() : undefined, // Include referral code only for new users
       });
 
       const token = response.data.token;
@@ -167,7 +204,7 @@ const OtpConfirmationScreen = () => {
               left: hp(2),
             }}
           >
-            <TouchableOpacity onPress={() => router.back()}>
+            <TouchableOpacity onPress={()=>router.push("/(screens)/otp-screen")}>
               <Ionicons
                 name="arrow-back"
                 size={24}
