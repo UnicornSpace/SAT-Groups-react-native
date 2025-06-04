@@ -1,0 +1,2 @@
+- This is an Expo app with pnpm package manager 
+- Used React native reuseable UI Library to build the UI
