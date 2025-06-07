@@ -13,6 +13,15 @@ import axiosInstance from "@/utils/axionsInstance";
 import CustomizedBadge from "./CustomizedBadge";
 import { useAuth } from "@/utils/AuthContext";
 import { t } from "i18next";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 const getGreetingMessage = () => {
   const currentHour = new Date().toLocaleString("en-IN", {
     hour: "numeric",
@@ -32,11 +41,11 @@ const getGreetingMessage = () => {
 
 console.log(getGreetingMessage(), "currentHour");
 const UserContainer = () => {
-  const {token, driverId} = useAuth()
+  const { token, driverId } = useAuth();
   const [userInfo, setuserInfo] = useState<{ id?: number; name?: string }>({});
   useEffect(() => {
     const driver_id = driverId;
-    const userToken =token
+    const userToken = token;
 
     const getUserDetails = async () => {
       try {
@@ -60,32 +69,31 @@ const UserContainer = () => {
 
     getUserDetails();
   }, []);
+
   const { t } = useTranslation();
   const greeting = getGreetingMessage();
   return (
-    <View style={styles.userContainer}>
-      <View
-        style={{
-          flexDirection: "row",
-          justifyContent: "space-between",
-          alignItems: "center",
-        }}
-      >
-        <View
-          style={{
-            flex: 1,
-            justifyContent: "center",
-            alignItems: "flex-start",
-          }}
-        >
-          <Text style={styles.cardText}>{t(greeting)}</Text>
-          <Text style={styles.userNametext}>{userInfo.name}</Text>
-        </View>
-        <View>
-          <CustomizedBadge userInfo={userInfo.name?.charAt(0)} />
-          {/* <Badge size={30} style={styles.badge}>{userInfo.name?.charAt(0)}</Badge> */}
-        </View>
-      </View>
+    <View>
+      <Card className="w-full ">
+        <CardHeader className="flex flex-row px-3 py-2">
+          <View className="flex-1 ">
+            <CardDescription className="text-sm font-SpaceGroteskRegular">
+              {greeting},
+            </CardDescription>
+            <CardTitle className="text-xl font-SpaceGroteskMedium">
+              {userInfo.name}
+            </CardTitle>
+          </View>
+          <View>
+            <Avatar className="w-10 h-10 " alt={userInfo.name || "User Avatar"}>
+              {/* <AvatarImage  /> */}
+              <AvatarFallback className="">
+                <Text className="font-SpaceGroteskSemibold text-xl text-white">{userInfo.name?.substring(0,2)}</Text>
+              </AvatarFallback>
+            </Avatar>
+          </View>
+        </CardHeader>
+      </Card>
     </View>
   );
 };

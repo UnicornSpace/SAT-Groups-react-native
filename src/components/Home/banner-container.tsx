@@ -10,14 +10,15 @@ import { width, height, size, fontSize } from "react-native-responsive-sizes";
 import { useTranslation } from "react-i18next";
 import axiosInstance from "@/utils/axionsInstance";
 import { useAuth } from "@/utils/AuthContext";
+import { Card } from "@/components/ui/card";
 const BannerContainer = () => {
   const { t } = useTranslation();
   const [Points, setPoints] = useState("");
-  const {token, driverId} = useAuth()
+  const { token, driverId } = useAuth();
   const { myDynamicPoints, setMyDynamicPoints } = useAuth();
   useEffect(() => {
     const driver_id = driverId;
-    const usertoken =token
+    const usertoken = token;
 
     const getPoints = async () => {
       try {
@@ -32,7 +33,7 @@ const BannerContainer = () => {
         );
         const userPoints = response.data;
         setPoints(userPoints.total_points);
-        setMyDynamicPoints(Math.ceil(Number(userPoints.total_points) || 0));  
+        setMyDynamicPoints(Math.ceil(Number(userPoints.total_points) || 0));
         // console.log("User Details:", userPoints.total_points);
         return userPoints.total_points;
       } catch (error) {
@@ -43,32 +44,37 @@ const BannerContainer = () => {
     getPoints();
   }, []);
   return (
-    <View style={{ position: "relative" }}>
-      <Image
-        style={{ width: width(90), height: height(18) }}
-        source={require("@/assets/images/satgroups/banner.png")}
-        resizeMode="stretch"
-      />
-      <View style={{ position: "absolute", top: size(28), left: size(22) }}>
-        <View style={{ flexDirection: "column", justifyContent: "flex-start" }}>
-          <Text style={styles.bannerText}>{t("Total Points")}</Text>
-          <Text style={styles.pointsText}>{Math.ceil(Number(Points) || 0)}</Text>
-
-        </View>
-        <TouchableOpacity style={styles.bannerBtn}>
-          <Text
-            style={{
-              fontFamily: theme.fontFamily.semiBold,
-              // fontSize: hp("1.8%"),
-              fontSize: fontSize(12),
-              color: theme.colors.brand.red,
-            }}
+    <Card>
+      <View style={{ position: "relative" }}>
+        <Image
+          style={{ width: width(90), height: height(18) }}
+          source={require("@/assets/images/satgroups/banner.png")}
+          resizeMode="stretch"
+        />
+        <View style={{ position: "absolute", top: size(28), left: size(22) }}>
+          <View
+            style={{ flexDirection: "column", justifyContent: "flex-start" }}
           >
-            {t("Redeem")}
-          </Text>
-        </TouchableOpacity>
+            <Text style={styles.bannerText}>{t("Total Points")}</Text>
+            <Text style={styles.pointsText}>
+              {Math.ceil(Number(Points) || 0)}
+            </Text>
+          </View>
+          <TouchableOpacity style={styles.bannerBtn}>
+            <Text
+              style={{
+                fontFamily: theme.fontFamily.semiBold,
+                // fontSize: hp("1.8%"),
+                fontSize: fontSize(12),
+                color: theme.colors.brand.red,
+              }}
+            >
+              {t("Redeem")}
+            </Text>
+          </TouchableOpacity>
+        </View>
       </View>
-    </View>
+    </Card>
   );
 };
 

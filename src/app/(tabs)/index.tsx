@@ -15,6 +15,9 @@ import HomeSkeleton from "@/src/components/skeleton/home/home-skeleton";
 import "../../../global.css";
 import { Button } from "@/components/ui/button";
 import Example from "@/src/components/card";
+import { Card } from "react-native-paper";
+import { CardHeader, CardTitle } from "@/components/ui/card";
+import { StatusBar } from "expo-status-bar";
 
 const Home = () => {
   const { t } = useTranslation();
@@ -31,18 +34,16 @@ const Home = () => {
   return loading ? (
     <HomeSkeleton />
   ) : (
-    <ScrollView>
-      <View style={styles.container}>
-        <Link href="/(tabs)/profile">
-          <UserContainer />
-        </Link>
-        <Example />
+    <ScrollView className="flex-1 ">
+      <View className="px-5 flex-col bg-background  gap-6">
+        <UserContainer />
         <BannerContainer />
         <View style={{ width: width(90), alignItems: "flex-start", gap: 10 }}>
-          <Title>{t("Recent_Transcation")}</Title>
+          <Text className="font-SpaceGroteskSemibold text-xl">{t("Recent_Transcation")}</Text>
           <TabsComponent />
         </View>
       </View>
+      <StatusBar style="dark" backgroundColor="#f2f3f5" />
     </ScrollView>
   );
 };

@@ -258,6 +258,9 @@ import axiosInstance from '@/utils/axionsInstance';
 import { width } from 'react-native-responsive-sizes';
 import { useAuth } from '@/utils/AuthContext';
 import { t } from 'i18next';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import RecentTranscationCard from './recent-transcation-card';
+
 
 // Define the transaction type
 interface Transaction {
@@ -268,6 +271,7 @@ interface Transaction {
 }
 
 export default function TabsComponent() {
+    const [value, setValue] = React.useState("Received");
   const [activeTab, setActiveTab] = useState('Received');
   const [transactionsData, setTransactionsData] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
@@ -370,83 +374,66 @@ export default function TabsComponent() {
   const tabWidth = (deviceWidth * 0.9 - 16) / 3; // Calculate based on container width, accounting for padding and gaps
 
   return (
-    <View style={styles.container}>
-      <View style={styles.tabsList}>
-        <TouchableOpacity
-          style={[
-            styles.tabsTrigger,
-            { width: tabWidth },
-            activeTab === 'Received' && styles.activeTabsTrigger,
-          ]}
-          onPress={() => setActiveTab('Received')}
-        >
-          <Text
-            style={[
-              styles.tabsTriggerText,
-              activeTab === 'Received' && styles.activeTabsTriggerText,
-            ]}
-            numberOfLines={1}
-            adjustsFontSizeToFit
+    <View className="flex-1  ">
+      <Tabs
+        value={value}
+        onValueChange={setValue}
+        className="w-full  mx-auto flex-col gap-1.5  "
+      >
+        <TabsList className="flex-row w-full bg-white rounded-3xl justify-around">
+          <TabsTrigger
+            value="Received"
+            className={`flex-1 rounded-3xl ${
+              value === "Received" ? "bg-[#3968A3]" : ""
+            }`}
           >
-            {t("Received")}
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[
-            styles.tabsTrigger,
-            { width: tabWidth },
-            activeTab === 'Spent' && styles.activeTabsTrigger,
-          ]}
-          onPress={() => setActiveTab('Spent')}
-        >
-          <Text
-            style={[
-              styles.tabsTriggerText,
-              activeTab === 'Spent' && styles.activeTabsTriggerText,
-            ]}
-            numberOfLines={1}
-            adjustsFontSizeToFit
+            <Text
+              className={`font-SpaceGroteskSemibold ${
+                value === "Received" ? "text-white" : ""
+              }`}
+            >
+              Received
+            </Text>
+          </TabsTrigger>
+          <TabsTrigger
+            value="Spent"
+            className={`flex-1 rounded-3xl ${
+              value === "Spent" ? "bg-[#3968A3]" : ""
+            }`}
           >
-            {t("Spent")}
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[
-            styles.tabsTrigger,
-            { width: tabWidth },
-            activeTab === 'All' && styles.activeTabsTrigger,
-          ]}
-          onPress={() => setActiveTab('All')}
-        >
-          <Text
-            style={[
-              styles.tabsTriggerText,
-              activeTab === 'All' && styles.activeTabsTriggerText,
-            ]}
-            numberOfLines={1}
-            adjustsFontSizeToFit
+            <Text
+              className={`font-SpaceGroteskSemibold ${
+                value === "Spent" ? "text-white" : ""
+              }`}
+            >
+              Spent
+            </Text>
+          </TabsTrigger>
+          <TabsTrigger
+            value="All"
+            className={`flex-1 rounded-3xl ${
+              value === "All" ? "bg-[#3968A3]" : ""
+            }`}
           >
-            {t("ALL")}
-          </Text>
-        </TouchableOpacity>
-      </View>
-
-      <View style={styles.transactionsContainer}>
-        {loading ? (
-          <Text style={styles.loadingText}>Loading transactions...</Text>
-        ) : (
-          <FlatList
-            nestedScrollEnabled={true}
-            keyboardShouldPersistTaps="handled"
-            data={filteredTransactions}
-            renderItem={renderItem}
-            keyExtractor={(item, index) => `transaction-${index}`}
-            contentContainerStyle={styles.listContainer}
-            ListEmptyComponent={renderEmptyList}
-            ItemSeparatorComponent={() => <View style={styles.separator} />}
-          />
-        )}
-      </View>
+            <Text
+              className={`font-SpaceGroteskSemibold ${
+                value === "All" ? "text-white" : ""
+              }`}
+            >
+              All
+            </Text>
+          </TabsTrigger>
+        </TabsList>
+        <TabsContent value="Received">
+         <RecentTranscationCard/>
+        </TabsContent>
+        <TabsContent value="Spent">
+         <RecentTranscationCard/>
+        </TabsContent>
+        <TabsContent value="All">
+         <RecentTranscationCard/>
+        </TabsContent>
+      </Tabs>
     </View>
   );
 }
