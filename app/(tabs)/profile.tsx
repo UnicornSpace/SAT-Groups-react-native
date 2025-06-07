@@ -22,123 +22,22 @@ import axiosInstance from "@/utils/axionsInstance";
 import ReferalCard from "@/components/Profile/referalCard";
 import { size, fontSize } from "react-native-responsive-sizes";
 import { useAuth } from "@/utils/AuthContext";
-
-// Skeleton Component
-const SkeletonLoader = ({ width, height, style }:any) => {
-  const opacity = useRef(new Animated.Value(0.3)).current;
-
-  useEffect(() => {
-    const animation = Animated.loop(
-      Animated.sequence([
-        Animated.timing(opacity, {
-          toValue: 1,
-          duration: 800,
-          useNativeDriver: true,
-        }),
-        Animated.timing(opacity, {
-          toValue: 0.3,
-          duration: 800,
-          useNativeDriver: true,
-        }),
-      ])
-    );
-
-    animation.start();
-
-    return () => animation.stop();
-  }, [opacity]);
-
-  return (
-    <Animated.View
-      style={[
-        {
-          width: width,
-          height: height,
-          backgroundColor: "#E0E0E0",
-          borderRadius: 8,
-          opacity: opacity,
-        },
-        style,
-      ]}
-    />
-  );
-};
-
-// Profile Skeleton Screen
-const ProfileSkeleton = () => {
-  const { t } = useTranslation();
-  
-  return (
-    <ScrollView>
-      <View>
-        <View
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "space-between",
-            alignItems: "center",
-            marginTop: hp(2),
-          }}
-        >
-          {/* Avatar Skeleton */}
-          <SkeletonLoader 
-            width={size(100)} 
-            height={size(100)} 
-            style={{ borderRadius: 50 }}
-          />
-          
-          <View
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "center",
-              alignItems: "center",
-              marginTop: hp(1.5),
-            }}
-          >
-            {/* Name Skeleton */}
-            <SkeletonLoader width={150} height={24} style={{ marginBottom: 8 }} />
-            
-            {/* Driver ID Skeleton */}
-            <SkeletonLoader width={120} height={22} style={{ borderRadius: 10 }} />
-          </View>
-        </View>
-      </View>
-      
-      <View style={styles.container}>
-        {/* Bentogrids Skeleton */}
-        <View style={{ width: "100%", flexDirection: "row", justifyContent: "space-between" }}>
-          <SkeletonLoader width={wp(28)} height={hp(14)} style={{ borderRadius: 12 }} />
-          <SkeletonLoader width={wp(28)} height={hp(14)} style={{ borderRadius: 12 }} />
-          <SkeletonLoader width={wp(28)} height={hp(14)} style={{ borderRadius: 12 }} />
-        </View>
-        
-        {/* Referal Card Skeleton */}
-        <SkeletonLoader width="100%" height={hp(18)} style={{ borderRadius: 12 }} />
-        
-        {/* User Details Skeleton */}
-        <SkeletonLoader width="100%" height={hp(20)} style={{ borderRadius: 12 }} />
-        
-        {/* Language Setting Skeleton */}
-        <SkeletonLoader width="100%" height={hp(8)} style={{ borderRadius: 8 }} />
-        
-        {/* Logout Button Skeleton */}
-        <SkeletonLoader width="100%" height={hp(6)} style={{ borderRadius: 8 }} />
-      </View>
-    </ScrollView>
-  );
-};
+import ProfileSkeleton from "@/components/skeleton/profile/profile-skeleton";
 
 const profile = () => {
-  const [userInfo, setuserInfo] = useState<{ id?: string; name?: string, points?: number }>({ 
-    id: undefined, 
+  const [userInfo, setuserInfo] = useState<{
+    id?: string;
+    name?: string;
+    points?: number;
+  }>({
+    id: undefined,
     name: undefined,
-    points: 0 
+    points: 0,
   });
   const [loading, setLoading] = useState(true);
   const { token, driverId, clearAuthData, logout: authLogout } = useAuth();
   const { t } = useTranslation();
-  
+
   // Extract getUserDetails as a separate function so we can call it multiple times
   const getUserDetails = async () => {
     try {
@@ -172,7 +71,7 @@ const profile = () => {
       };
     }, [driverId, token])
   );
-  
+
   // Initial data loading
   useEffect(() => {
     getUserDetails();
@@ -194,7 +93,7 @@ const profile = () => {
   if (loading) {
     return <ProfileSkeleton />;
   }
-  
+
   return (
     <ScrollView>
       <View>
@@ -232,7 +131,7 @@ const profile = () => {
             >
               {userInfo.name}
             </Text>
-  
+
             <LinearGradient
               colors={["#4A86D2", theme.colors.brand.blue]}
               style={styles.gradient}
@@ -243,10 +142,10 @@ const profile = () => {
         </View>
       </View>
       <View style={styles.container}>
-        <UserBentogrids  />
+        <UserBentogrids />
         <ReferalCard />
         <UserDetails data={userInfo} />
-  
+
         <LanguageSetting />
         <TouchableOpacity onPress={handleLogout} style={styles.btn}>
           <Text
