@@ -413,7 +413,7 @@ const SvgComponent: React.FC<MilestonePathProps> = ({
         {/* Dynamic height container based on total path height */}
         <View style={{ height: totalSvgHeight }}>
           <ImageBackground
-            opacity={0.3}
+            // opacity={0.3}
             source={require("@/assets/images/satgroups/tile_background.png")}
             resizeMode="cover"
             style={styles.backgroundImage}

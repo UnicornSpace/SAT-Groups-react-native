@@ -13,6 +13,8 @@ import TabsComponent from "@/src/components/Home/tabs";
 import { Link } from "expo-router";
 import HomeSkeleton from "@/src/components/skeleton/home/home-skeleton";
 import "../../../global.css";
+import { Button } from "@/components/ui/button";
+import Example from "@/src/components/card";
 
 const Home = () => {
   const { t } = useTranslation();
@@ -34,7 +36,7 @@ const Home = () => {
         <Link href="/(tabs)/profile">
           <UserContainer />
         </Link>
-
+        <Example />
         <BannerContainer />
         <View style={{ width: width(90), alignItems: "flex-start", gap: 10 }}>
           <Title>{t("Recent_Transcation")}</Title>
