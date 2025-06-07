@@ -1,17 +1,18 @@
-import { ScrollView, StyleSheet, View } from "react-native";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
 import React, { useState, useEffect, useRef } from "react";
-import BannerContainer from "@/components/Home/banner-container";
-import UserContainer from "@/components/Home/user-container";
-import Title from "@/components/General/Title";
+import BannerContainer from "@/src/components/Home/banner-container";
+import UserContainer from "@/src/components/Home/user-container";
+import Title from "@/src/components/General/Title";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
 import { useTranslation } from "react-i18next";
 import { width } from "react-native-responsive-sizes";
-import TabsComponent from "@/components/Home/tabs";
+import TabsComponent from "@/src/components/Home/tabs";
 import { Link } from "expo-router";
-import HomeSkeleton from "@/components/skeleton/home/home-skeleton";
+import HomeSkeleton from "@/src/components/skeleton/home/home-skeleton";
+import "../../../global.css";
 
 const Home = () => {
   const { t } = useTranslation();
@@ -33,6 +34,7 @@ const Home = () => {
         <Link href="/(tabs)/profile">
           <UserContainer />
         </Link>
+
         <BannerContainer />
         <View style={{ width: width(90), alignItems: "flex-start", gap: 10 }}>
           <Title>{t("Recent_Transcation")}</Title>

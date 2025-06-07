@@ -7,7 +7,7 @@ import {
 import Svg, { Path } from "react-native-svg";
 import { theme } from "@/infrastructure/themes";
 import { Button } from "react-native-paper";
-import RefferalSteps from "@/components/Profile/RefferalSteps";
+import RefferalSteps from "@/src/components/Profile/RefferalSteps";
 import { t } from "i18next";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
@@ -52,7 +52,7 @@ const ReferalScreen = (props: any) => {
           top: hp(14),
           right: wp(5),
         }}
-        source={require("../../assets/images/satgroups/referal.png")}
+        source={require("@/assets/images/satgroups//referal.png")}
       />
       <View style={{ paddingTop: wp(17),paddingLeft:hp(2),display:"flex",justifyContent:"center",gap:hp(2), }}>
         <Text

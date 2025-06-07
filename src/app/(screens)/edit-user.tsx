@@ -531,7 +531,7 @@ import {
 } from "react-native-responsive-screen";
 import { useTranslation } from "react-i18next";
 import axiosInstance from "@/utils/axionsInstance";
-import SimpleDatePicker from "@/components/General/dob-input";
+import SimpleDatePicker from "@/src/components/General/dob-input";
 import { Dropdown } from "react-native-element-dropdown";
 import { indianStates } from "@/utils/data";
 import { useAuth } from "@/utils/AuthContext";

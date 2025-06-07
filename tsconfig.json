@@ -12,6 +12,9 @@
     "**/*.ts",
     "**/*.tsx",
     ".expo/types/**/*.ts",
-    "expo-env.d.ts"
-, "components/Home/language-selectiom.js", ]
+    "expo-env.d.ts",
+    "src/components/Home/language-selectiom.js",
+    "src/app",
+    "nativewind-env.d.ts"
+  ]
 }

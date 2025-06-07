@@ -252,7 +252,7 @@
 // TabsComponent.tsx
 import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, FlatList, Dimensions } from 'react-native';
-import TransactionCard from '@/components/Home/transcation-card';
+import TransactionCard from '@/src/components/Home/transcation-card';
 import { theme } from '@/infrastructure/themes';
 import axiosInstance from '@/utils/axionsInstance';
 import { width } from 'react-native-responsive-sizes';

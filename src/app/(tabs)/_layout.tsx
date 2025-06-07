@@ -2,12 +2,12 @@ import { Image, StyleSheet, View, Text, BackHandler } from "react-native";
 import { Link, Tabs, useRouter } from "expo-router";
 import { FontAwesome, Ionicons } from "@expo/vector-icons";
 import React, { useEffect } from "react";
-import '@/app/language-selectiom'
+import '../language-selectiom'
 import { theme } from "@/infrastructure/themes";
 
-import EditButton from "@/components/Profile/edit";
+import EditButton from "@/src/components/Profile/edit";
 import { useAuth } from "@/utils/AuthContext";
-import ProtectedRoute from "@/components/General/proteted-route";
+import ProtectedRoute from "@/src/components/General/proteted-route";
 
 const TextComponent = Text as any;
 if (TextComponent.defaultProps == null) {
@@ -30,7 +30,7 @@ function LogoTitle() {
     >
       <Image
         style={{ width: 80, height: 50 }}
-        source={require("../../assets/images/satgroups/Logo.png")}
+        source={require("@/assets/images/satgroups/Logo.png")}
         resizeMode="contain"
       />
       {/* <LanguageSelection/> */}

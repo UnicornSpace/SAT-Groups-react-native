@@ -15,14 +15,14 @@ import {
 } from "react-native-responsive-screen";
 import { useTranslation } from "react-i18next";
 import { LinearGradient } from "expo-linear-gradient";
-import UserBentogrids from "@/components/Profile/bentogrids";
-import UserDetails from "@/components/Profile/UserDetails";
-import LanguageSetting from "@/components/Profile/languageSetting";
+import UserBentogrids from "@/src/components/Profile/bentogrids";
+import UserDetails from "@/src/components/Profile/UserDetails";
+import LanguageSetting from "@/src/components/Profile/languageSetting";
 import axiosInstance from "@/utils/axionsInstance";
-import ReferalCard from "@/components/Profile/referalCard";
+import ReferalCard from "@/src/components/Profile/referalCard";
 import { size, fontSize } from "react-native-responsive-sizes";
 import { useAuth } from "@/utils/AuthContext";
-import ProfileSkeleton from "@/components/skeleton/profile/profile-skeleton";
+import ProfileSkeleton from "@/src/components/skeleton/profile/profile-skeleton";
 
 const profile = () => {
   const [userInfo, setuserInfo] = useState<{

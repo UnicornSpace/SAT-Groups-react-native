@@ -1,6 +1,6 @@
 import { Alert, ScrollView, StyleSheet, Text, View, Animated } from "react-native";
 import React, { useEffect, useState, useRef } from "react";
-import Title from "@/components/General/Title";
+import Title from "@/src/components/General/Title";
 import { theme } from "@/infrastructure/themes";
 import {
   widthPercentageToDP as wp,
@@ -9,9 +9,9 @@ import {
 import { useTranslation } from "react-i18next";
 import axiosInstance from "@/utils/axionsInstance";
 import { useAuth } from "@/utils/AuthContext";
-import NearBranchList from "@/components/Location/nearBranchList";
-import AllBranches from "@/components/Location/allBranches";
-import LocationSkeleton from "@/components/skeleton/location/location-skeleton";
+import NearBranchList from "@/src/components/Location/nearBranchList";
+import AllBranches from "@/src/components/Location/allBranches";
+import LocationSkeleton from "@/src/components/skeleton/location/location-skeleton";
 
 
 

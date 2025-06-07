@@ -20,8 +20,8 @@ import {
 } from "react-native-responsive-screen";
 import { useTranslation } from "react-i18next";
 import axiosInstance from "@/utils/axionsInstance";
-import ReferalCard from "@/components/Profile/referalCard";
-import SimpleDatePicker from "@/components/General/dob-input";
+import ReferalCard from "@/src/components/Profile/referalCard";
+import SimpleDatePicker from "@/src/components/General/dob-input";
 import RNPickerSelect from "react-native-picker-select";
 import { Dropdown } from "react-native-element-dropdown";
 import { indianStates } from "@/utils/data";

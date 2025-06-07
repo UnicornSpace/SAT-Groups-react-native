@@ -46,7 +46,7 @@ const BannerContainer = () => {
     <View style={{ position: "relative" }}>
       <Image
         style={{ width: width(90), height: height(18) }}
-        source={require("../../assets/images/satgroups/banner.png")}
+        source={require("@/assets/images/satgroups/banner.png")}
         resizeMode="stretch"
       />
       <View style={{ position: "absolute", top: size(28), left: size(22) }}>
