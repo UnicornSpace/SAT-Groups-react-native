@@ -12,6 +12,9 @@ import { useAuth } from "@/utils/AuthContext";
 import NearBranchList from "@/components/Location/nearBranchList";
 import AllBranches from "@/components/Location/allBranches";
 import LocationSkeleton from "@/components/skeleton/location/location-skeleton";
+import axios from "axios";
+
+
 
 
 
@@ -51,6 +54,9 @@ const Location = () => {
   if (loading) {
     return <LocationSkeleton />;
   }
+
+
+
 
   return (
     <ScrollView>

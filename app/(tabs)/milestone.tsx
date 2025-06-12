@@ -440,7 +440,7 @@ const SvgComponent: React.FC<MilestonePathProps> = ({
                   <Path
                     stroke="#DBDBDB"
                     strokeLinecap="round"
-                    strokeWidth={30}
+                    strokeWidth={20}
                     d={remainingPath}
                   />
                 )}

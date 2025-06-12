@@ -121,7 +121,7 @@ export default UserDetails;
 
 const styles = StyleSheet.create({
   container: {
-    width: wp(85),
+    width: wp(70),
     display: "flex",
     flexDirection: "column",
     gap: hp(2),

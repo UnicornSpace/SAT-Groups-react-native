@@ -134,16 +134,18 @@ const AllBranches = ({ branch }: any) => {
             >
               <Image
                 style={styles.branchImage}
-                source={require("@/assets/images/satgroups/branch.png")}
+                // source={require("@/assets/images/satgroups/branch.png")}
+                source={ { uri:item.brand_logo}}
+                resizeMode="contain"
               />
               <View style={styles.branchInfo}>
                 <Text style={styles.branchName}>
                   {sentenceCase(branchName)}
                 </Text>
-                {branchLocation && (
+                {item.brand && (
                   <View style={styles.dateContainer}>
                     <Text style={styles.date}>
-                      {t(sentenceCase(branchLocation))}
+                      {item.brand}
                     </Text>
                   </View>
                 )}
@@ -190,8 +192,11 @@ const styles = StyleSheet.create({
   branchImage: {
     width: wp("25%"),
     height: hp("12%"),
+    // aspectRatio: 1,
     borderRadius: 100,
     marginBottom: 8,
+    // borderWidth: 1,
+    // borderColor: "gray",
   },
   branchInfo: {
     display: "flex",
@@ -208,12 +213,13 @@ const styles = StyleSheet.create({
   },
   dateContainer: {
     borderRadius: 5,
-    width: size(50),
+    width: "auto",
     backgroundColor: theme.colors.brand.blue,
     paddingVertical: size(2),
     justifyContent: "center",
     alignItems: "center",
     marginTop: size(4),
+    paddingHorizontal: size(8),
   },
   date: {
     fontSize: size(8),

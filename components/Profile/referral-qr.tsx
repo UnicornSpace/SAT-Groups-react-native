@@ -89,7 +89,7 @@ const styles = StyleSheet.create({
     marginBottom: 30,
   },
   shareButton: {
-    backgroundColor: '#007AFF',
+    backgroundColor: theme.colors.brand.blue,
     paddingHorizontal: 30,
     paddingVertical: 12,
     borderRadius: 25,

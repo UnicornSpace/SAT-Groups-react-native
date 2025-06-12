@@ -88,7 +88,6 @@ const _layout = () => {
   if (!poppinsLoaded) {
     return null;
   }
-
   return (
     <AuthProvider>
       <I18nextProvider i18n={i18n}>

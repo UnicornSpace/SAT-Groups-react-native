@@ -21,6 +21,14 @@ import axiosInstance from "@/utils/axionsInstance";
 import { useAuth } from "@/utils/AuthContext";
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import {
+  CodeField,
+  Cursor,
+  useClearByFocusCell,
+  useBlurOnFulfill,
+} from "react-native-confirmation-code-field";
+
+const CELL_COUNT = 5; // Your OTP has 5 digits
 
 const OtpConfirmationScreen = () => {
   const { setAuthData, token } = useAuth();
@@ -31,13 +39,24 @@ const OtpConfirmationScreen = () => {
   }>();
   const [count, setCount] = useState(60);
   const [loading, setLoading] = useState(false);
-  const [otpArray, setOtpArray] = useState(["", "", "", "", ""]);
+  const [otp, setOtp] = useState("");
   const [referralCode, setReferralCode] = useState("");
   const [isReferralDetected, setIsReferralDetected] = useState(false);
-  const inputs = useRef<TextInput[]>([]);
+
+  // New states for error handling
+  const [otpError, setOtpError] = useState("");
+  const [isOtpIncorrect, setIsOtpIncorrect] = useState(false);
+  const [attemptCount, setAttemptCount] = useState(0);
 
   const { t } = useTranslation();
   const isNewUser = UserExist === "true";
+
+  // react-native-confirmation-code-field hooks
+  const ref = useBlurOnFulfill({ value: otp, cellCount: CELL_COUNT });
+  const [props, getCellOnLayoutHandler] = useClearByFocusCell({
+    value: otp,
+    setValue: setOtp,
+  });
 
   useEffect(() => {
     checkForReferralCode();
@@ -45,18 +64,20 @@ const OtpConfirmationScreen = () => {
 
   const checkForReferralCode = async () => {
     try {
-      const savedReferralCode = await AsyncStorage.getItem('pendingReferralCode');
+      const savedReferralCode = await AsyncStorage.getItem(
+        "pendingReferralCode"
+      );
       if (savedReferralCode) {
         setReferralCode(savedReferralCode);
         setIsReferralDetected(true);
         // Clear it so it doesn't appear again
-        await AsyncStorage.removeItem('pendingReferralCode');
+        await AsyncStorage.removeItem("pendingReferralCode");
       }
     } catch (error) {
-      console.log('Error loading referral code:', error);
+      console.log("Error loading referral code:", error);
     }
   };
-// console.log("REfeal code",referralCode)
+
   // Countdown timer
   useEffect(() => {
     if (count <= 0) return;
@@ -65,52 +86,59 @@ const OtpConfirmationScreen = () => {
     }, 1000);
     return () => clearInterval(interval);
   }, [count]);
-useEffect(() => {
+
+  useEffect(() => {
     // Check if there's a stored referral code
     const loadReferralCode = async () => {
       try {
-        const storedReferralCode = await AsyncStorage.getItem('referralCode');
+        const storedReferralCode = await AsyncStorage.getItem("referralCode");
+        console.log("Stored Referral Code:👀👀", storedReferralCode);
         if (storedReferralCode) {
           setReferralCode(storedReferralCode);
           // Optionally remove it after setting
-          await AsyncStorage.removeItem('referralCode');
+          await AsyncStorage.removeItem("referralCode");
         }
       } catch (error) {
-        console.log('Error loading referral code:', error);
+        console.log("Error loading referral code:", error);
       }
     };
 
     loadReferralCode();
   }, []);
 
-  const handleOtpChange = (text: string, i: number) => {
-    if (!/^\d+$/.test(text) && text !== "") return;
+  const handleOtpChange = (text: string) => {
+    setOtp(text);
 
-    const newOtp = [...otpArray];
-    newOtp[i] = text;
-    setOtpArray(newOtp);
-
-    if (text && i < inputs.current.length - 1) {
-      inputs.current[i + 1]?.focus();
+    // Clear error when user starts typing
+    if (otpError || isOtpIncorrect) {
+      setOtpError("");
+      setIsOtpIncorrect(false);
     }
-    if (!text && i > 0) {
-      inputs.current[i - 1]?.focus();
+
+    // Auto-verify when OTP is complete
+    if (text.length === CELL_COUNT) {
+      // Small delay to ensure state is updated
+      setTimeout(() => {
+        otpVerified(text);
+      }, 100);
     }
   };
 
-  const otpVerified = async () => {
-    const finalOtp = otpArray.join("");
+  const otpVerified = async (otpValue?: string) => {
+    const finalOtp = otpValue || otp;
 
-    if (finalOtp.length < 5) {
-      Alert.alert("Error", "Please enter a valid 5-digit OTP");
+    if (finalOtp.length < CELL_COUNT) {
+      setOtpError(`Please enter a valid ${CELL_COUNT}-digit OTP`);
       return;
     }
 
     try {
       setLoading(true);
+      setOtpError(""); // Clear any previous errors
+
       const response = await axiosInstance.post("/user-login-verify-otp.php", {
         mobile: number,
-        otp: otpArray.join(""),
+        otp: finalOtp,
         referral_code: isNewUser ? referralCode.trim() : undefined, // Include referral code only for new users
       });
 
@@ -124,12 +152,12 @@ useEffect(() => {
           console.log("Routing to userDetails page for new user");
           router.replace({
             pathname: "/(screens)/userDetails",
-            params: { 
-              response: token, 
-              isNewUser: "true", 
-              driverId, 
+            params: {
+              response: token,
+              isNewUser: "true",
+              driverId,
               token,
-              referralCode // Pass referral code to next screen if needed
+              referralCode, // Pass referral code to next screen if needed
             },
           });
         } else {
@@ -139,15 +167,37 @@ useEffect(() => {
             params: { response: token },
           });
         }
-      } else {
-        Alert.alert("Error", "Wrong OTP, please try again.");
       }
     } catch (error: any) {
       console.error("OTP Verification Error:", error);
-      Alert.alert(
-        "Something went wrong",
-        error.message || "Failed to verify OTP"
-      );
+      setAttemptCount((prev) => prev + 1);
+
+      // Handle specific OTP errors
+      if (error.response?.status === 400 || error.response?.status === 401) {
+        setIsOtpIncorrect(true);
+        setOtpError("Incorrect OTP. Please check and try again.");
+        setOtp(""); // Clear the OTP field for retry
+      } else if (error.response?.status === 429) {
+        setOtpError("Too many attempts. Please try again later.");
+      } else if (error.message?.toLowerCase().includes("otp")) {
+        setIsOtpIncorrect(true);
+        setOtpError("Invalid OTP. Please enter the correct code.");
+        setOtp(""); // Clear the OTP field for retry
+      } else {
+        setOtpError("Something went wrong. Please try again.");
+      }
+
+      // Show alert for multiple failed attempts
+      if (attemptCount >= 2) {
+        Alert.alert(
+          "Multiple Failed Attempts",
+          "You've entered an incorrect OTP multiple times. Please check your messages or request a new code.",
+          [
+            { text: "OK", style: "default" },
+            { text: "Resend OTP", onPress: resendOtpHandler, style: "default" },
+          ]
+        );
+      }
     } finally {
       setLoading(false);
     }
@@ -156,6 +206,10 @@ useEffect(() => {
   const resendOtpHandler = async () => {
     try {
       setLoading(true);
+      setOtpError(""); // Clear errors
+      setIsOtpIncorrect(false);
+      setAttemptCount(0); // Reset attempt count
+
       const response = await axiosInstance.post("/user-login-request-otp.php", {
         mobile: number,
       });
@@ -163,12 +217,11 @@ useEffect(() => {
       if (response.data?.status === "success") {
         Alert.alert("Success", "OTP has been resent");
         setCount(60); // Restart the countdown
-      } else {
-        Alert.alert("Error", "Failed to resend OTP");
+        setOtp(""); // Clear the OTP field
       }
     } catch (error: any) {
       console.error("Resend OTP Error:", error);
-      Alert.alert("Error", error.message || "Failed to resend OTP");
+      setOtpError("Failed to resend OTP. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -176,10 +229,10 @@ useEffect(() => {
 
   // Check if user can proceed (valid OTP and referral code if new user)
   const canProceed = () => {
-    const isOtpComplete = !otpArray.includes("");
+    const isOtpComplete = otp.length === CELL_COUNT;
     // For new users, require both OTP and referral code
     // For existing users, only require OTP
-    return isOtpComplete && (!isNewUser || (isNewUser ));
+    return isOtpComplete && (!isNewUser || isNewUser) && !otpError;
   };
 
   return (
@@ -204,7 +257,9 @@ useEffect(() => {
               left: hp(2),
             }}
           >
-            <TouchableOpacity onPress={()=>router.push("/(screens)/otp-screen")}>
+            <TouchableOpacity
+              onPress={() => router.push("/(screens)/otp-screen")}
+            >
               <Ionicons
                 name="arrow-back"
                 size={24}
@@ -223,22 +278,53 @@ useEffect(() => {
           </Text>
 
           <View style={{ alignItems: "center", gap: 15, width: wp("90%") }}>
-            <View style={styles.otpInputContainer}>
-              {otpArray.map((digit, i) => (
-                <TextInput
-                  autoFocus={i === 0}
-                  key={i}
-                  ref={(ref) => (inputs.current[i] = ref!)}
-                  style={styles.input}
-                  value={digit}
-                  onChangeText={(text) => handleOtpChange(text, i)}
-                  maxLength={1}
-                  keyboardType="numeric"
-                  placeholder="-"
-                  placeholderTextColor={theme.colors.text.secondary}
+            {/* New OTP Input using react-native-confirmation-code-field */}
+            <CodeField
+              InputComponent={TextInput}
+              ref={ref as React.RefObject<TextInput>}
+              {...props}
+              value={otp}
+              onChangeText={handleOtpChange}
+              cellCount={CELL_COUNT}
+              rootStyle={styles.codeFieldRoot}
+              keyboardType="number-pad"
+              textContentType="oneTimeCode"
+              autoFocus={true}
+              renderCell={({ index, symbol, isFocused }) => (
+                <View
+                  key={index}
+                  style={[
+                    styles.otpCell,
+                    isFocused && styles.focusedOtpCell,
+                    isOtpIncorrect && styles.errorOtpCell, // Add error styling
+                  ]}
+                  onLayout={getCellOnLayoutHandler(index)}
+                >
+                  <Text
+                    style={[
+                      styles.otpCellText,
+                      isOtpIncorrect && styles.errorOtpCellText, // Add error text styling
+                    ]}
+                  >
+                    {symbol || (isFocused ? <Cursor /> : "")}
+                  </Text>
+                </View>
+              )}
+            />
+
+            {/* Error message display */}
+            {otpError ? (
+              <View style={styles.errorContainer}>
+                <Ionicons
+                  name="alert-circle"
+                  size={16}
+                  color={theme.colors.brand.red || "#FF3B30"}
+                  style={{ marginRight: 6 }}
                 />
-              ))}
-            </View>
+                <Text style={styles.errorText}>{otpError}</Text>
+              </View>
+            ) : null}
+
             <Text
               style={{
                 fontFamily: theme.fontFamily.regular,
@@ -246,8 +332,7 @@ useEffect(() => {
                 fontSize: hp(1.9),
               }}
             >
-              {t("We sent a confirmation code to")} +91 {String(number).slice(0, 3)}
-              XX XXXXX
+              {t("We sent a confirmation code to")} +91 XXXXX XXXXX
             </Text>
           </View>
 
@@ -276,18 +361,33 @@ useEffect(() => {
             </View>
           )}
 
-          <View style={{ alignItems: "center", gap: 15, width: wp("90%"), marginTop: isNewUser ? 0 : 20 }}>
+          <View
+            style={{
+              alignItems: "center",
+              gap: 15,
+              width: wp("90%"),
+              marginTop: isNewUser ? 0 : 20,
+            }}
+          >
             <TouchableOpacity
-              onPress={otpVerified}
+              onPress={() => otpVerified()}
               style={[
                 styles.btn,
                 { opacity: canProceed() && !loading ? 1 : 0.5 },
               ]}
               disabled={!canProceed() || loading}
             >
-              <Text style={styles.buttonText}>{t("Continue")}</Text>
+              <Text style={styles.buttonText}>
+                {loading ? t("Verifying...") : t("Continue")}
+              </Text>
             </TouchableOpacity>
-            <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "center" }}>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
               <Text
                 style={{
                   fontFamily: theme.fontFamily.regular,
@@ -295,7 +395,7 @@ useEffect(() => {
                   fontSize: hp(1.9),
                 }}
               >
-                {t("Resend code in")} {" "}
+                {t("Resend code in")}{" "}
                 <Text
                   style={{
                     fontWeight: "bold",
@@ -307,17 +407,20 @@ useEffect(() => {
                 </Text>
               </Text>
               <View style={{ width: 8 }} />
-              <TouchableOpacity 
+              <TouchableOpacity
                 onPress={resendOtpHandler}
-                disabled={count > 0}
+                disabled={count > 0 || loading}
               >
                 <Text
                   style={{
                     fontFamily: theme.fontFamily.semiBold,
-                    color: count > 0 ? theme.colors.text.secondary : theme.colors.brand.blue,
+                    color:
+                      count > 0 || loading
+                        ? theme.colors.text.secondary
+                        : theme.colors.brand.blue,
                     fontSize: hp(1.9),
                     textDecorationLine: "underline",
-                    opacity: count > 0 ? 0.5 : 1,
+                    opacity: count > 0 || loading ? 0.5 : 1,
                   }}
                 >
                   {t("Resend Code")}
@@ -334,23 +437,7 @@ useEffect(() => {
 export default OtpConfirmationScreen;
 
 const styles = StyleSheet.create({
-  input: {
-    height: hp(10),
-    width: wp(15),
-    borderWidth: 1,
-    color: theme.colors.brand.blue,
-    fontFamily: theme.fontFamily.semiBold,
-    fontSize: theme.fontSize.h3,
-    borderRadius: 5,
-    borderColor: theme.colors.brand.blue,
-    textAlign: "center",
-  },
-  otpInputContainer: {
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    gap: 15,
-  },
+  // Old input styles (keeping for referral input)
   referralInput: {
     height: hp(7),
     width: wp(90),
@@ -375,5 +462,55 @@ const styles = StyleSheet.create({
     alignItems: "center",
     width: wp("90%"),
     height: hp("7%"),
+  },
+
+  // New OTP field styles using react-native-confirmation-code-field
+  codeFieldRoot: {
+    justifyContent: "space-between",
+    width: wp(80),
+  },
+  otpCell: {
+    width: wp(12),
+    height: hp(8),
+    borderWidth: 2,
+    borderColor: theme.colors.brand.blue,
+    borderRadius: 8,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "transparent",
+  },
+  focusedOtpCell: {
+    borderColor: theme.colors.brand.blue,
+    backgroundColor: theme.colors.brand.blue + "10", // 10% opacity
+  },
+  otpCellText: {
+    fontSize: hp(3),
+    fontFamily: theme.fontFamily.semiBold,
+    color: theme.colors.brand.blue,
+    textAlign: "center",
+  },
+
+  // Error styles for OTP cells
+  errorOtpCell: {
+    borderColor: theme.colors.brand.red || "#FF3B30",
+    backgroundColor: (theme.colors.brand.red || "#FF3B30") + "10", // 10% opacity
+  },
+  errorOtpCellText: {
+    color: theme.colors.brand.red || "#FF3B30",
+  },
+
+  // Error message container
+  errorContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    alignSelf: "flex-start",
+    marginTop: -10,
+    marginBottom: 5,
+  },
+  errorText: {
+    fontSize: hp(1.8),
+    fontFamily: theme.fontFamily.regular,
+    color: theme.colors.brand.red || "#FF3B30",
+    flex: 1,
   },
 });
