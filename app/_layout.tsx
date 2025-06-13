@@ -100,7 +100,7 @@ const _layout = () => {
               />
               <Stack.Screen name="(tabs)" options={{ title: "tabs" }} />
             </Stack>
-            <StatusBar backgroundColor="#000000" />
+            <StatusBar backgroundColor="#000000" barStyle={"light-content"} />
           </PaperProvider>
         </ThemeProvider>
       </I18nextProvider>

@@ -191,15 +191,15 @@ const UserDetails = () => {
         return; // Don't proceed if validation fails
       }
 
-      console.log("Submitting details:", {
-        driver_id: driverId,
-        name: userName,
-        age: dob,
-        email: email,
-        state: stateName,
-        city: address,
-        profile_pic: "new_base64encodedstring",
-      });
+      // console.log("Submitting details:", {
+      //   driver_id: driverId,
+      //   name: userName,
+      //   age: dob,
+      //   email: email,
+      //   state: stateName,
+      //   city: address,
+      //   profile_pic: "new_base64encodedstring",
+      // });
 
       setLoading(true); // Show loading while submitting
 
@@ -221,7 +221,7 @@ const UserDetails = () => {
         }
       );
       
-      console.log("Response:", response.data);
+      // console.log("Response:", response.data);
       router.replace("/(tabs)");
     } catch (error) {
       setLoading(false);
@@ -302,7 +302,7 @@ const UserDetails = () => {
               searchPlaceholder="Search..."
               value={stateName}
               onChange={(item) => {
-                console.log(item.label);  
+                // console.log(item.label);  
                 setStateName(item.value);
                 setErrors({...errors, stateName: validateState(item.value)});
               }}

@@ -43,8 +43,8 @@ const UserOTPScreen = () => {
         // referral_code: referral || undefined,
       });
 
-      console.log("Response:", response.data);
-      console.log("Response:", number);
+      // console.log("Response:", response.data);
+      // console.log("Response:", number);
 
       if (response.status === 200) {
         router.replace({

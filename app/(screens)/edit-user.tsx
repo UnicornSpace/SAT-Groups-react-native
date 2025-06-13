@@ -1,514 +1,3 @@
-// "use client";
-
-// import {
-//   StyleSheet,
-//   Text,
-//   TextInput,
-//   TouchableOpacity,
-//   View,
-//   ScrollView,
-//   KeyboardAvoidingView,
-//   Platform,
-//   Animated,
-// } from "react-native";
-// import { useState, useEffect, useRef } from "react";
-// import { theme } from "@/infrastructure/themes";
-// import { LinearGradient } from "expo-linear-gradient";
-// import { AntDesign, Ionicons } from "@expo/vector-icons";
-// import { router } from "expo-router";
-// import {
-//   widthPercentageToDP as wp,
-//   heightPercentageToDP as hp,
-// } from "react-native-responsive-screen";
-// import { useTranslation } from "react-i18next";
-// import axiosInstance from "@/utils/axionsInstance";
-// import SimpleDatePicker from "@/components/General/dob-input";
-// import { Dropdown } from "react-native-element-dropdown";
-// import { indianStates } from "@/utils/data";
-// import { useAuth } from "@/utils/AuthContext";
-
-// // Skeleton Component
-// const SkeletonLoader = ({ width, height, style }: any) => {
-//   const opacity = useRef(new Animated.Value(0.3)).current;
-
-//   useEffect(() => {
-//     const animation = Animated.loop(
-//       Animated.sequence([
-//         Animated.timing(opacity, {
-//           toValue: 1,
-//           duration: 800,
-//           useNativeDriver: true,
-//         }),
-//         Animated.timing(opacity, {
-//           toValue: 0.3,
-//           duration: 800,
-//           useNativeDriver: true,
-//         }),
-//       ])
-//     );
-
-//     animation.start();
-
-//     return () => animation.stop();
-//   }, [opacity]);
-
-//   return (
-//     <Animated.View
-//       style={[
-//         {
-//           width: width,
-//           height: height,
-//           backgroundColor: "#E0E0E0",
-//           borderRadius: 8,
-//           opacity: opacity,
-//         },
-//         style,
-//       ]}
-//     />
-//   );
-// };
-
-// // EditProfile Skeleton
-// const EditProfileSkeleton = () => {
-//   return (
-//     <ScrollView contentContainerStyle={styles.container}>
-//       {/* Header Skeleton */}
-//       <SkeletonLoader width={200} height={40} style={{ marginBottom: 20 }} />
-
-//       <View style={styles.formContainer}>
-//         {/* Input Fields Skeleton */}
-//         <SkeletonLoader
-//           width={wp("90%")}
-//           height={hp("7%")}
-//           style={{ borderRadius: 5 }}
-//         />
-//         <SkeletonLoader
-//           width={wp("90%")}
-//           height={hp("7%")}
-//           style={{ borderRadius: 5 }}
-//         />
-//         <SkeletonLoader
-//           width={wp("90%")}
-//           height={hp("7%")}
-//           style={{ borderRadius: 5 }}
-//         />
-//         <SkeletonLoader
-//           width={wp("90%")}
-//           height={hp("7%")}
-//           style={{ borderRadius: 5 }}
-//         />
-//         <SkeletonLoader
-//           width={wp("90%")}
-//           height={hp("7%")}
-//           style={{ borderRadius: 5 }}
-//         />
-//       </View>
-
-//       {/* Button Skeleton */}
-//       <SkeletonLoader
-//         width={wp("90%")}
-//         height={hp("7%")}
-//         style={{ borderRadius: 10 }}
-//       />
-//     </ScrollView>
-//   );
-// };
-
-// const EditProfile = () => {
-//   const { token, driverId } = useAuth();
-//   const [userName, setUserName] = useState("");
-//   const [dob, setDob] = useState(""); // Store date as a string in format YYYY-MM-DD
-//   const [email, setEmail] = useState("");
-//   const [stateName, setStateName] = useState("");
-//   const [address, setAddress] = useState("");
-//   const [loading, setLoading] = useState(true);
-//   const { t } = useTranslation();
-
-//   // Form validation states
-//   const [errors, setErrors] = useState({
-//     userName: "",
-//     dob: "",
-//     email: "",
-//     stateName: "",
-//     address: "",
-//   });
-
-//   useEffect(() => {
-//     const getUserDetails = async () => {
-//       try {
-//         setLoading(true);
-//         const getUserDetails = await axiosInstance.post(
-//           "/user-details.php",
-//           { driver_id: driverId },
-//           {
-//             headers: {
-//               Authorization: `Bearer ${token}`,
-//             },
-//           }
-//         );
-
-//         const user = getUserDetails.data.driver;
-//         console.log("User Detailsssss:", user);
-
-//         if (user) {
-//           setUserName(user.name || "");
-//           setDob(user.dob || "");
-//           setAddress(user.city || "");
-//           setEmail(user.email || "");
-//           setStateName(user.state || "");
-//         }
-//       } catch (error) {
-//         console.error("Error fetching user:", error);
-//       } finally {
-//         setLoading(false);
-//       }
-//     };
-//     getUserDetails();
-//   }, []);
-
-//   // Validation functions
-//   const validateName = (name: any) => {
-//     if (!name.trim()) {
-//       return "Name is required";
-//     }
-//     if (name.length < 3) {
-//       return "Name must be at least 3 characters";
-//     }
-//     return "";
-//   };
-
-//   const validateEmail = (email: any) => {
-//     if (!email.trim()) {
-//       return "Email is required";
-//     }
-//     if (!email.includes("@gmail.com")) {
-//       return "Email must contain @gmail.com";
-//     }
-//     return "";
-//   };
-
-//   const validateDob = (dob: any) => {
-//     if (!dob) {
-//       return "Date of birth is required";
-//     }
-//     return "";
-//   };
-
-//   const validateState = (state: any) => {
-//     if (!state || state === "empty") {
-//       return "Please select a state";
-//     }
-//     return "";
-//   };
-
-//   const validateAddress = (address: any) => {
-//     if (!address.trim()) {
-//       return "Address is required";
-//     }
-//     if (address.length < 5) {
-//       return "Please enter a valid address";
-//     }
-//     return "";
-//   };
-
-//   const validateForm = () => {
-//     const newErrors = {
-//       userName: validateName(userName),
-//       dob: validateDob(dob),
-//       email: validateEmail(email),
-//       stateName: validateState(stateName),
-//       address: validateAddress(address),
-//     };
-
-//     setErrors(newErrors);
-
-//     // Form is valid if no error messages exist
-//     return !Object.values(newErrors).some((error) => error !== "");
-//   };
-
-//   const handleUpdate = async () => {
-//     try {
-//       // Validate the form
-//       const isValid = validateForm();
-
-//       if (!isValid) {
-//         return; // Don't proceed if validation fails
-//       }
-
-//       setLoading(true); // Show loading while submitting
-
-//       const response = await axiosInstance.put(
-//         "/user-update-details.php",
-//         {
-//           driver_id: driverId,
-//           name: userName,
-
-//           email: email,
-
-//           city: address,
-//           state: stateName,
-//           dob: dob, // Send DOB as YYYY-MM-DD
-//           profile_pic: "new_base64encodedstring",
-//         },
-//         {
-//           headers: {
-//             Authorization: `Bearer ${token}`,
-//           },
-//         }
-//       );
-
-//       console.log("Responseeeee:", response.data);
-
-//       if (response.data.success === "success") {
-//         alert("Profile updated successfully!");
-//         router.back();
-//       } else {
-//         alert("Failed to update profile.");
-//       }
-//     } catch (error) {
-//       console.error("Error updating profile:", error);
-//       alert("Something went wrong!");
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
-
-//   // Handle date change from SimpleDatePicker
-//   const handleDateChange = (dateString: any) => {
-//     setDob(dateString);
-//     setErrors({ ...errors, dob: validateDob(dateString) });
-//   };
-
-//   if (loading) {
-//     return <EditProfileSkeleton />;
-//   }
-
-//   return (
-//     <KeyboardAvoidingView
-//       behavior={Platform.OS === "ios" ? "padding" : "height"}
-//       style={{ flex: 1 }}
-//     >
-//       <ScrollView contentContainerStyle={styles.container}>
-//         <Text style={styles.headerText}>{t("Edit Profile")}</Text>
-//         <View style={styles.formContainer}>
-//           <View>
-//             <TextInput
-//               autoFocus={true}
-//               style={[styles.input, errors.userName ? styles.inputError : null]}
-//               onChangeText={(text) => {
-//                 setUserName(text);
-//                 setErrors({ ...errors, userName: validateName(text) });
-//               }}
-//               value={userName}
-//               placeholder={t("Enter your Full Name")}
-//               keyboardType="name-phone-pad"
-//               placeholderTextColor={theme.colors.ui.black + "70"}
-//             />
-//             {errors.userName ? (
-//               <Text style={styles.errorText}>{errors.userName}</Text>
-//             ) : null}
-//           </View>
-
-//           <View>
-//             {/* Using the SimpleDatePicker */}
-//             <SimpleDatePicker
-//               onDateChange={handleDateChange}
-//               placeholder={t("Date of Birth")}
-//               value={dob} // Pass the dob state as value
-//             />
-//             {errors.dob ? (
-//               <Text style={styles.errorText}>{errors.dob}</Text>
-//             ) : null}
-//           </View>
-
-//           <View>
-//             <TextInput
-//               style={[styles.input, errors.email ? styles.inputError : null]}
-//               onChangeText={(text) => {
-//                 setEmail(text);
-//                 setErrors({ ...errors, email: validateEmail(text) });
-//               }}
-//               value={email}
-//               placeholder={t("Enter your Email")}
-//               keyboardType="email-address"
-//               placeholderTextColor={theme.colors.ui.black + "70"}
-//             />
-//             {errors.email ? (
-//               <Text style={styles.errorText}>{errors.email}</Text>
-//             ) : null}
-//           </View>
-
-//           <View>
-//             <Dropdown
-//               style={[
-//                 styles2.dropdown,
-//                 errors.stateName ? styles2.dropdownError : null,
-//               ]}
-//               placeholderStyle={styles2.placeholderStyle}
-//               selectedTextStyle={styles2.selectedTextStyle}
-//               inputSearchStyle={styles2.inputSearchStyle}
-//               iconStyle={styles2.iconStyle}
-//               data={indianStates}
-//               maxHeight={300}
-//               labelField="label"
-//               valueField="value"
-//               placeholder="Select state"
-//               searchPlaceholder="Search..."
-//               value={stateName}
-//               onChange={(item) => {
-//                 setStateName(item.value);
-//                 setErrors({ ...errors, stateName: validateState(item.value) });
-//               }}
-//               renderLeftIcon={() => (
-//                 <AntDesign
-//                   style={styles2.icon}
-//                   color={theme.colors.text.secondary}
-//                   name="earth"
-//                   size={18}
-//                 />
-//               )}
-//             />
-//             {errors.stateName ? (
-//               <Text style={styles.errorText}>{errors.stateName}</Text>
-//             ) : null}
-//           </View>
-
-//           <View>
-//             <TextInput
-//               style={[styles.input, errors.address ? styles.inputError : null]}
-//               onChangeText={(text) => {
-//                 setAddress(text);
-//                 setErrors({ ...errors, address: validateAddress(text) });
-//               }}
-//               value={address}
-//               placeholder={t("Address")}
-//               keyboardType="name-phone-pad"
-//               placeholderTextColor={theme.colors.ui.black + "70"}
-//             />
-//             {errors.address ? (
-//               <Text style={styles.errorText}>{errors.address}</Text>
-//             ) : null}
-//           </View>
-//         </View>
-
-//         <TouchableOpacity onPress={handleUpdate}>
-//           <LinearGradient
-//             colors={["#26456C", "#4073B4", "#4073B4"]}
-//             style={styles.gradient2}
-//           >
-//             <Text style={styles.buttonText}>{t("Update Profile")}</Text>
-//             <Ionicons
-//               name="arrow-forward"
-//               size={20}
-//               color={theme.colors.text.primary}
-//             />
-//           </LinearGradient>
-//         </TouchableOpacity>
-//       </ScrollView>
-//     </KeyboardAvoidingView>
-//   );
-// };
-
-// export default EditProfile;
-
-// const styles2 = StyleSheet.create({
-//   dropdown: {
-//     height: hp("7%"),
-//     width: wp("90%"),
-//     borderColor: theme.colors.brand.blue + 50,
-//     borderWidth: 0.5,
-//     borderRadius: 5,
-//     paddingHorizontal: hp("2.3%"),
-//   },
-//   dropdownError: {
-//     borderColor: "red",
-//     borderWidth: 1,
-//   },
-//   icon: {
-//     marginRight: 5,
-//   },
-//   placeholderStyle: {
-//     fontSize: 14,
-//   },
-//   selectedTextStyle: {
-//     fontSize: 14,
-//     color: theme.colors.ui.black,
-//     fontFamily: theme.fontFamily.medium,
-//   },
-//   iconStyle: {
-//     width: 20,
-//     height: 20,
-//   },
-//   inputSearchStyle: {
-//     height: 40,
-//     fontSize: 16,
-//   },
-// });
-
-// const styles = StyleSheet.create({
-//   container: {
-//     width: wp("100%"),
-//     minHeight: hp("100%"),
-//     display: "flex",
-//     gap: 40,
-//     justifyContent: "center",
-//     alignItems: "center",
-//     paddingHorizontal: 30,
-//     paddingVertical: 20,
-//   },
-//   headerText: {
-//     fontFamily: theme.fontFamily.semiBold,
-//     color: theme.colors.brand.blue,
-//     fontSize: hp("3.5%"),
-//   },
-//   formContainer: {
-//     display: "flex",
-//     flexDirection: "column",
-//     gap: 10,
-//     width: wp("90%"),
-//   },
-//   input: {
-//     height: hp("7%"),
-//     width: wp("90%"),
-//     borderWidth: 0.2,
-//     borderColor: theme.colors.brand.blue,
-//     color: theme.colors.ui.black,
-//     fontFamily: theme.fontFamily.semiBold,
-//     borderRadius: 5,
-//     paddingHorizontal: hp("2.3%"),
-//   },
-//   inputError: {
-//     borderColor: "red",
-//     borderWidth: 1,
-//   },
-//   errorText: {
-//     color: "red",
-//     fontSize: hp(1.6),
-//     marginTop: 3,
-//     marginLeft: 5,
-//     fontFamily: theme.fontFamily.regular,
-//   },
-//   gradient2: {
-//     width: wp("90%"),
-//     height: hp("7%"),
-//     justifyContent: "center",
-//     alignItems: "center",
-//     borderRadius: 10,
-//     display: "flex",
-//     flexDirection: "row",
-//     gap: 10,
-//   },
-//   buttonText: {
-//     fontSize: hp("2.5%"),
-//     fontFamily: theme.fontFamily.semiBold,
-//     textAlign: "center",
-//     color: theme.colors.text.primary,
-//   },
-// });
-
-
-"use client";
-
 import {
   StyleSheet,
   Text,
@@ -519,11 +8,13 @@ import {
   KeyboardAvoidingView,
   Platform,
   Animated,
+  StatusBar,
+  Alert,
 } from "react-native";
 import { useState, useEffect, useRef } from "react";
 import { theme } from "@/infrastructure/themes";
 import { LinearGradient } from "expo-linear-gradient";
-import { AntDesign, Ionicons } from "@expo/vector-icons";
+import { AntDesign, Ionicons, MaterialIcons, Feather } from "@expo/vector-icons";
 import { router } from "expo-router";
 import {
   widthPercentageToDP as wp,
@@ -536,101 +27,118 @@ import { Dropdown } from "react-native-element-dropdown";
 import { indianStates } from "@/utils/data";
 import { useAuth } from "@/utils/AuthContext";
 
-// Skeleton Component
+// Enhanced Skeleton Component with shimmer effect
 const SkeletonLoader = ({ width, height, style }: any) => {
-  const opacity = useRef(new Animated.Value(0.3)).current;
+  const shimmerAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    const animation = Animated.loop(
+    const shimmer = Animated.loop(
       Animated.sequence([
-        Animated.timing(opacity, {
+        Animated.timing(shimmerAnim, {
           toValue: 1,
-          duration: 800,
+          duration: 1000,
           useNativeDriver: true,
         }),
-        Animated.timing(opacity, {
-          toValue: 0.3,
-          duration: 800,
+        Animated.timing(shimmerAnim, {
+          toValue: 0,
+          duration: 1000,
           useNativeDriver: true,
         }),
       ])
     );
+    shimmer.start();
+    return () => shimmer.stop();
+  }, [shimmerAnim]);
 
-    animation.start();
-
-    return () => animation.stop();
-  }, [opacity]);
+  const translateX = shimmerAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [-width, width],
+  });
 
   return (
-    <Animated.View
+    <View
       style={[
         {
           width: width,
           height: height,
-          backgroundColor: "#E0E0E0",
-          borderRadius: 8,
-          opacity: opacity,
+          backgroundColor: "#F0F0F0",
+          borderRadius: 12,
+          overflow: "hidden",
         },
         style,
       ]}
-    />
+    >
+      <Animated.View
+        style={[
+          StyleSheet.absoluteFillObject,
+          {
+            backgroundColor: "rgba(255,255,255,0.7)",
+            transform: [{ translateX }],
+          },
+        ]}
+      />
+    </View>
   );
 };
 
-// EditProfile Skeleton
+// Enhanced EditProfile Skeleton
 const EditProfileSkeleton = () => {
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <View style={styles.skeletonContainer}>
+      <StatusBar barStyle="light-content" backgroundColor="#1a365d" />
+      
       {/* Header Skeleton */}
-      <SkeletonLoader width={200} height={40} style={{ marginBottom: 20 }} />
+      <LinearGradient
+        colors={["#1a365d", "#2d5a87", "#4a90c2"]}
+        style={styles.headerGradient}
+      >
+        <View style={styles.headerContent}>
+          <SkeletonLoader width={30} height={30} style={{ borderRadius: 15 }} />
+          <SkeletonLoader width={150} height={28} style={{ borderRadius: 6 }} />
+          <View style={{ width: 30 }} />
+        </View>
+      </LinearGradient>
 
-      <View style={styles.formContainer}>
-        {/* Input Fields Skeleton */}
-        <SkeletonLoader
-          width={wp("90%")}
-          height={hp("7%")}
-          style={{ borderRadius: 5 }}
-        />
-        <SkeletonLoader
-          width={wp("90%")}
-          height={hp("7%")}
-          style={{ borderRadius: 5 }}
-        />
-        <SkeletonLoader
-          width={wp("90%")}
-          height={hp("7%")}
-          style={{ borderRadius: 5 }}
-        />
-        <SkeletonLoader
-          width={wp("90%")}
-          height={hp("7%")}
-          style={{ borderRadius: 5 }}
-        />
-        <SkeletonLoader
-          width={wp("90%")}
-          height={hp("7%")}
-          style={{ borderRadius: 5 }}
-        />
-      </View>
+      <ScrollView contentContainerStyle={styles.skeletonContent}>
+        {/* Profile Avatar Skeleton */}
+        <View style={styles.avatarSection}>
+          <SkeletonLoader width={120} height={120} style={{ borderRadius: 60 }} />
+          <SkeletonLoader width={100} height={20} style={{ marginTop: 12, borderRadius: 4 }} />
+        </View>
 
-      {/* Button Skeleton */}
-      <SkeletonLoader
-        width={wp("90%")}
-        height={hp("7%")}
-        style={{ borderRadius: 10 }}
-      />
-    </ScrollView>
+        {/* Form Fields Skeleton */}
+        <View style={styles.formContainer}>
+          {[...Array(5)].map((_, index) => (
+            <View key={index} style={styles.inputContainer}>
+              <SkeletonLoader width={wp("85%")} height={60} style={{ borderRadius: 12 }} />
+            </View>
+          ))}
+        </View>
+
+        {/* Button Skeleton */}
+        <SkeletonLoader
+          width={wp("85%")}
+          height={55}
+          style={{ borderRadius: 25, marginTop: 20 }}
+        />
+      </ScrollView>
+    </View>
   );
 };
 
 const EditProfile = () => {
   const { token, driverId } = useAuth();
   const [userName, setUserName] = useState("");
-  const [dob, setDob] = useState(""); // Store date as a string in format YYYY-MM-DD
+  const [dob, setDob] = useState("");
   const [email, setEmail] = useState("");
   const [stateName, setStateName] = useState("");
   const [address, setAddress] = useState("");
   const [loading, setLoading] = useState(true);
+  const [updating, setUpdating] = useState(false);
+  
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const slideAnim = useRef(new Animated.Value(50)).current;
+  
   const { t } = useTranslation();
 
   // Form validation states
@@ -642,10 +150,23 @@ const EditProfile = () => {
     address: "",
   });
 
-  // Debug log to verify DOB
+  // Animation on mount
   useEffect(() => {
-    console.log("Current DOB state:", dob);
-  }, [dob]);
+    if (!loading) {
+      Animated.parallel([
+        Animated.timing(fadeAnim, {
+          toValue: 1,
+          duration: 600,
+          useNativeDriver: true,
+        }),
+        Animated.timing(slideAnim, {
+          toValue: 0,
+          duration: 600,
+          useNativeDriver: true,
+        }),
+      ]).start();
+    }
+  }, [loading]);
 
   useEffect(() => {
     const getUserDetails = async () => {
@@ -662,14 +183,11 @@ const EditProfile = () => {
         );
 
         const user = getUserDetails.data.driver;
-        console.log("User Details:", user);
-
+        
         if (user) {
           setUserName(user.name || "");
-          // Make sure DOB is valid before setting it
           if (user.dob && user.dob.match(/^\d{4}-\d{2}-\d{2}$/)) {
             setDob(user.dob);
-            console.log("Setting DOB from API:", user.dob);
           }
           setAddress(user.city || "");
           setEmail(user.email || "");
@@ -677,6 +195,7 @@ const EditProfile = () => {
         }
       } catch (error) {
         console.error("Error fetching user:", error);
+        Alert.alert("Error", "Failed to load profile data");
       } finally {
         setLoading(false);
       }
@@ -686,46 +205,31 @@ const EditProfile = () => {
 
   // Validation functions
   const validateName = (name: any) => {
-    if (!name.trim()) {
-      return "Name is required";
-    }
-    if (name.length < 3) {
-      return "Name must be at least 3 characters";
-    }
+    if (!name.trim()) return "Name is required";
+    if (name.length < 3) return "Name must be at least 3 characters";
     return "";
   };
 
   const validateEmail = (email: any) => {
-    if (!email.trim()) {
-      return "Email is required";
-    }
-    if (!email.includes("@gmail.com")) {
-      return "Email must contain @gmail.com";
-    }
+    if (!email.trim()) return "Email is required";
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) return "Please enter a valid email address";
     return "";
   };
 
   const validateDob = (dob: any) => {
-    if (!dob) {
-      return "Date of birth is required";
-    }
+    if (!dob) return "Date of birth is required";
     return "";
   };
 
   const validateState = (state: any) => {
-    if (!state || state === "empty") {
-      return "Please select a state";
-    }
+    if (!state || state === "empty") return "Please select a state";
     return "";
   };
 
   const validateAddress = (address: any) => {
-    if (!address.trim()) {
-      return "Address is required";
-    }
-    if (address.length < 5) {
-      return "Please enter a valid address";
-    }
+    if (!address.trim()) return "Address is required";
+    if (address.length < 5) return "Please enter a valid address";
     return "";
   };
 
@@ -739,154 +243,99 @@ const EditProfile = () => {
     };
 
     setErrors(newErrors);
-
-    // Form is valid if no error messages exist
     return !Object.values(newErrors).some((error) => error !== "");
   };
 
-  // const handleUpdate = async () => {
-  //   try {
-  //     // Validate the form
-  //     const isValid = validateForm();
+  const handleUpdate = async () => {
+    try {
+      const isValid = validateForm();
+      if (!isValid) return;
 
-  //     if (!isValid) {
-  //       return; // Don't proceed if validation fails
-  //     }
+      setUpdating(true);
 
-  //     setLoading(true); // Show loading while submitting
+      const updateData = {
+        driver_id: driverId,
+        name: userName.trim(),
+        email: email.trim(),
+        city: address.trim(),
+        state: stateName,
+        dob: dob,
+        profile_pic: "new_base64encodedstring",
+      };
 
-  //     // Log what we're sending to the API
-  //     console.log("Sending update request with data:", {
-  //       driver_id: driverId,
-  //       name: userName,
-  //       email: email,
-  //       city: address, // Note: sending address to 'city' field
-  //       state: stateName,
-  //       dob: dob,
-  //     });
+      const response = await axiosInstance.put(
+        "/user-update-details.php",
+        updateData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
-  //     const response = await axiosInstance.put(
-  //       "/user-update-details.php",
-  //       {
-  //         driver_id: driverId,
-  //         name: userName,
-  //         email: email,
-  //         city: address.trim(), // Trim whitespace from address
-  //         state: stateName,
-  //         dob: dob, // Make sure DOB is in YYYY-MM-DD format
-  //         profile_pic: "new_base64encodedstring",
-  //       },
-  //       {
-  //         headers: {
-  //           Authorization: `Bearer ${token}`,
-  //         },
-  //       }
-  //     );
-
-  //     console.log("API Response:", response.data);
-
-  //     if (response.data.success === "success") {
-  //       alert("Profile updated successfully!");
-  //       router.back();
-  //     } else {
-  //       alert("Failed to update profile.");
-  //     }
-  //   } catch (error) {
-  //     console.error("Error updating profile:", error);
-  //     alert("Something went wrong!");
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-
-  // Handle date change from SimpleDatePicker
-  
-const handleUpdate = async () => {
-  try {
-    // Validate the form
-    const isValid = validateForm();
-
-    if (!isValid) {
-      return; // Don't proceed if validation fails
-    }
-
-    setLoading(true); // Show loading while submitting
-
-    // Clean up all data before sending
-    const updateData = {
-      driver_id: driverId,
-      name: userName.trim(),
-      email: email.trim(),
-      city: address.trim(), 
-      state: stateName,
-      dob: dob,
-      profile_pic: "new_base64encodedstring",
-    };
-    
-    console.log("Sending update request with data:", updateData);
-
-    const response = await axiosInstance.put(
-      "/user-update-details.php",
-      updateData,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-
-    console.log("API Response:", response.data);
-
-    // More precise success check
-    if (response.data && (response.data.success === "success" || response.data.status === "success")) {
-      // alert("Profile updated successfully!");
-      
-      // Force refresh before navigating back
-      try {
-        // Optional: Refresh user data in context if you have that functionality
-        const refreshResponse = await axiosInstance.post(
-          "/user-details.php",
-          { driver_id: driverId },
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
+      if (response.data && (response.data.success === "success" || response.data.status === "success")) {
+        Alert.alert(
+          "Success! 🎉",
+          "Your profile has been updated successfully",
+          [
+            {
+              text: "OK",
+              onPress: () => router.replace("/(tabs)/profile"),
             },
-          }
+          ]
         );
-        console.log("User data refreshed before navigation");
-      } catch (refreshError) {
-        console.error("Error refreshing user data:", refreshError);
-        // Continue with navigation even if refresh fails
+      } else {
+        const errorMsg = response.data?.message || "Failed to update profile";
+        Alert.alert("Update Failed", errorMsg);
       }
-      
-      // Navigate back to profile
-      router.replace("/(tabs)/profile");
-    } else {
-      // More detailed error message
-      const errorMsg = response.data && response.data.message 
-        ? response.data.message 
-        : "Failed to update profile. Please check your information and try again.";
-      alert(errorMsg);
+    } catch (error: any) {
+      console.error("Error updating profile:", error);
+      const errorMessage = error.response?.data?.message || "Something went wrong!";
+      Alert.alert("Error", errorMessage);
+    } finally {
+      setUpdating(false);
     }
-  } catch (error: any) {
-    console.error("Error updating profile:", error);
-    // Better error handling with response details
-    const errorMessage = error.response?.data?.message || 
-                         error.response?.data?.error || 
-                         "Something went wrong!";
-    alert(errorMessage);
-  } finally {
-    setLoading(false);
-  }
-};
-  
-  
+  };
+
   const handleDateChange = (dateString: string) => {
-    console.log("Date changed to:", dateString);
     if (dateString) {
       setDob(dateString);
       setErrors({ ...errors, dob: validateDob(dateString) });
     }
+  };
+
+  const renderInputField = (
+    value: string,
+    onChangeText: (text: string) => void,
+    placeholder: string,
+    icon: string,
+    iconFamily: "MaterialIcons" | "Feather" = "MaterialIcons",
+    keyboardType: any = "default",
+    error?: string
+  ) => {
+    const IconComponent = iconFamily === "MaterialIcons" ? MaterialIcons : Feather;
+    
+    return (
+      <View style={styles.inputContainer}>
+        <View style={[styles.inputWrapper, error ? styles.inputError : null]}>
+          <IconComponent
+            name={icon as any}
+            size={20}
+            color={error ? "#e53e3e" : theme.colors.brand.blue}
+            style={styles.inputIcon}
+          />
+          <TextInput
+            style={styles.input}
+            onChangeText={onChangeText}
+            value={value}
+            placeholder={placeholder}
+            keyboardType={keyboardType}
+            placeholderTextColor="#9CA3AF"
+          />
+        </View>
+        {error ? <Text style={styles.errorText}>{error}</Text> : null}
+      </View>
+    );
   };
 
   if (loading) {
@@ -894,225 +343,366 @@ const handleUpdate = async () => {
   }
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-      style={{ flex: 1 }}
-    >
-      <ScrollView contentContainerStyle={styles.container}>
-        <Text style={styles.headerText}>{t("Edit Profile")}</Text>
-        <View style={styles.formContainer}>
-          <View>
-            <TextInput
-              autoFocus={false} // Changed to false to avoid keyboard popping up automatically
-              style={[styles.input, errors.userName ? styles.inputError : null]}
-              onChangeText={(text) => {
-                setUserName(text);
-                setErrors({ ...errors, userName: validateName(text) });
-              }}
-              value={userName}
-              placeholder={t("Enter your Full Name")}
-              keyboardType="name-phone-pad"
-              placeholderTextColor={theme.colors.ui.black + "70"}
-            />
-            {errors.userName ? (
-              <Text style={styles.errorText}>{errors.userName}</Text>
-            ) : null}
-          </View>
-
-          <View>
-            {/* Using the SimpleDatePicker */}
-            <SimpleDatePicker
-              onDateChange={handleDateChange}
-              placeholder={t("Date of Birth")}
-              value={dob} // Pass the dob state as value
-            />
-            {errors.dob ? (
-              <Text style={styles.errorText}>{errors.dob}</Text>
-            ) : null}
-          </View>
-
-          <View>
-            <TextInput
-              style={[styles.input, errors.email ? styles.inputError : null]}
-              onChangeText={(text) => {
-                setEmail(text);
-                setErrors({ ...errors, email: validateEmail(text) });
-              }}
-              value={email}
-              placeholder={t("Enter your Email")}
-              keyboardType="email-address"
-              placeholderTextColor={theme.colors.ui.black + "70"}
-            />
-            {errors.email ? (
-              <Text style={styles.errorText}>{errors.email}</Text>
-            ) : null}
-          </View>
-
-          <View>
-            <Dropdown
-              style={[
-                styles2.dropdown,
-                errors.stateName ? styles2.dropdownError : null,
-              ]}
-              placeholderStyle={styles2.placeholderStyle}
-              selectedTextStyle={styles2.selectedTextStyle}
-              inputSearchStyle={styles2.inputSearchStyle}
-              iconStyle={styles2.iconStyle}
-              data={indianStates}
-              maxHeight={300}
-              labelField="label"
-              valueField="value"
-              placeholder="Select state"
-              searchPlaceholder="Search..."
-              value={stateName}
-              onChange={(item) => {
-                setStateName(item.value);
-                setErrors({ ...errors, stateName: validateState(item.value) });
-              }}
-              renderLeftIcon={() => (
-                <AntDesign
-                  style={styles2.icon}
-                  color={theme.colors.text.secondary}
-                  name="earth"
-                  size={18}
-                />
-              )}
-            />
-            {errors.stateName ? (
-              <Text style={styles.errorText}>{errors.stateName}</Text>
-            ) : null}
-          </View>
-
-          <View>
-            <TextInput
-              style={[styles.input, errors.address ? styles.inputError : null]}
-              onChangeText={(text) => {
-                setAddress(text);
-                setErrors({ ...errors, address: validateAddress(text) });
-              }}
-              value={address}
-              placeholder={t("Address")}
-              keyboardType="name-phone-pad"
-              placeholderTextColor={theme.colors.ui.black + "70"}
-            />
-            {errors.address ? (
-              <Text style={styles.errorText}>{errors.address}</Text>
-            ) : null}
-          </View>
-        </View>
-
-        <TouchableOpacity onPress={handleUpdate}>
-          <LinearGradient
-            colors={["#26456C", "#4073B4", "#4073B4"]}
-            style={styles.gradient2}
+    <View style={styles.container}>
+      <StatusBar barStyle="light-content" backgroundColor="#1a365d" />
+      
+      {/* Enhanced Header */}
+      <LinearGradient
+        colors={["#1a365d", "#2d5a87", "#4a90c2"]}
+        style={styles.headerGradient}
+      >
+        <View style={styles.headerContent}>
+          <TouchableOpacity
+            onPress={() => router.back()}
+            style={styles.backButton}
           >
-            <Text style={styles.buttonText}>{t("Update Profile")}</Text>
-            <Ionicons
-              name="arrow-forward"
-              size={20}
-              color={theme.colors.text.primary}
-            />
-          </LinearGradient>
-        </TouchableOpacity>
-      </ScrollView>
-    </KeyboardAvoidingView>
+            <Ionicons name="arrow-back" size={24} color="white" />
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>{t("Edit Profile")}</Text>
+          <View style={{ width: 40 }} />
+        </View>
+      </LinearGradient>
+
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={{ flex: 1 }}
+      >
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+        >
+          <Animated.View
+            style={[
+              styles.contentContainer,
+              {
+                opacity: fadeAnim,
+                transform: [{ translateY: slideAnim }],
+              },
+            ]}
+          >
+            {/* Profile Avatar Section */}
+            <View style={styles.avatarSection}>
+              <View style={styles.avatarContainer}>
+                <LinearGradient
+                  colors={["#4a90c2", "#2d5a87"]}
+                  style={styles.avatarGradient}
+                >
+                  <MaterialIcons name="person" size={50} color="white" />
+                </LinearGradient>
+                <TouchableOpacity style={styles.editAvatarButton}>
+                  <MaterialIcons name="edit" size={16} color="white" />
+                </TouchableOpacity>
+              </View>
+              <Text style={styles.avatarLabel}>Profile Picture</Text>
+            </View>
+
+            {/* Form Fields */}
+            <View style={styles.formContainer}>
+              {renderInputField(
+                userName,
+                (text) => {
+                  setUserName(text);
+                  setErrors({ ...errors, userName: validateName(text) });
+                },
+                t("Enter your Full Name"),
+                "person",
+                "MaterialIcons",
+                "default",
+                errors.userName
+              )}
+
+              <View style={styles.inputContainer}>
+                <View style={[styles.inputWrapper, errors.dob ? styles.inputError : null]}>
+                  <MaterialIcons
+                    name="calendar-today"
+                    size={20}
+                    color={errors.dob ? "#e53e3e" : theme.colors.brand.blue}
+                    style={styles.inputIcon}
+                  />
+                  <SimpleDatePicker
+                    onDateChange={handleDateChange}
+                    placeholder={t("Date of Birth")}
+                    value={dob}
+                    // Remove style prop as it's not supported by SimpleDatePicker component
+                  />
+                </View>
+                {errors.dob ? <Text style={styles.errorText}>{errors.dob}</Text> : null}
+              </View>
+
+              {renderInputField(
+                email,
+                (text) => {
+                  setEmail(text);
+                  setErrors({ ...errors, email: validateEmail(text) });
+                },
+                t("Enter your Email"),
+                "email",
+                "MaterialIcons",
+                "email-address",
+                errors.email
+              )}
+
+              <View style={styles.inputContainer}>
+                <View style={[styles.inputWrapper, errors.stateName ? styles.inputError : null]}>
+                  <MaterialIcons
+                    name="location-on"
+                    size={20}
+                    color={errors.stateName ? "#e53e3e" : theme.colors.brand.blue}
+                    style={styles.inputIcon}
+                  />
+                  <Dropdown
+                    style={styles.dropdown}
+                    placeholderStyle={styles.placeholderStyle}
+                    selectedTextStyle={styles.selectedTextStyle}
+                    inputSearchStyle={styles.inputSearchStyle}
+                    data={indianStates}
+                    maxHeight={300}
+                    labelField="label"
+                    valueField="value"
+                    placeholder="Select state"
+                    searchPlaceholder="Search..."
+                    value={stateName}
+                    onChange={(item) => {
+                      setStateName(item.value);
+                      setErrors({ ...errors, stateName: validateState(item.value) });
+                    }}
+                  />
+                </View>
+                {errors.stateName ? <Text style={styles.errorText}>{errors.stateName}</Text> : null}
+              </View>
+
+              {renderInputField(
+                address,
+                (text) => {
+                  setAddress(text);
+                  setErrors({ ...errors, address: validateAddress(text) });
+                },
+                t("Address"),
+                "home",
+                "MaterialIcons",
+                "default",
+                errors.address
+              )}
+            </View>
+
+            {/* Update Button */}
+            <TouchableOpacity
+              onPress={handleUpdate}
+              disabled={updating}
+              style={[styles.updateButton, updating && styles.updateButtonDisabled]}
+            >
+              <LinearGradient
+                colors={updating ? ["#9CA3AF", "#6B7280"] : ["#1a365d", "#2d5a87", "#4a90c2"]}
+                style={styles.buttonGradient}
+              >
+                {updating ? (
+                  <View style={styles.buttonContent}>
+                    <Animated.View style={styles.loadingSpinner}>
+                      <MaterialIcons name="refresh" size={20} color="white" />
+                    </Animated.View>
+                    <Text style={styles.buttonText}>Updating...</Text>
+                  </View>
+                ) : (
+                  <View style={styles.buttonContent}>
+                    <Text style={styles.buttonText}>{t("Update Profile")}</Text>
+                    <MaterialIcons name="check-circle" size={20} color="white" />
+                  </View>
+                )}
+              </LinearGradient>
+            </TouchableOpacity>
+          </Animated.View>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </View>
   );
 };
 
 export default EditProfile;
 
-const styles2 = StyleSheet.create({
-  dropdown: {
-    height: hp("7%"),
-    width: wp("90%"),
-    borderColor: theme.colors.brand.blue + 50,
-    borderWidth: 0.5,
-    borderRadius: 5,
-    paddingHorizontal: hp("2.3%"),
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#F8FAFC",
   },
-  dropdownError: {
-    borderColor: "red",
+  skeletonContainer: {
+    flex: 1,
+    backgroundColor: "#F8FAFC",
+  },
+  headerGradient: {
+    paddingTop: Platform.OS === "ios" ? 50 : 30,
+    paddingBottom: 20,
+    elevation: 8,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+  },
+  headerContent: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 20,
+  },
+  backButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: "rgba(255,255,255,0.2)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  headerTitle: {
+    fontSize: 22,
+    fontWeight: "700",
+    color: "white",
+    textAlign: "center",
+  },
+  scrollContent: {
+    flexGrow: 1,
+  },
+  skeletonContent: {
+    padding: 20,
+    alignItems: "center",
+  },
+  contentContainer: {
+    padding: 20,
+    alignItems: "center",
+  },
+  avatarSection: {
+    alignItems: "center",
+    marginBottom: 30,
+  },
+  avatarContainer: {
+    position: "relative",
+  },
+  avatarGradient: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    alignItems: "center",
+    justifyContent: "center",
+    elevation: 8,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+  },
+  editAvatarButton: {
+    position: "absolute",
+    bottom: 5,
+    right: 5,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: "#4a90c2",
+    alignItems: "center",
+    justifyContent: "center",
+    elevation: 4,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+  },
+  avatarLabel: {
+    marginTop: 12,
+    fontSize: 16,
+    color: "#6B7280",
+    fontWeight: "500",
+  },
+  formContainer: {
+    width: "100%",
+    marginBottom: 20,
+  },
+  inputContainer: {
+    marginBottom: 20,
+  },
+  inputWrapper: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "white",
+    borderRadius: 12,
     borderWidth: 1,
+    borderColor: "#E5E7EB",
+    elevation: 2,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
   },
-  icon: {
-    marginRight: 5,
+  inputError: {
+    borderColor: "#e53e3e",
+    borderWidth: 2,
+  },
+  inputIcon: {
+    marginLeft: 16,
+    marginRight: 12,
+  },
+  input: {
+    flex: 1,
+    height: 55,
+    fontSize: 16,
+    color: "#1F2937",
+    fontWeight: "500",
+  },
+  datePickerStyle: {
+    flex: 1,
+    height: 55,
+  },
+  dropdown: {
+    flex: 1,
+    height: 55,
+    paddingRight: 16,
   },
   placeholderStyle: {
-    fontSize: 14,
+    fontSize: 16,
+    color: "#9CA3AF",
   },
   selectedTextStyle: {
-    fontSize: 14,
-    color: theme.colors.ui.black,
-    fontFamily: theme.fontFamily.medium,
-  },
-  iconStyle: {
-    width: 20,
-    height: 20,
+    fontSize: 16,
+    color: "#1F2937",
+    fontWeight: "500",
   },
   inputSearchStyle: {
     height: 40,
     fontSize: 16,
-  },
-});
-
-const styles = StyleSheet.create({
-  container: {
-    width: wp("100%"),
-    minHeight: hp("100%"),
-    display: "flex",
-    gap: 40,
-    justifyContent: "center",
-    alignItems: "center",
-    paddingHorizontal: 30,
-    paddingVertical: 20,
-  },
-  headerText: {
-    fontFamily: theme.fontFamily.semiBold,
-    color: theme.colors.brand.blue,
-    fontSize: hp("3.5%"),
-  },
-  formContainer: {
-    display: "flex",
-    flexDirection: "column",
-    gap: 10,
-    width: wp("90%"),
-  },
-  input: {
-    height: hp("7%"),
-    width: wp("90%"),
-    borderWidth: 0.2,
-    borderColor: theme.colors.brand.blue,
-    color: theme.colors.ui.black,
-    fontFamily: theme.fontFamily.semiBold,
-    borderRadius: 5,
-    paddingHorizontal: hp("2.3%"),
-  },
-  inputError: {
-    borderColor: "red",
-    borderWidth: 1,
+    borderRadius: 8,
   },
   errorText: {
-    color: "red",
-    fontSize: hp(1.6),
-    marginTop: 3,
-    marginLeft: 5,
-    fontFamily: theme.fontFamily.regular,
+    color: "#e53e3e",
+    fontSize: 14,
+    marginTop: 6,
+    marginLeft: 16,
+    fontWeight: "500",
   },
-  gradient2: {
-    width: wp("90%"),
-    height: hp("7%"),
-    justifyContent: "center",
-    alignItems: "center",
-    borderRadius: 10,
-    display: "flex",
+  updateButton: {
+    width: "100%",
+    marginTop: 20,
+  },
+  updateButtonDisabled: {
+    opacity: 0.7,
+  },
+  buttonGradient: {
+    borderRadius: 25,
+    elevation: 6,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
+  },
+  buttonContent: {
     flexDirection: "row",
-    gap: 10,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 16,
+    paddingHorizontal: 32,
+    gap: 12,
   },
   buttonText: {
-    fontSize: hp("2.5%"),
-    fontFamily: theme.fontFamily.semiBold,
-    textAlign: "center",
-    color: theme.colors.text.primary,
+    fontSize: 18,
+    fontWeight: "700",
+    color: "white",
+  },
+  loadingSpinner: {
+    transform: [{ rotate: "45deg" }],
   },
 });
-

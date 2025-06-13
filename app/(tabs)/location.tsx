@@ -1,4 +1,11 @@
-import { Alert, ScrollView, StyleSheet, Text, View, Animated } from "react-native";
+import {
+  Alert,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+  Animated,
+} from "react-native";
 import React, { useEffect, useState, useRef } from "react";
 import Title from "@/components/General/Title";
 import { theme } from "@/infrastructure/themes";
@@ -13,9 +20,7 @@ import NearBranchList from "@/components/Location/nearBranchList";
 import AllBranches from "@/components/Location/allBranches";
 import LocationSkeleton from "@/components/skeleton/location/location-skeleton";
 import axios from "axios";
-
-
-
+import FuelStationDetails from "../(screens)/fuel-station";
 
 
 const Location = () => {
@@ -23,25 +28,22 @@ const Location = () => {
   const [getBranches, setgetBranches] = useState([]);
   const [loading, setLoading] = useState(true);
   const { token, driverId } = useAuth();
-
+  const [selectedBranch, setSelectedBranch] = useState(null);
   useEffect(() => {
     const driver_id = driverId;
     const usertoken = token;
     const getBranchesList = async () => {
       try {
         setLoading(true);
-        const response = await axiosInstance.get(
-          "/get-location.php",
-          {
-            headers: {
-              Authorization: `Bearer ${usertoken}`,
-            },
-          }
-        );
+        const response = await axiosInstance.get("/get-location.php", {
+          headers: {
+            Authorization: `Bearer ${usertoken}`,
+          },
+        });
         const Branches = response.data;
         setgetBranches(Branches.data);
         setLoading(false);
-        // console.log("User Details😑😑:", Branches.data);
+        // console.log("User Details😑😑:", Branches);
       } catch (error) {
         console.error("Error fetching user details:", error);
         setLoading(false);
@@ -55,29 +57,30 @@ const Location = () => {
     return <LocationSkeleton />;
   }
 
-
-
-
   return (
     <ScrollView>
-      <View style={styles.container}>
-        <View
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "flex-start",
-          }}
-        >
-          <Title>{t("Our Branches").trim()}</Title>
-          <Text style={styles.description}>
-            {t("Find the branches near you")}
-          </Text>
-        </View>
-    
-        <NearBranchList />
-        <AllBranches branch={getBranches} />
-        {/* <GoogleMapLocation/> */}
-      </View>
+      {!selectedBranch ? (
+          <View style={styles.container}>
+            <View
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "flex-start",
+              }}
+            >
+              <Title>{t("Our Branches").trim()}</Title>
+              <Text style={styles.description}>
+                {t("Check out nearby branches")}
+              </Text>
+            </View>
+            <NearBranchList />
+            <AllBranches  branch={getBranches}  onBranchClick={(item:any) => setSelectedBranch(item)} />
+          </View>
+        ) : (
+          <View>
+            <FuelStationDetails data={selectedBranch}  onBack={() => setSelectedBranch(null)} />
+          </View>
+        )}
     </ScrollView>
   );
 };

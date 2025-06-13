@@ -10,7 +10,9 @@ import { width, height, size, fontSize } from "react-native-responsive-sizes";
 import { useTranslation } from "react-i18next";
 import axiosInstance from "@/utils/axionsInstance";
 import { useAuth } from "@/utils/AuthContext";
+import { router } from "expo-router";
 const BannerContainer = () => {
+  
   const { t } = useTranslation();
   const [Points, setPoints] = useState("");
   const {token, driverId} = useAuth()
@@ -55,7 +57,7 @@ const BannerContainer = () => {
           <Text style={styles.pointsText}>{Math.ceil(Number(Points) || 0)}</Text>
 
         </View>
-        <TouchableOpacity style={styles.bannerBtn}>
+        <TouchableOpacity onPress={()=>router.push("/(screens)/redeem-navigate")} style={styles.bannerBtn}>
           <Text
             style={{
               fontFamily: theme.fontFamily.semiBold,

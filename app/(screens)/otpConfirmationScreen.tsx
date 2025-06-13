@@ -92,7 +92,7 @@ const OtpConfirmationScreen = () => {
     const loadReferralCode = async () => {
       try {
         const storedReferralCode = await AsyncStorage.getItem("referralCode");
-        console.log("Stored Referral Code:👀👀", storedReferralCode);
+        // console.log("Stored Referral Code:👀👀", storedReferralCode);
         if (storedReferralCode) {
           setReferralCode(storedReferralCode);
           // Optionally remove it after setting
@@ -149,7 +149,7 @@ const OtpConfirmationScreen = () => {
         await setAuthData(token, driverId);
         // Check if user is new and route accordingly
         if (isNewUser) {
-          console.log("Routing to userDetails page for new user");
+          // console.log("Routing to userDetails page for new user");
           router.replace({
             pathname: "/(screens)/userDetails",
             params: {
@@ -161,7 +161,7 @@ const OtpConfirmationScreen = () => {
             },
           });
         } else {
-          console.log("Routing to tabs for existing user");
+          // console.log("Routing to tabs for existing user");
           router.replace({
             pathname: "/(tabs)",
             params: { response: token },

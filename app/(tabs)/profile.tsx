@@ -53,7 +53,7 @@ const profile = () => {
       );
       const userDetails = response.data;
       setuserInfo(userDetails.driver);
-      console.log("User Details refreshed:", userDetails.driver);
+      // console.log("User Details refreshed:", userDetails.driver);
     } catch (error) {
       console.error("Error fetching user details:", error);
     } finally {
@@ -64,7 +64,7 @@ const profile = () => {
   // Use this hook to refresh data when screen comes into focus
   useFocusEffect(
     useCallback(() => {
-      console.log("Profile screen focused - refreshing data");
+      // console.log("Profile screen focused - refreshing data");
       getUserDetails();
       return () => {
         // Cleanup if needed
@@ -80,7 +80,7 @@ const profile = () => {
   // Fixed logout function that properly calls the logout from AuthContext
   const handleLogout = async () => {
     try {
-      console.log("Logging out user");
+      // console.log("Logging out user");
       // Use the logout function from AuthContext
       await authLogout();
       // Then navigate to language selection screen

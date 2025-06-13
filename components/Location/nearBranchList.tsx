@@ -73,7 +73,7 @@ const GOOGLE_API_KEY = "AIzaSyC77ybS7vBhldjja1wO7YiGd5z0jkTHm4I";
     Linking.openURL(link);
   };
 
-
+const slice = data.slice(0, 3); // Limit to 5 branches for performance
   // Fetch distances from Google API
   useEffect(()=>{
     const fetchdata = async ()=>{
@@ -124,7 +124,7 @@ console.log("Sorted Branches😂😂:", sortedBranches);
 
   return (
     <View style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-      {sortedBranches.map((item: any) => {
+      {slice.map((item: any) => {
         return (
           <TouchableOpacity
             key={item.location_code}
@@ -272,7 +272,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     paddingHorizontal: wp(4),
-    paddingVertical: hp(1.5),
+    paddingVertical: hp(0.3),
     elevation: 2.5,
   },
   loadingContainer: {

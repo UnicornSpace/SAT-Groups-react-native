@@ -296,7 +296,7 @@ export default function TabsComponent() {
           }
         );
 
-        console.log("API Response:", response.data);
+        // console.log("API Response:", response.data);
         
         if (response.data.status === "success") {
           setTransactionsData(response.data.transactions || []);

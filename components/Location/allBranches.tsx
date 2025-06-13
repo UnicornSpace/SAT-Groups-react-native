@@ -19,7 +19,7 @@ import * as Location from "expo-location";
 import * as Linking from "expo-linking";
 import { getDistance } from "geolib";
 
-const AllBranches = ({ branch }: any) => {
+const AllBranches = ({ branch,onBranchClick }: any) => {
   const { t } = useTranslation();
   const [userLocation, setUserLocation] = useState<{
     latitude: number;
@@ -128,9 +128,9 @@ const AllBranches = ({ branch }: any) => {
 
           return (
             <TouchableOpacity
-              key={item.id || item.location_code}
+            key={item.id || item.location_code}
               style={styles.branchItem}
-              onPress={() => openInGoogleMaps(item.lat, item.lng)}
+              onPress={()=>onBranchClick(item)}
             >
               <Image
                 style={styles.branchImage}
@@ -145,7 +145,7 @@ const AllBranches = ({ branch }: any) => {
                 {item.brand && (
                   <View style={styles.dateContainer}>
                     <Text style={styles.date}>
-                      {item.brand}
+                      {item.location_code}
                     </Text>
                   </View>
                 )}
@@ -190,8 +190,8 @@ const styles = StyleSheet.create({
     // elevation: 1,
   },
   branchImage: {
-    width: wp("25%"),
-    height: hp("12%"),
+    width: wp("20%"),
+    height: hp("10%"),
     // aspectRatio: 1,
     borderRadius: 100,
     marginBottom: 8,
@@ -225,6 +225,7 @@ const styles = StyleSheet.create({
     fontSize: size(8),
     color: theme.colors.text.primary,
     fontFamily: theme.fontFamily.medium,
+    textAlign: "center",
   },
   distanceText: {
     fontFamily: theme.fontFamily.medium,
