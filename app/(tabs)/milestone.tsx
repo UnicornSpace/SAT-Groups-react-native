@@ -24,34 +24,26 @@ import Svg, {
   G,
 } from "react-native-svg";
 
-// Milestone data structure
-type Milestone = {
-  label: string;
-  points?: number;
-  isCurrent?: boolean;
-  isAchieved?: boolean;
-  iconType?: "gift" | "tshirt" | "coins" | "check" | "star" | "flag";
-  id?: string;
-  rewardType?: string;
-  rewardPoints?: string;
-  status?: string;
-  position?: number;
-};
-
-// API Response types
-interface ApiMilestone {
+// Single unified milestone type
+interface Milestone {
   id: string;
-  requiredPoints: string;
+  requiredPoints: number;
   rewardPoints: string;
   rewardType: string;
-  status: string;
+  status: "unclaimed" | "claimed";
   position: number;
+  // Computed properties
+  label?: string;
+  isCurrent?: boolean;
+  isAchieved?: boolean;
+  iconType?: "lock" | "points" | "coins" | "flag" | null;
 }
 
+// API Response type
 interface ApiResponse {
   status: string;
   totalPoints: number;
-  mileStones: ApiMilestone[];
+  mileStones: Milestone[];
 }
 
 // Component props
@@ -64,7 +56,6 @@ const SvgComponent: React.FC<MilestonePathProps> = ({
   userPoints: initialUserPoints,
   milestones: customMilestones,
 }) => {
-  // ALL HOOKS MUST BE CALLED AT THE TOP LEVEL - NO CONDITIONAL HOOKS
   const { myDynamicPoints, driverId, token } = useAuth();
   const scrollRef = useRef<ScrollView>(null);
   const { width: screenWidth } = Dimensions.get("window");
@@ -81,21 +72,29 @@ const SvgComponent: React.FC<MilestonePathProps> = ({
       : myDynamicPoints || milestoneData?.totalPoints || 0;
   }, [initialUserPoints, myDynamicPoints, milestoneData?.totalPoints]);
 
-  // Function to map reward type to icon type
-  const getIconType = (rewardType: string, requiredPoints: number): "gift" | "tshirt" | "coins" | "check" | "star" | "flag" => {
-    if (requiredPoints === 0) return "flag";
-    
-    switch (rewardType.toLowerCase()) {
-      case "gift":
-        return "gift";
-      case "points":
-        if (requiredPoints >= 500) return "gift";
-        if (requiredPoints >= 100) return "coins";
-        if (requiredPoints >= 50) return "coins";
-        return "tshirt";
-      default:
-        return "coins";
+  // Function to determine icon type based on status and reward type
+  const getIconType = (milestone: Milestone): "lock" | "points" | "coins" | "flag" | null => {
+    // At start (position 1 or requiredPoints 0) -> no icon
+    if (milestone.position === 1 || milestone.requiredPoints === 0) {
+      return null;
     }
+    
+    // Unclaimed status -> lock icon
+    if (milestone.status === "unclaimed") {
+      return "lock";
+    }
+    
+    // Claimed status with Points reward type -> points icon
+    if (milestone.status === "claimed" && milestone.rewardType === "Points") {
+      return "points";
+    }
+    
+    // Claimed status with other reward types -> coins icon
+    if (milestone.status === "claimed") {
+      return "coins";
+    }
+    
+    return "lock"; // fallback
   };
 
   // Function to generate label from required points
@@ -104,45 +103,44 @@ const SvgComponent: React.FC<MilestonePathProps> = ({
     return `${requiredPoints} L`;
   };
 
-  // Convert API data to Milestone format
-  const convertApiDataToMilestones = (apiData: ApiResponse): Milestone[] => {
+  // Process API milestones to add computed properties
+  const processApiMilestones = (apiData: ApiResponse): Milestone[] => {
     if (!apiData?.mileStones) return [];
 
     return apiData.mileStones
       .sort((a, b) => a.position - b.position)
-      .map((milestone) => {
-        const requiredPoints = parseInt(milestone.requiredPoints);
-        return {
-          id: milestone.id,
-          label: generateLabel(requiredPoints),
-          points: requiredPoints,
-          isAchieved: false,
-          iconType: getIconType(milestone.rewardType, requiredPoints),
-          rewardType: milestone.rewardType,
-          rewardPoints: milestone.rewardPoints,
-          status: milestone.status,
-          position: milestone.position,
-        };
-      });
+      .map((milestone) => ({
+        ...milestone,
+        requiredPoints: parseInt(milestone.requiredPoints.toString()),
+        label: generateLabel(parseInt(milestone.requiredPoints.toString())),
+        iconType: getIconType(milestone),
+      }));
   };
 
-  // Use API data converted to milestones, or custom milestones, or empty array
+  // Use API data or custom milestones
   const activeMilestones = useMemo(() => {
-    if (customMilestones) return customMilestones;
-    if (milestoneData) return convertApiDataToMilestones(milestoneData);
+    if (customMilestones) {
+      return customMilestones.map(milestone => ({
+        ...milestone,
+        label: milestone.label || generateLabel(milestone.requiredPoints),
+        iconType: milestone.iconType || getIconType(milestone),
+      }));
+    }
+    if (milestoneData) {
+      return processApiMilestones(milestoneData);
+    }
     return [];
   }, [customMilestones, milestoneData]);
 
   // Process milestones based on user points
   const processedMilestones = useMemo(() => {
     return activeMilestones.map((milestone, index) => {
-      const milestonePoints = milestone.points ?? 0;
+      const milestonePoints = milestone.requiredPoints;
       const isAchieved = userPoints >= milestonePoints;
 
       const isNext =
         !isAchieved &&
-        (index === 0 ||
-          userPoints >= (activeMilestones[index - 1].points ?? 0)) &&
+        (index === 0 || userPoints >= activeMilestones[index - 1].requiredPoints) &&
         userPoints < milestonePoints;
 
       return {
@@ -176,7 +174,7 @@ const SvgComponent: React.FC<MilestonePathProps> = ({
           }
         );
         const data: ApiResponse = response.data;
-        console.log("😂", data);
+        console.log("Milestone data:", data);
         setMilestoneData(data);
       } catch (error) {
         console.error("Error fetching milestone data:", error);
@@ -221,8 +219,8 @@ const SvgComponent: React.FC<MilestonePathProps> = ({
       points.push({
         x,
         y,
-        label: item.label,
-        points: item.points ?? 0,
+        label: item.label || generateLabel(item.requiredPoints),
+        points: item.requiredPoints,
         isCurrent: item.isCurrent,
         isAchieved: item.isAchieved,
         iconType: item.iconType,
@@ -381,23 +379,20 @@ const SvgComponent: React.FC<MilestonePathProps> = ({
     ? processedMilestones[currentMilestoneIndex]
     : processedMilestones[processedMilestones.length - 1];
 
-  const pointsToNextMilestone = (currentMilestone?.points ?? 0) - (previousMilestone?.points ?? 0);
-  const userProgressInSegment = userPoints - (previousMilestone?.points ?? 0);
+  const pointsToNextMilestone = (currentMilestone?.requiredPoints ?? 0) - (previousMilestone?.requiredPoints ?? 0);
+  const userProgressInSegment = userPoints - (previousMilestone?.requiredPoints ?? 0);
   const progressPercentage = pointsToNextMilestone > 0
     ? Math.min(100, Math.floor((userProgressInSegment / pointsToNextMilestone) * 100))
     : 100;
 
-  // Icon SVG paths
+  // Updated icon SVG paths - only lock, points, and coins
   const iconPaths = {
-    check: "M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z",
-    flag: "M14.4 6L14 4H5v17h2v-7h5.6l.4 2h7V6z",
-    star: "M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z",
-    gift: "M20 6h-2.18c.11-.31.18-.65.18-1 0-1.66-1.34-3-3-3-1.05 0-1.96.54-2.5 1.35l-.5.67-.5-.68C10.96 2.54 10.05 2 9 2 7.34 2 6 3.34 6 5c0 .35.07.69.18 1H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-5-2c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zM9 4c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm11 15H4v-2h16v2zm0-5H4V8h5.08L7 10.83 8.62 12 11 8.76l1-1.36 1 1.36L15.38 12 17 10.83 14.92 8H20v6z",
-    tshirt: "M16 21H8c-1.1 0-2-.9-2-2v-7.32l-1.66 1.23L3 11.39 9 7h2l.48.36c.61.46 1.42.46 2.04 0L14 7h2l6 4.39-1.34 1.52L19 11.68V19c0 1.1-.9 2-2 2zM10 9l-6 4.39v-2.83l6-4.39V9zm10 0v-2.83l-6-4.39V9l6 4.39v-2.83z",
+    lock: "M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM9 6c0-1.66 1.34-3 3-3s3 1.34 3 3v2H9V6z",
+    points: "M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z",
     coins: "M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm.31-8.86c-1.77-.45-2.34-.94-2.34-1.67 0-.84.79-1.43 2.1-1.43 1.38 0 1.9.66 1.94 1.64h1.71c-.05-1.34-.87-2.57-2.49-2.97V5H10.9v1.69c-1.51.32-2.72 1.3-2.72 2.81 0 1.79 1.49 2.69 3.66 3.21 1.95.46 2.34 1.15 2.34 1.87 0 .53-.39 1.39-2.1 1.39-1.6 0-2.23-.72-2.32-1.64H8.04c.1 1.7 1.36 2.66 2.86 2.97V19h2.34v-1.67c1.52-.29 2.72-1.16 2.73-2.77-.01-2.2-1.9-2.96-3.66-3.42z",
   };
 
-  // RENDER LOGIC - Handle all states here without early returns
+  // Loading and error states
   if (loading) {
     return (
       <View style={[styles.container, styles.loadingContainer]}>
@@ -432,7 +427,7 @@ const SvgComponent: React.FC<MilestonePathProps> = ({
           </RNText>
           <View style={styles.nextMilestoneContainer}>
             <RNText style={styles.milestoneText}>
-              {userPoints >= (activeMilestones[activeMilestones.length - 1]?.points ?? 0)
+              {userPoints >= (activeMilestones[activeMilestones.length - 1]?.requiredPoints ?? 0)
                 ? t("All milestones achieved")
                 : `${progressPercentage}% to ${currentMilestone?.label || 'Next milestone'}`}
             </RNText>
@@ -523,7 +518,7 @@ const SvgComponent: React.FC<MilestonePathProps> = ({
                         strokeWidth={point.isCurrent ? 5 : 3}
                       />
 
-                      {point.iconType && (
+                      {point.iconType && iconPaths[point.iconType] && (
                         <G
                           transform={`translate(${point.x - 10}, ${point.y - 10}) scale(0.8)`}
                           fill={
