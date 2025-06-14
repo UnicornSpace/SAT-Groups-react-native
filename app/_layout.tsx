@@ -19,6 +19,8 @@ import { PaperProvider } from "react-native-paper";
 import { I18nextProvider } from "react-i18next";
 import { AuthProvider } from "@/utils/AuthContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import InternetWrapper from "@/components/internet-wrapper";
+import { InternetProvider } from "@/components/InternetDetector";
 
 const TextComponent = Text as any;
 if (TextComponent.defaultProps == null) {
@@ -29,30 +31,30 @@ TextComponent.defaultProps.allowFontScaling = false;
 
 const processReferralLink = async (url: string) => {
   try {
-    console.log('Processing URL:', url);
+    console.log("Processing URL:", url);
     const { queryParams } = Linking.parse(url);
-    
+
     let referralCode = null;
-    
+
     // Handle Play Store referrer parameter: referrer=ref_USER123
     if (queryParams?.referrer) {
       const referrer = queryParams.referrer as string;
-      if (referrer.startsWith('ref_')) {
-        referralCode = referrer.replace('ref_', '');
+      if (referrer.startsWith("ref_")) {
+        referralCode = referrer.replace("ref_", "");
       }
     }
-    
+
     // Handle direct referral parameter: ref=USER123
     if (queryParams?.ref) {
       referralCode = queryParams.ref as string;
     }
 
     if (referralCode) {
-      await AsyncStorage.setItem('pendingReferralCode', referralCode);
-      console.log('Referral code saved:', referralCode);
+      await AsyncStorage.setItem("pendingReferralCode", referralCode);
+      console.log("Referral code saved:", referralCode);
     }
   } catch (error) {
-    console.log('Error processing referral link:', error);
+    console.log("Error processing referral link:", error);
   }
 };
 
@@ -75,7 +77,7 @@ const _layout = () => {
         await processReferralLink(initialUrl);
       }
 
-      const subscription = Linking.addEventListener('url', async ({ url }) => {
+      const subscription = Linking.addEventListener("url", async ({ url }) => {
         await processReferralLink(url);
       });
       return () => subscription?.remove();

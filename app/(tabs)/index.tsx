@@ -18,6 +18,7 @@ import axiosInstance from "@/utils/axionsInstance";
 import { useAuth } from "@/utils/AuthContext";
 import { theme } from "@/infrastructure/themes";
 import { Ionicons } from "@expo/vector-icons";
+import NoInternetScreen from "@/components/network/no-intenet";
 
 type RedeemItem = {
   status: string;
@@ -29,6 +30,8 @@ type RedeemItem = {
   id: string;
 };
 
+
+import { useInternetStatus } from "@/infrastructure/themes/hooks/internet-hook";
 const Home = () => {
   const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
@@ -36,7 +39,7 @@ const Home = () => {
   const [visible, setVisible] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFirstLoad, setIsFirstLoad] = useState(true);
-
+  const {checkInternet} = useInternetStatus()
   const { token, driverId } = useAuth();
 
   useEffect(() => {
@@ -104,7 +107,7 @@ const Home = () => {
       // await axiosInstance.post("/authorize-user-redeem-list.php", {
       //   id: currentItem?.id,
       //   driver_id: driverId,
-      //   accepted: true
+      //   authorization_status: 2
       // }, {
       //   headers: {
       //     Authorization: `Bearer ${token}`,
@@ -112,12 +115,11 @@ const Home = () => {
       // });
 
       hideModal();
-      
+
       // Show next modal after a short delay
       setTimeout(() => {
         showNextModal();
       }, 500);
-
     } catch (error) {
       console.error("Error accepting redemption:", error);
     }
@@ -132,7 +134,7 @@ const Home = () => {
       // await axiosInstance.post("/authorize-user-redeem-list.php", {
       //   id: currentItem?.id,
       //   driver_id: driverId,
-      //   accepted: false
+      //   authorization_status: 3
       // }, {
       //   headers: {
       //     Authorization: `Bearer ${token}`,
@@ -140,18 +142,18 @@ const Home = () => {
       // });
 
       hideModal();
-      
+
       // Show next modal after a short delay
       setTimeout(() => {
         showNextModal();
       }, 500);
-
     } catch (error) {
       console.error("Error declining redemption:", error);
     }
   };
 
-  const currentItem = redeemList && redeemList.length > 0 ? redeemList[currentIndex] : null;
+  const currentItem =
+    redeemList && redeemList.length > 0 ? redeemList[currentIndex] : null;
 
   return loading ? (
     <HomeSkeleton />
@@ -184,29 +186,7 @@ const Home = () => {
                 {currentItem.redeem_points}
               </Text>
 
-              <Text style={styles.branchText}>
-                {currentItem.branch}
-              </Text>
-
-              {/* Additional details - uncomment if needed */}
-              {/* <View style={styles.detailsContainer}>
-                <Text style={styles.detailText}>
-                  <Text style={styles.labelText}>Date: </Text>
-                  {currentItem.date}
-                </Text>
-                <Text style={styles.detailText}>
-                  <Text style={styles.labelText}>Invoice No: </Text>
-                  {currentItem.invoice_no}
-                </Text>
-                <Text style={styles.detailText}>
-                  <Text style={styles.labelText}>Status: </Text>
-                  {currentItem.status}
-                </Text>
-                <Text style={styles.detailText}>
-                  <Text style={styles.labelText}>Authorization Status: </Text>
-                  {currentItem.authorization_status}
-                </Text>
-              </View> */}
+              <Text style={styles.branchText}>{currentItem.branch}</Text>
             </View>
 
             <View style={styles.buttonContainer}>
@@ -236,6 +216,8 @@ const Home = () => {
           <Link href="/(tabs)/profile">
             <UserContainer />
           </Link>
+
+       
 
           <BannerContainer />
           <View style={{ width: width(90), alignItems: "flex-start", gap: 10 }}>

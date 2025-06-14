@@ -8,6 +8,8 @@ import { theme } from "@/infrastructure/themes";
 import EditButton from "@/components/Profile/edit";
 import { useAuth } from "@/utils/AuthContext";
 import ProtectedRoute from "@/components/General/proteted-route";
+import { useInternetStatus } from "@/infrastructure/themes/hooks/internet-hook";
+import NoInternetScreen from "@/components/network/no-intenet";
 
 const TextComponent = Text as any;
 if (TextComponent.defaultProps == null) {
@@ -51,9 +53,16 @@ const TabLayout = () => {
 
     return () => backHandler.remove();
   }, []);
+  
+   const { isConnected, checkInternet } = useInternetStatus();
 
+  // If no internet, show no internet screen
+  if (!isConnected) {
+    return <NoInternetScreen onRetry={checkInternet} />;
+  }
   return (
     <ProtectedRoute>
+
       <Tabs
         screenOptions={{
           sceneStyle: { backgroundColor: "#F8F9FA" },
