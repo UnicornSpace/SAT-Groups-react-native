@@ -7,7 +7,7 @@ import {
   Animated,
 } from "react-native";
 import React, { useEffect, useState, useRef } from "react";
-import Title from "@/components/General/Title";
+import Title from "@/components/General/title";
 import { theme } from "@/infrastructure/themes";
 import {
   widthPercentageToDP as wp,

@@ -19,8 +19,6 @@ import { PaperProvider } from "react-native-paper";
 import { I18nextProvider } from "react-i18next";
 import { AuthProvider } from "@/utils/AuthContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import InternetWrapper from "@/components/internet-wrapper";
-import { InternetProvider } from "@/components/InternetDetector";
 
 const TextComponent = Text as any;
 if (TextComponent.defaultProps == null) {
@@ -91,6 +89,7 @@ const _layout = () => {
     return null;
   }
   return (
+    // <ErrorHandler>
     <AuthProvider>
       <I18nextProvider i18n={i18n}>
         <ThemeProvider theme={theme}>
@@ -107,6 +106,7 @@ const _layout = () => {
         </ThemeProvider>
       </I18nextProvider>
     </AuthProvider>
+    // </ErrorHandler>
   );
 };
 

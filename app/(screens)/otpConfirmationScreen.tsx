@@ -143,12 +143,12 @@ const OtpConfirmationScreen = () => {
         referral_code: isNewUser ? referralCode.trim() : undefined, // Include referral code only for new users
       });
       console.log("OTP Verification Response:", response.data);
-      if (response.data.status === "invalid_otp"){
+      if (response.data.status === "invalid_otp") {
         setOtpError("The OTP you entered is invalid");
         console.error("Invalid OTP response:", response.data);
         return;
       }
-      
+
       const token = response.data.token;
       const driverId = response.data.driver?.id;
 
@@ -223,9 +223,12 @@ const OtpConfirmationScreen = () => {
 
       if (response.data?.status === "success") {
         Alert.alert("Success", "OTP has been resent");
-        setCount(60); // Restart the countdown
+        setCount(30); // Restart the countdown
         setOtp(""); // Clear the OTP field
       }
+      //  else {
+      //   setOtpError("Unexpected response from server. Please try again.");
+      // }
     } catch (error: any) {
       console.error("Resend OTP Error:", error);
       setOtpError("Failed to resend OTP. Please try again.");
@@ -321,18 +324,16 @@ const OtpConfirmationScreen = () => {
 
             {/* Error message display */}
             {otpError ? (
-            <View style={styles.errorContainer}>
-              <Ionicons
-                name="alert-circle"
-                size={16}
-                color={theme.colors.brand.red || "#FF3B30"}
-                style={{ marginRight: 6 }}
-              />
-              <Text style={styles.errorText}>
-                {otpError}
-              </Text>
-            </View>
-             ) : null} 
+              <View style={styles.errorContainer}>
+                <Ionicons
+                  name="alert-circle"
+                  size={16}
+                  color={theme.colors.brand.red || "#FF3B30"}
+                  style={{ marginRight: 6 }}
+                />
+                <Text style={styles.errorText}>{otpError}</Text>
+              </View>
+            ) : null}
 
             <Text
               style={{

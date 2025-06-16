@@ -1,0 +1,375 @@
+hey I've 3 files
+
+milestone-component.tsx
+```tsx
+"use client";
+
+import { iconPaths } from "@/components/icons";
+import { theme } from "@/infrastructure/themes";
+import { generatePathSegments } from "@/utils";
+import React, { useEffect, useRef, useMemo } from "react";
+import {
+  ScrollView,
+  View,
+  StyleSheet,
+  ImageBackground,
+  Text as RNText,
+} from "react-native";
+import Svg, { Path, Circle, Text, G } from "react-native-svg";
+
+const MilestoneComponent: React.FC<MilestonePathProps> = ({
+  milestones: milestoneData,
+  totalPoints,
+}) => {
+  const scrollRef = useRef<ScrollView>(null);
+
+  // Process milestones based on user points
+  const processedMilestones = useMemo(() => {
+    return milestoneData.map((milestone, index) => {
+      const milestonePoints = milestone.points ?? 0;
+      const isAchieved = totalPoints >= milestonePoints;
+
+      // Find the next unachieved milestone
+      const isNext =
+        !isAchieved &&
+        (index === 0 ||
+          totalPoints >= (milestoneData[index - 1].points ?? 0)) &&
+        totalPoints < milestonePoints;
+
+      return {
+        ...milestone,
+        isAchieved,
+        isCurrent: isNext,
+      };
+    });
+  }, [totalPoints, milestoneData]);
+
+  // SVG dimensions and spacing
+  const svgWidth = 300;
+  const verticalSpacing = 100;
+  const leftPosition = 60;
+  const rightPosition = 240;
+  const startY = 15; // Starting position (will be adjusted by total height calculation)
+
+  // Calculate coordinates for each milestone
+  const calculatePoints = (items: Milestone[]) => {
+    const points = [];
+    const totalItems = items.length;
+
+    // Determine total path height based on number of milestones
+    const totalPathHeight = (totalItems - 1) * verticalSpacing;
+    let currentY = totalPathHeight + startY; // Start from bottom
+
+    for (let index = 0; index < totalItems; index++) {
+      const item = items[index];
+      const isEven = index % 2 === 0;
+
+      // First point is centered, others alternate left and right
+      const x =
+        index === 0 ? svgWidth / 2 : isEven ? leftPosition : rightPosition;
+      const y = currentY - index * verticalSpacing; // Move up for each point
+
+      points.push({
+        x,
+        y,
+        label: `${item.points} L`,
+        points: item.points ?? 0,
+        isCurrent: item.isCurrent,
+        isAchieved: item.isAchieved,
+        iconType: item.iconType,
+      });
+    }
+
+    return points;
+  };
+
+  // Get dynamic points
+  const points = calculatePoints(processedMilestones);
+
+  // Generate path segments based on user progress
+  const { completedPath, remainingPath } = generatePathSegments(
+    points.map((p) => ({ x: p.x, y: p.y, points: p.points || 0 })),
+    totalPoints
+  );
+
+  // Calculate the SVG height based on the number of milestones
+  const totalPathHeight = (processedMilestones.length - 1) * verticalSpacing;
+  const totalSvgHeight = totalPathHeight + startY * 2; // Add padding for top and bottom
+
+  // Find current milestone for displaying progress
+  const currentMilestoneIndex = processedMilestones.findIndex(
+    (m) => m.isCurrent
+  );
+  const previousMilestone =
+    currentMilestoneIndex > 0
+      ? processedMilestones[currentMilestoneIndex - 1]
+      : processedMilestones[0];
+
+  const currentMilestone =
+    currentMilestoneIndex >= 0
+      ? processedMilestones[currentMilestoneIndex]
+      : processedMilestones[processedMilestones.length - 1];
+
+  // Calculate progress percentage
+  const pointsToNextMilestone =
+    (currentMilestone.points ?? 0) - (previousMilestone.points ?? 0);
+  const userProgressInSegment = totalPoints - (previousMilestone.points ?? 0);
+  const progressPercentage =
+    pointsToNextMilestone > 0
+      ? Math.min(
+          100,
+          Math.floor((userProgressInSegment / pointsToNextMilestone) * 100)
+        )
+      : 100;
+
+  useEffect(() => {
+    // Scroll to the bottom initially to show the start point
+    setTimeout(() => {
+      scrollRef.current?.scrollToEnd({ animated: false });
+    }, 50);
+  }, []);
+
+  return (
+    <View style={styles.container}>
+  
+
+      {/* Scrollable Content */}
+      <ScrollView
+        ref={scrollRef}
+        contentContainerStyle={styles.scrollContainer}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Top Padding to compensate for fixed header */}
+        <View style={styles.topPadding} />
+
+        {/* Dynamic height container based on total path height */}
+        <View style={{ height: totalSvgHeight }}>
+          <ImageBackground
+            // @ts-ignore
+            opacity={0.3}
+            source={require("@/assets/images/satgroups/tile_background.png")}
+            resizeMode="cover"
+            style={styles.backgroundImage}
+          >
+            <Svg
+              fill="none"
+              height={totalSvgHeight}
+              viewBox={`0 0 ${svgWidth} ${totalSvgHeight}`}
+            >
+              {/* Path segments */}
+              <G>
+                {/* Completed path segment */}
+                {completedPath && (
+                  <Path
+                    stroke="#26456C"
+                    strokeLinecap="round"
+                    strokeWidth={30}
+                    d={completedPath}
+                  />
+                )}
+
+                {/* Remaining path segment */}
+                {remainingPath && (
+                  <Path
+                    stroke="#DBDBDB"
+                    strokeLinecap="round"
+                    strokeWidth={20}
+                    d={remainingPath}
+                  />
+                )}
+
+                {/* Milestone circles and labels */}
+                {points.map((point, index) => {
+                  const isStart = index === 0; // First point is start
+                  const circleRadius = isStart ? 38 : 25;
+                  const labelOffset = isStart ? 5 : 35;
+                  const isEven = index % 2 === 0;
+                  const labelX = isStart
+                    ? point.x
+                    : isEven && !isStart
+                      ? point.x - 10
+                      : point.x + 10;
+
+                  return (
+                    <React.Fragment key={index}>
+                      {/* Circle */}
+                      <Circle
+                        cx={point.x}
+                        cy={point.y}
+                        r={circleRadius}
+                        fill={
+                          point.isAchieved
+                            ? "#26456C"
+                            : isStart
+                              ? "#26456C"
+                              : point.isCurrent
+                                ? "#fff"
+                                : "#DBDBDB"
+                        }
+                        stroke={
+                          isStart
+                            ? "#fff"
+                            : point.isCurrent
+                              ? "#26456C"
+                              : "#fff"
+                        }
+                        strokeWidth={point.isCurrent ? 5 : 3}
+                      />
+
+                      {/* Icon inside circle */}
+                      {point.iconType && (
+                        <G
+                          transform={`translate(${point.x - 10}, ${
+                            point.y - 10
+                          }) scale(0.8)`}
+                          fill={
+                            point.isAchieved || isStart
+                              ? "#fff"
+                              : point.isCurrent
+                                ? "#26456C"
+                                : "#fff"
+                          }
+                        >
+                          <Path d={iconPaths[point.iconType]} />
+                        </G>
+                      )}
+
+                      {/* Label */}
+                      <Text
+                        x={labelX}
+                        y={point.y + labelOffset}
+                        fill={isStart ? "#fff" : "#26456C"}
+                        fontFamily={
+                          isStart
+                            ? theme.fontFamily.bold
+                            : theme.fontFamily.regular
+                        }
+                        fontSize={isStart ? 14 : 12}
+                        textAnchor={
+                          isStart
+                            ? "middle"
+                            : isEven && !isStart
+                              ? "end"
+                              : "start"
+                        }
+                      >
+                        {point.points} L
+                      </Text>
+                    </React.Fragment>
+                  );
+                })}
+              </G>
+            </Svg>
+          </ImageBackground>
+        </View>
+      </ScrollView>
+    </View>
+  );
+};
+```
+
+types.ts
+```
+// Milestone data structure
+type Milestone = {
+  label: string;
+  points?: number;
+  isCurrent?: boolean;
+  isAchieved?: boolean;
+  iconType?: "gift" | "coins" | "check" | "star" | "flag";
+};
+// Component props
+interface MilestonePathProps {
+  milestones: Milestone[]; // Optional: Allow passing custom milestones
+  totalPoints: number; // Total points earned by the user
+}
+
+```
+
+milestone.tsx
+
+```
+import { StyleSheet, View } from "react-native";
+import MilestoneComponent from "@/components/milestone/milestone-component";
+
+const milestone = () => {
+  const milestoneData = [
+    {
+      id: "1",
+      position: 1,
+      requiredPoints: "0",
+      rewardPoints: "0",
+      rewardType: "Points",
+      status: "unclaimed",
+    },
+    {
+      id: "2",
+      position: 2,
+      requiredPoints: "50",
+      rewardPoints: "60",
+      rewardType: "Points",
+      status: "unclaimed",
+    },
+    {
+      id: "3",
+      position: 3,
+      requiredPoints: "100",
+      rewardPoints: "60",
+      rewardType: "Points",
+      status: "unclaimed",
+    },
+    {
+      id: "4",
+      position: 4,
+      requiredPoints: "150",
+      rewardPoints: "60",
+      rewardType: "Points",
+      status: "unclaimed",
+    },
+    {
+      id: "5",
+      position: 5,
+      requiredPoints: "250",
+      rewardPoints: "120",
+      rewardType: "Points",
+      status: "unclaimed",
+    },
+    {
+      id: "6",
+      position: 6,
+      requiredPoints: "500",
+      rewardPoints: "Gift",
+      rewardType: "Gift",
+      status: "unclaimed",
+    },
+  ];
+
+  const totalPoints = 813.56;
+
+  const defaultMilestones: Milestone[] = [
+    { label: "START", points: 0, isAchieved: false },
+    { label: "1 L", points: 1, isAchieved: false, iconType: "coins" },
+    { label: "50 L", points: 50, isAchieved: false, iconType: "coins" },
+    { label: "100 L", points: 100, isAchieved: false, iconType: "coins" },
+    { label: "200 L", points: 200, isAchieved: false, iconType: "coins" },
+    { label: "250 L", points: 250, isAchieved: false, iconType: "coins" },
+    { label: "500 L", points: 500, isAchieved: false, iconType: "gift" },
+    { label: "550 L", points: 550, isAchieved: false, iconType: "coins" },
+    { label: "600 L", points: 600, isAchieved: false, iconType: "coins" },
+    { label: "700 L", points: 700, isAchieved: false, iconType: "coins" },
+    { label: "750 L", points: 750, isAchieved: false, iconType: "coins" },
+    { label: "1000 L", points: 1000, isAchieved: false, iconType: "gift" },
+  ];
+
+  return (
+    <View style={{ flex: 1, backgroundColor: "#fff" }}>
+      <MilestoneComponent
+        milestones={defaultMilestones}
+        totalPoints={totalPoints}
+      />
+    </View>
+  );
+};
+
+export default milestone;
+```

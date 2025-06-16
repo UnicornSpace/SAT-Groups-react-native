@@ -1,16 +1,14 @@
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import React, { useState } from "react";
-import { SegmentedButtons } from "react-native-paper";
 import { LinearGradient } from "expo-linear-gradient";
 import { theme } from "@/infrastructure/themes";
-import { FontAwesome, Ionicons, MaterialIcons } from "@expo/vector-icons";
+import { MaterialIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
 import i18next from "i18next";
-import { useTranslation } from "react-i18next";
 
 type Language = {
   code: string;
@@ -19,8 +17,6 @@ type Language = {
 };
 
 const LanguageSeletionScreen = () => {
-  const [error, setError] = useState(null);
-  const [value, setValue] = React.useState("");
   const [SelectLang, setSelectLang] = useState<string | null>(null);
 
   const languages: Language[] = [
@@ -30,35 +26,12 @@ const LanguageSeletionScreen = () => {
     { code: "ಅ", name: "ಕನ್ನಡ", trans: "kan" },
     { code: "అ", name: "తెలుగు", trans: "tel" },
   ];
-  const { t, ready, i18n } = useTranslation();
 
-  React.useEffect(() => {
-    try {
-      // console.log("i18n initialization status:", i18n.isInitialized);
-      // console.log("Current language:", i18n.language);
-      // console.log(
-      //   "Available resources:",
-      //   Object.keys(i18n.options.resources || {})
-      // );
-    } catch (err) {
-      console.error("Error checking i18n:", err);
-      // setError(err.message);
-    }
-  }, []);
-
-  if (error) {
-    return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <Text >Translation Error: {error}</Text>
-      </View>
-    );
-  }
   const SubmitLang = () => {
     if (SelectLang) {
       i18next.changeLanguage(SelectLang).then(() => {
         router.replace("/(screens)/otp-screen");
       });
-      // console.log(SelectLang);
     }
   };
 

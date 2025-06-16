@@ -20,17 +20,17 @@ import {
 import { useTranslation } from "react-i18next";
 import { ActivityIndicator } from "react-native-paper";
 import axiosInstance from "@/utils/axionsInstance";
+
 const UserOTPScreen = () => {
   const [number, onChangeNumber] = useState("");
-  const [referral, setReferral] = useState("");
   const [loading, setLoading] = useState(false);
   const { t } = useTranslation();
+  const [error, setError] = useState<string | null>(null);
 
   const SubmitNumber = async () => {
     if (number.length !== 11) {
-      Alert.alert("Invalid Number", "Please enter a valid number", [
-        { text: "OK", onPress: () => console.log("OK Pressed") },
-      ]);
+
+      setError("Please enter a valid number");
       return;
     }
 
@@ -40,11 +40,7 @@ const UserOTPScreen = () => {
 
       const response = await axiosInstance.post("/user-login-request-otp.php", {
         mobile: formattedNumber,
-        // referral_code: referral || undefined,
       });
-
-      // console.log("Response:", response.data);
-      // console.log("Response:", number);
 
       if (response.status === 200) {
         router.replace({
@@ -55,6 +51,9 @@ const UserOTPScreen = () => {
           },
         });
       }
+      else{
+        setError("Failed to send OTP. Please try again.");
+      }
     } catch (error) {
       Alert.alert("Something went wrong");
     } finally {
@@ -64,23 +63,23 @@ const UserOTPScreen = () => {
 
   const formateNumber = (text: string) => {
     let cleanText = text.replace(/[^0-9]/g, "");
-  
+
     // Allow clearing the field
     if (cleanText === "") {
       onChangeNumber("");
       return;
     }
-  
+
     // Allow only if the first digit is 6-9
     if (!/^([6789])/.test(cleanText)) return;
-  
+
     if (cleanText.length > 10) cleanText = cleanText.slice(0, 10);
     if (cleanText.length > 5)
       cleanText = cleanText.slice(0, 5) + "-" + cleanText.slice(5);
-      
+
     onChangeNumber(cleanText);
   };
-  
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -145,6 +144,17 @@ const UserOTPScreen = () => {
               {t("We will send an SMS code to verify your number")}
             </Text>
           </View>
+          {error ? (
+            <View style={styles.errorContainer}>
+              <Ionicons
+                name="alert-circle"
+                size={16}
+                color={theme.colors.brand.red || "#FF3B30"}
+                style={{ marginRight: 6 }}
+              />
+              <Text style={styles.errorText}>{error}</Text>
+            </View>
+          ) : null}
         </View>
 
         {loading ? (
@@ -200,5 +210,15 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     gap: 10,
+  },
+  errorContainer: {
+    flexDirection: "row",
+    marginLeft: hp(1),
+  },
+  errorText: {
+    fontSize: hp(1.8),
+    fontFamily: theme.fontFamily.regular,
+    color: theme.colors.brand.red || "#FF3B30",
+    flex: 1,
   },
 });

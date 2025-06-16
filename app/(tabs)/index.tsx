@@ -11,7 +11,7 @@ import { Link } from "expo-router";
 
 import BannerContainer from "@/components/Home/banner-container";
 import UserContainer from "@/components/Home/user-container";
-import Title from "@/components/General/Title";
+import Title from "@/components/General/title";
 import TabsComponent from "@/components/Home/tabs";
 import HomeSkeleton from "@/components/skeleton/home/home-skeleton";
 import axiosInstance from "@/utils/axionsInstance";
@@ -62,6 +62,13 @@ const Home = () => {
           }
         );
         const redeemData = response.data;
+        // Check if redeemData is empty
+        if (!redeemData || redeemData.length === 0) {
+          console.log("No redeem data available, so not showing modal.");
+          setIsFirstLoad(false);
+          return;
+        }
+
         const fixed = `[${redeemData.replace(/}\s*{/g, "},{")}]`;
         const parsed = JSON.parse(fixed);
         setRedeemList(parsed);
