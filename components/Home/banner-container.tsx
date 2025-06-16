@@ -54,7 +54,7 @@ const BannerContainer = () => {
       <View style={{ position: "absolute", top: size(28), left: size(22) }}>
         <View style={{ flexDirection: "column", justifyContent: "flex-start" }}>
           <Text style={styles.bannerText}>{t("Total Points")}</Text>
-          <Text style={styles.pointsText}>{Math.ceil(Number(Points) || 0)}</Text>
+          <Text style={styles.pointsText}>{(Number(Points) || 0)}</Text>
 
         </View>
         <TouchableOpacity onPress={()=>router.push("/(screens)/redeem-navigate")} style={styles.bannerBtn}>

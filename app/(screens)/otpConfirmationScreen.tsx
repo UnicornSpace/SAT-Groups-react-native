@@ -37,6 +37,7 @@ const OtpConfirmationScreen = () => {
     number: string;
     UserExist: any;
   }>();
+  // console.log("Number from params:👍", number);
   const [count, setCount] = useState(60);
   const [loading, setLoading] = useState(false);
   const [otp, setOtp] = useState("");
@@ -141,7 +142,13 @@ const OtpConfirmationScreen = () => {
         otp: finalOtp,
         referral_code: isNewUser ? referralCode.trim() : undefined, // Include referral code only for new users
       });
-
+      console.log("OTP Verification Response:", response.data);
+      if (response.data.status === "invalid_otp"){
+        setOtpError("The OTP you entered is invalid");
+        console.error("Invalid OTP response:", response.data);
+        return;
+      }
+      
       const token = response.data.token;
       const driverId = response.data.driver?.id;
 
@@ -314,25 +321,29 @@ const OtpConfirmationScreen = () => {
 
             {/* Error message display */}
             {otpError ? (
-              <View style={styles.errorContainer}>
-                <Ionicons
-                  name="alert-circle"
-                  size={16}
-                  color={theme.colors.brand.red || "#FF3B30"}
-                  style={{ marginRight: 6 }}
-                />
-                <Text style={styles.errorText}>{otpError}</Text>
-              </View>
-            ) : null}
+            <View style={styles.errorContainer}>
+              <Ionicons
+                name="alert-circle"
+                size={16}
+                color={theme.colors.brand.red || "#FF3B30"}
+                style={{ marginRight: 6 }}
+              />
+              <Text style={styles.errorText}>
+                {otpError}
+              </Text>
+            </View>
+             ) : null} 
 
             <Text
               style={{
                 fontFamily: theme.fontFamily.regular,
                 color: theme.colors.text.secondary,
                 fontSize: hp(1.9),
+                // width: wp("90%"),
+                textAlign: "center",
               }}
             >
-              {t("We sent a confirmation code to")} +91 XXXXX XXXXX
+              {t("We sent a confirmation code to")} {number}
             </Text>
           </View>
 
@@ -502,10 +513,7 @@ const styles = StyleSheet.create({
   // Error message container
   errorContainer: {
     flexDirection: "row",
-    alignItems: "center",
-    alignSelf: "flex-start",
-    marginTop: -10,
-    marginBottom: 5,
+    marginLeft: hp(2),
   },
   errorText: {
     fontSize: hp(1.8),

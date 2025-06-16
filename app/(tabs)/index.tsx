@@ -103,16 +103,16 @@ const Home = () => {
       const currentItem = redeemList[currentIndex];
       console.log("Redemption accepted for item:", currentItem?.id);
 
-      // Example API call for accepting
-      // await axiosInstance.post("/authorize-user-redeem-list.php", {
-      //   id: currentItem?.id,
-      //   driver_id: driverId,
-      //   authorization_status: 2
-      // }, {
-      //   headers: {
-      //     Authorization: `Bearer ${token}`,
-      //   },
-      // });
+      
+      await axiosInstance.post("/authorize-user-redeem-list.php", {
+        id: currentItem?.id,
+        driver_id: driverId,
+        authorization_status: 2
+      }, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
       hideModal();
 
@@ -130,16 +130,16 @@ const Home = () => {
       const currentItem = redeemList[currentIndex];
       console.log("Redemption declined for item:", currentItem?.id);
 
-      // Example API call for declining
-      // await axiosInstance.post("/authorize-user-redeem-list.php", {
-      //   id: currentItem?.id,
-      //   driver_id: driverId,
-      //   authorization_status: 3
-      // }, {
-      //   headers: {
-      //     Authorization: `Bearer ${token}`,
-      //   },
-      // });
+      
+      await axiosInstance.post("/authorize-user-redeem-list.php", {
+        id: currentItem?.id,
+        driver_id: driverId,
+        authorization_status: 3
+      }, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
       hideModal();
 
@@ -266,7 +266,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   pointsText: {
-    fontSize: 18,
+    fontSize: 20,
     fontFamily: theme.fontFamily.semiBold,
     color: theme.colors.ui.black,
     marginTop: 10,
@@ -275,8 +275,8 @@ const styles = StyleSheet.create({
     fontFamily: theme.fontFamily.medium,
   },
   branchText: {
-    fontSize: 18,
-    fontFamily: theme.fontFamily.semiBold,
+    fontSize: 14,
+    fontFamily: theme.fontFamily.medium,
     color: theme.colors.brand.blue,
     marginTop: 5,
   },
