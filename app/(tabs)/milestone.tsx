@@ -55,7 +55,7 @@ const milestone = () => {
       status: "unclaimed",
     },
   ];
-  const totalpoints = 200
+  const totalpoints = 50
 const { token, isLoading, driverId } = useAuth();
 
   const [data, setData] = useState(milestoneData);
@@ -77,7 +77,8 @@ const { token, isLoading, driverId } = useAuth();
           }
         );
 
-        console.log("Fetched milestones:", response.data.mileStones, response.data.totalPoints);
+        // console.log("Fetched milestones:✅", response.data);
+
          // Add validation for the response data
       const fetchedMilestones = response.data.mileStones;
       const fetchedTotalPoints = response.data.totalPoints;
@@ -123,8 +124,8 @@ const { token, isLoading, driverId } = useAuth();
   return (
     <View style={{ flex: 1, backgroundColor: "#fff" }}>
       <MilestoneComponent
-        milestones={milestoneData}
-        totalPoints={totalpoints}
+        milestones={data}
+        totalPoints={totalPoints}
       />
     </View>
   );

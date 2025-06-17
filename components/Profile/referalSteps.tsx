@@ -1,4 +1,5 @@
 import { theme } from '@/infrastructure/themes';
+import { t } from 'i18next';
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 
@@ -21,7 +22,7 @@ const ReferralStepsVisual = () => {
             {index !== steps.length - 1 && <View style={styles.line} />}
           </View>
 
-          <Text style={styles.text}>{step.text}</Text>
+          <Text style={styles.text}>{t(`${step.text}`)}</Text>
         </View>
       ))}
     </View>

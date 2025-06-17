@@ -30,7 +30,6 @@ type RedeemItem = {
   id: string;
 };
 
-
 import { useInternetStatus } from "@/infrastructure/themes/hooks/internet-hook";
 const Home = () => {
   const { t } = useTranslation();
@@ -39,7 +38,7 @@ const Home = () => {
   const [visible, setVisible] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFirstLoad, setIsFirstLoad] = useState(true);
-  const {checkInternet} = useInternetStatus()
+  const { checkInternet } = useInternetStatus();
   const { token, driverId } = useAuth();
 
   useEffect(() => {
@@ -110,16 +109,19 @@ const Home = () => {
       const currentItem = redeemList[currentIndex];
       console.log("Redemption accepted for item:", currentItem?.id);
 
-      
-      await axiosInstance.post("/authorize-user-redeem-list.php", {
-        id: currentItem?.id,
-        driver_id: driverId,
-        authorization_status: 2
-      }, {
-        headers: {
-          Authorization: `Bearer ${token}`,
+      await axiosInstance.post(
+        "/authorize-user-redeem-list.php",
+        {
+          id: currentItem?.id,
+          driver_id: driverId,
+          authorization_status: 2,
         },
-      });
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       hideModal();
 
@@ -137,16 +139,19 @@ const Home = () => {
       const currentItem = redeemList[currentIndex];
       console.log("Redemption declined for item:", currentItem?.id);
 
-      
-      await axiosInstance.post("/authorize-user-redeem-list.php", {
-        id: currentItem?.id,
-        driver_id: driverId,
-        authorization_status: 3
-      }, {
-        headers: {
-          Authorization: `Bearer ${token}`,
+      await axiosInstance.post(
+        "/authorize-user-redeem-list.php",
+        {
+          id: currentItem?.id,
+          driver_id: driverId,
+          authorization_status: 3,
         },
-      });
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       hideModal();
 
@@ -223,8 +228,6 @@ const Home = () => {
           <Link href="/(tabs)/profile">
             <UserContainer />
           </Link>
-
-       
 
           <BannerContainer />
           <View style={{ width: width(90), alignItems: "flex-start", gap: 10 }}>

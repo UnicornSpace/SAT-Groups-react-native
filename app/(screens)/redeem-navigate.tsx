@@ -14,6 +14,7 @@ import { theme } from "@/infrastructure/themes";
 import { router } from "expo-router";
 import { useAuth } from "@/utils/AuthContext";
 import axiosInstance from "@/utils/axionsInstance";
+import { t } from "i18next";
 
 const RedeemPointsScreen: React.FC = () => {
   const { token, driverId } = useAuth();
@@ -58,7 +59,7 @@ const RedeemPointsScreen: React.FC = () => {
         >
           <Ionicons name="arrow-back" size={24} color="#111418" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Redeem Points</Text>
+        <Text style={styles.headerTitle}>{t("Redeem Points")}</Text>
       </View>
 
       <View
@@ -79,10 +80,10 @@ const RedeemPointsScreen: React.FC = () => {
         </View>
 
         {/* Content */}
-        <Text style={styles.title}>Redeem Points</Text>
+        <Text style={styles.title}>{t("Redeem Points")}</Text>
         <Text style={styles.description}>
           {
-            `You have ${Math.ceil(Number(Points) || 0)} points available to redeem.`
+            t(`You have ${Math.ceil(Number(Points) || 0)} points available to redeem.`)
           }
         </Text>
 
@@ -92,7 +93,7 @@ const RedeemPointsScreen: React.FC = () => {
             onPress={() => router.push("/(tabs)/location")}
             style={styles.redeemButton}
           >
-            <Text style={styles.buttonText}>Check the nearest Branch</Text>
+            <Text style={styles.buttonText}>{t("Check the nearest Branch")}</Text>
             <Ionicons name="chevron-forward" size={20} color="white" />
           </TouchableOpacity>
         </View>

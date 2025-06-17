@@ -426,7 +426,7 @@ export default function TabsComponent() {
             numberOfLines={1}
             adjustsFontSizeToFit
           >
-            {t("ALL")}
+            {t("All")}
           </Text>
         </TouchableOpacity>
       </View>

@@ -24,15 +24,19 @@ import { useAuth } from "@/utils/AuthContext";
 
 const MilestoneComponent: React.FC<MilestonePathProps> = ({
   milestones: milestoneData,
-  totalPoints,
+  totalPoints: initialTotalPoints,
 }) => {
   const scrollRef = useRef<ScrollView>(null);
   const [visible, setVisible] = useState(false);
   const [selectedMilestone, setSelectedMilestone] = useState<any>(null);
 
+  // Add state for total points and milestones to handle updates
+  const [totalPoints, setTotalPoints] = useState(initialTotalPoints);
+  const [milestones, setMilestones] = useState(milestoneData);
+
   // Process milestones based on user points
   const processedMilestones = useMemo(() => {
-    return milestoneData.map((milestone, index) => {
+    return milestones.map((milestone, index) => {
       if (!milestone) {
         console.warn(`Milestone at index ${index} is undefined`);
         return {
@@ -52,8 +56,7 @@ const MilestoneComponent: React.FC<MilestonePathProps> = ({
       const isNext =
         !isAchieved &&
         (index === 0 ||
-          totalPoints >=
-            (Number(milestoneData[index - 1].requiredPoints) || 0)) &&
+          totalPoints >= (Number(milestones[index - 1].requiredPoints) || 0)) &&
         totalPoints < milestonePoints;
 
       return {
@@ -62,17 +65,20 @@ const MilestoneComponent: React.FC<MilestonePathProps> = ({
         isCurrent: isNext,
       };
     });
-  }, [totalPoints, milestoneData]);
+  }, [totalPoints, milestones]);
+
+
 
   // SVG dimensions and spacing
   const svgWidth = 300;
   const verticalSpacing = 120;
   const leftPosition = 60;
   const rightPosition = 240;
-  const startY = 20;
+  const startY = 15;
 
   // Calculate coordinates for each milestone
   const calculatePoints = (items: Milestone[]) => {
+    
     const points = [];
     const totalItems = items.length;
     const totalPathHeight = (totalItems - 1) * verticalSpacing;
@@ -81,7 +87,7 @@ const MilestoneComponent: React.FC<MilestonePathProps> = ({
     for (let index = 0; index < totalItems; index++) {
       const item = items[index];
       const isEven = index % 2 === 0;
-
+     
       const x =
         index === 0 ? svgWidth / 2 : isEven ? leftPosition : rightPosition;
       const y = currentY - index * verticalSpacing;
@@ -168,31 +174,50 @@ const MilestoneComponent: React.FC<MilestonePathProps> = ({
     showModal(point.milestone);
   };
 
-const { token, driverId } = useAuth();
-  const handleClaim = (milestone: Milestone) => {
-    console.log("Claiming milestone:", milestone);
-    const updatedMilestone = async () => {
-      try {
-        const response = await axiosInstance.post("/claim-user-milestones.php", {
-          driver_id: driverId,
-          mileStoneId: milestone.id
-        },
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-      );
-      
-        console.log("Claim response:", response.data);
-      } catch (error) {
-        console.error("Error claiming milestone:", error);
-      }
+  const { token, driverId } = useAuth();
 
-    };
-    updatedMilestone();
+  const handleClaim = async (milestone: Milestone) => {
+    console.log("Claiming milestone:", milestone);
+
+    try {
+      const response = await axiosInstance.post(
+        "/claim-user-milestones.php",
+        {
+          driver_id: driverId,
+          mileStoneId: milestone.id,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      console.log("Claim response:", response.data);
+
+      // Update the milestone status to claimed
+      setMilestones((prevMilestones) =>
+        prevMilestones.map((m) =>
+          m.id === milestone.id ? { ...m, status: "claimed" as const } : m
+        )
+      );
+
+      // Add reward points to total points
+      const rewardPoints = Number(milestone.rewardPoints) || 0;
+      setTotalPoints((prevTotal) => prevTotal + rewardPoints);
+
+      console.log(
+        `Added ${rewardPoints} reward points. New total: ${
+          totalPoints + rewardPoints
+        }`
+      );
+    } catch (error) {
+      console.error("Error claiming milestone:", error);
+      // You might want to show an error message to the user here
+    }
+
     hideModal();
-  }
+  };
 
   // Fixed PanResponder implementation
   const panResponder = PanResponder.create({
@@ -249,9 +274,7 @@ const { token, driverId } = useAuth();
           <View style={styles.nextMilestoneContainer}>
             <RNText style={styles.milestoneText}>
               {totalPoints >=
-              (Number(
-                milestoneData[milestoneData.length - 1]?.requiredPoints
-              ) || 0)
+              (Number(milestones[milestones.length - 1]?.requiredPoints) || 0)
                 ? t("All milestones achieved")
                 : currentMilestone
                 ? `${progressPercentage}% to ${currentMilestone.requiredPoints} L`
@@ -380,6 +403,7 @@ const { token, driverId } = useAuth();
                     },
                   ]}
                 >
+                  
                   {selectedMilestone.status === "claimed"
                     ? "Already Claimed"
                     : selectedMilestone.isAchieved
@@ -484,12 +508,18 @@ const { token, driverId } = useAuth();
                               : "#fff"
                           }
                         >
-                          <Path d={iconPaths[point.rewardType]} />
+                          {isStart ? " " : <Path d={iconPaths[point.rewardType]} />}
                         </G>
                       )}
 
                       <Text
-                        x={labelX}
+                        x={
+                          isStart? point.x
+                            : isEven && !isStart
+                            ? labelX - wp(2.5)
+                            : labelX + wp(2.5)
+                            
+                        }
                         y={point.y + labelOffset}
                         fill={isStart ? "#fff" : "#26456C"}
                         fontFamily={
@@ -497,7 +527,7 @@ const { token, driverId } = useAuth();
                             ? theme.fontFamily.bold
                             : theme.fontFamily.regular
                         }
-                        fontSize={isStart ? wp(3.5) : wp(3)}
+                        fontSize={isStart ? wp(4) : wp(4)}
                         textAnchor={
                           isStart
                             ? "middle"
@@ -506,7 +536,7 @@ const { token, driverId } = useAuth();
                             : "start"
                         }
                       >
-                        {point.points} L
+                        {isStart ? "START" : point.points + " L"}
                       </Text>
                     </React.Fragment>
                   );
@@ -530,7 +560,7 @@ const styles = StyleSheet.create({
   },
   scrollContainer: {
     flexGrow: 1,
-    paddingTop: hp(20), // Responsive padding for fixed header
+    paddingTop: hp(20),
   },
   svgContainer: {
     flex: 1,
@@ -550,7 +580,7 @@ const styles = StyleSheet.create({
     borderRadius: wp(3),
     maxHeight: hp(80),
     elevation: 5,
-    shadowColor: "#000",
+    // shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 4,
@@ -565,8 +595,8 @@ const styles = StyleSheet.create({
   },
   modalTitle: {
     fontSize: wp(5),
-    fontWeight: "bold",
     color: "#26456C",
+    fontFamily: theme.fontFamily.bold,
   },
   closeButton: {
     width: wp(8),
@@ -579,7 +609,7 @@ const styles = StyleSheet.create({
   closeButtonText: {
     fontSize: wp(5),
     color: "#666",
-    fontWeight: "bold",
+    fontFamily: theme.fontFamily.bold,
   },
   modalBody: {
     padding: wp(5),
@@ -592,7 +622,7 @@ const styles = StyleSheet.create({
   },
   milestonePointsText: {
     fontSize: wp(6),
-    fontWeight: "bold",
+fontFamily: theme.fontFamily.semiBold,
     color: "#26456C",
     textAlign: "center",
     marginBottom: wp(4),
@@ -606,12 +636,13 @@ const styles = StyleSheet.create({
   rewardLabel: {
     fontSize: wp(4),
     color: "#666",
-    fontWeight: "500",
+    fontFamily: theme.fontFamily.medium,
   },
   rewardText: {
     fontSize: wp(4),
     color: "#26456C",
-    fontWeight: "bold",
+    fontFamily: theme.fontFamily.semiBold,
+
   },
   statusSection: {
     flexDirection: "row",
@@ -622,7 +653,7 @@ const styles = StyleSheet.create({
   statusLabel: {
     fontSize: wp(4),
     color: "#666",
-    fontWeight: "500",
+    fontFamily: theme.fontFamily.medium,
   },
   statusBadge: {
     paddingHorizontal: wp(3),
@@ -631,8 +662,8 @@ const styles = StyleSheet.create({
   },
   statusText: {
     color: "white",
-    fontSize: wp(3.5),
-    fontWeight: "bold",
+    fontSize: wp(3.2),
+    fontFamily: theme.fontFamily.semiBold,
   },
   progressSection: {
     marginTop: wp(4),
@@ -641,6 +672,7 @@ const styles = StyleSheet.create({
     fontSize: wp(3.5),
     color: "#666",
     marginBottom: wp(2),
+    fontFamily: theme.fontFamily.medium,
   },
   progressBarContainer: {
     height: wp(2),
@@ -658,7 +690,7 @@ const styles = StyleSheet.create({
     fontSize: wp(3),
     color: "#26456C",
     textAlign: "right",
-    fontWeight: "bold",
+    fontFamily: theme.fontFamily.bold,
   },
   actionButton: {
     padding: wp(4),
@@ -667,7 +699,7 @@ const styles = StyleSheet.create({
   },
   actionButtonText: {
     fontSize: wp(4),
-    fontWeight: "bold",
+    fontFamily: theme.fontFamily.bold,
   },
   fixedProgressContainer: {
     position: "absolute",
@@ -678,7 +710,7 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(255, 255, 255, 0.95)",
     paddingTop: hp(1.5),
     paddingBottom: hp(1.5),
-    shadowColor: "#000",
+    // shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 3,
@@ -689,25 +721,24 @@ const styles = StyleSheet.create({
     backgroundColor: "#f5f5f5",
     borderRadius: wp(2),
     marginHorizontal: wp(4),
-    shadowColor: "#000",
+    // shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
     shadowRadius: 2,
     elevation: 2,
   },
   pointsText: {
-    fontSize: wp(4.5),
-    fontWeight: "bold",
+    fontSize: wp(4.8),
     color: "#26456C",
-    marginBottom: wp(2),
-    fontFamily: theme.fontFamily.regular,
+    // marginBottom: wp(2),
+    fontFamily: theme.fontFamily.semiBold,
   },
   nextMilestoneContainer: {
     marginTop: wp(2),
   },
   milestoneText: {
     fontSize: wp(3.5),
-    color: "#666",
+    // color: "#666",
     marginBottom: wp(1),
     fontFamily: theme.fontFamily.light,
   },

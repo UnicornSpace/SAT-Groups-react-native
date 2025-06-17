@@ -3,6 +3,7 @@ import React from 'react'
 import { useAuth } from '@/utils/AuthContext';
 import QRCode from 'react-native-qrcode-svg';
 import { theme } from '@/infrastructure/themes';
+import { t } from 'i18next';
 const ReferralQR = () => {
  const { driverId} = useAuth()
   
@@ -35,7 +36,7 @@ const referralLink = `https://play.google.com/store/apps/details?id=com.satgroup
       </View>
       
       <Text style={styles.linkText}>
-        Friends scan this QR code to download the app with your referral code!
+        {t("Friends scan this QR code to download the app with your referral code!")}
       </Text>
       
       {/* <Text style={styles.userId}>
@@ -43,7 +44,7 @@ const referralLink = `https://play.google.com/store/apps/details?id=com.satgroup
       </Text> */}
       
       <TouchableOpacity style={styles.shareButton} onPress={shareReferralLink}>
-        <Text style={styles.shareButtonText}>Share Link</Text>
+        <Text style={styles.shareButtonText}>{t("Share Link")}</Text>
       </TouchableOpacity>
     </View>
   )

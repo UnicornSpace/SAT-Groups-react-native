@@ -12,6 +12,7 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { theme } from "@/infrastructure/themes";
+import { t } from "i18next";
 
 const { width } = Dimensions.get("window");
 
@@ -102,7 +103,7 @@ const FuelStationDetails: React.FC<FuelStationDetailsProps> = ({
         <TouchableOpacity onPress={onBack}>
           <Ionicons name="arrow-back" size={24} color="#1F2937" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Station Details</Text>
+        <Text style={styles.headerTitle}>{t("Station Details")}</Text>
       </View>
 
       <ScrollView
@@ -130,23 +131,23 @@ const FuelStationDetails: React.FC<FuelStationDetailsProps> = ({
 
         {/* Quick Actions */}
         <View style={styles.quickActionsSection}>
-          <Text style={styles.sectionTitle}>Quick Actions</Text>
+          <Text style={styles.sectionTitle}>{t("Quick Actions")}</Text>
           <View style={styles.quickActionsContainer}>
             <QuickActionButton
               icon="call"
-              label="Call"
+              label={t("Call")}
               color="#10B981"
               onPress={() => handlePhoneCall(data.phone_no)}
             />
             <QuickActionButton
               icon="mail"
-              label="Email"
+              label={t("Email")}
               color="#F59E0B"
               onPress={() => Linking.openURL(`mailto:${data.email_id}`)}
             />
             <QuickActionButton
               icon="navigate"
-              label="Directions"
+              label={t("Directions")}
               color="#3B82F6"
               onPress={() => Linking.openURL(`${data.google_map_link}`)}
             />
@@ -174,7 +175,7 @@ const FuelStationDetails: React.FC<FuelStationDetailsProps> = ({
 
           <InfoCard
             icon="call"
-            title="Phone Number"
+            title={t("Phone Number")}
             value={data.phone_no}
             iconColor="#10B981"
             actionIcon="call"
@@ -183,7 +184,7 @@ const FuelStationDetails: React.FC<FuelStationDetailsProps> = ({
 
           <InfoCard
             icon="phone-portrait"
-            title="Mobile Number"
+            title={t("Mobile Number")}
             value={data.mobile_no}
             iconColor="#10B981"
             actionIcon="call"
@@ -192,7 +193,7 @@ const FuelStationDetails: React.FC<FuelStationDetailsProps> = ({
 
           <InfoCard
             icon="mail"
-            title="Email Address"
+            title={t("Email Address")}
             value={data.email_id}
             iconColor="#F59E0B"
             actionIcon="mail"
@@ -201,10 +202,11 @@ const FuelStationDetails: React.FC<FuelStationDetailsProps> = ({
 
           <InfoCard
             icon="business"
-            title="Brand"
+            title={t("Brand")}
             value={data.brand}
             iconColor="#8B5CF6"
           />
+         
         </View>
 
         {/* Bottom Spacing */}

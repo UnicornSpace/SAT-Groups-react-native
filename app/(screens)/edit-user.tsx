@@ -393,7 +393,7 @@ const EditProfile = () => {
                   <MaterialIcons name="edit" size={16} color="white" />
                 </TouchableOpacity>
               </View>
-              <Text style={styles.avatarLabel}>Profile Picture</Text>
+              <Text style={styles.avatarLabel}>{t("Profile Picture")}</Text>
             </View>
 
             {/* Form Fields */}
@@ -500,11 +500,11 @@ const EditProfile = () => {
                     <Animated.View style={styles.loadingSpinner}>
                       <MaterialIcons name="refresh" size={20} color="white" />
                     </Animated.View>
-                    <Text style={styles.buttonText}>Updating...</Text>
+                    <Text style={styles.buttonText}>{t("Updating...")}</Text>
                   </View>
                 ) : (
                   <View style={styles.buttonContent}>
-                    <Text style={styles.buttonText}>{t("Update Profile")}</Text>
+                    <Text style={styles.buttonText}>{t("Update profile")}</Text>
                     <MaterialIcons name="check-circle" size={20} color="white" />
                   </View>
                 )}
@@ -553,7 +553,7 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     fontSize: 22,
-    fontWeight: "700",
+    fontWeight: "600",
     color: "white",
     textAlign: "center",
   },
@@ -699,7 +699,7 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     fontSize: 18,
-    fontWeight: "700",
+    fontWeight: "600",
     color: "white",
   },
   loadingSpinner: {

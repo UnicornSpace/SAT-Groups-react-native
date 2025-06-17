@@ -12,7 +12,7 @@ import { router } from "expo-router";
 const LanguageSetting = () => {
   const { t } = useTranslation();
   return (
-    <TouchableOpacity onPress={() => {router.replace("/(screens)/language-setting")}}>
+    <View>
       <View
         style={{
           display: "flex",
@@ -28,38 +28,52 @@ const LanguageSetting = () => {
           {t("Account Settings")}
         </Text>
       </View>
-      <View
-        style={{
-          display: "flex",
-          flexDirection: "row", 
-          justifyContent: "space-between",
-          width: wp(85),
-          alignItems: "center",
-          marginTop: hp(0.5),
+      <TouchableOpacity
+        onPress={() => {
+          router.replace("/(screens)/language-setting");
         }}
       >
-        <View style={{ display: "flex", flexDirection: "row",justifyContent:"center", alignItems: "center",gap:wp(4), }}>
-          <TouchableOpacity style={styles.userbtn}>
-            {/* <Ionicons name="pencil" size={20} color="black" /> */}
-            <FontAwesome
-              name="language"
-              size={20}
-              color={theme.colors.brand.blue}
-            />
-          </TouchableOpacity>
-          <Text
+        <View
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "space-between",
+            width: wp(85),
+            alignItems: "center",
+            marginTop: hp(0.5),
+          }}
+        >
+          <View
             style={{
-              fontFamily: theme.fontFamily.medium,
-              fontSize: hp(1.8),
-              color: theme.colors.brand.blue,
+              display: "flex",
+              flexDirection: "row",
+              justifyContent: "center",
+              alignItems: "center",
+              gap: wp(4),
             }}
           >
-            {t("Language")}
-          </Text>
+            <TouchableOpacity style={styles.userbtn}>
+              {/* <Ionicons name="pencil" size={20} color="black" /> */}
+              <FontAwesome
+                name="language"
+                size={20}
+                color={theme.colors.brand.blue}
+              />
+            </TouchableOpacity>
+            <Text
+              style={{
+                fontFamily: theme.fontFamily.medium,
+                fontSize: hp(1.8),
+                color: theme.colors.brand.blue,
+              }}
+            >
+              {t("Language")}
+            </Text>
+          </View>
+          <LanguageSelection />
         </View>
-        <LanguageSelection/>
-      </View>
-    </TouchableOpacity>
+      </TouchableOpacity>
+    </View>
   );
 };
 

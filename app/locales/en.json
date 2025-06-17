@@ -58,6 +58,34 @@
  "Invite Friends":"Invite Friends",
  "How to earn 100 points":"How to earn 100 points",
  "Follow the steps below and get rewards and points":"Follow the steps below and get rewards and points",
- "Scan the QR code to get 100 points":"Scan the QR code to get 100 points"
+ "Scan the QR code to get 100 points":"Scan the QR code to get 100 points",
+
+  "Edit Profile": "Edit Profile",
+  "Profile Picture": "Profile Picture",
+  "Update profile": "Update profile",
+  "Redeem Points": "Redeem Points",
+  "You have points available to redeem": "You have points available to redeem",
+  "Check the nearest Branch": "Check the nearest Branch",
+  "Station Details": "Station Details",
+  "Quick Actions": "Quick Actions",
+  "Call": "Call",
+  "Email": "Email",
+  "Directions": "Directions",
+  "Phone Number": "Phone Number",
+  "Mobile Number": "Mobile Number",
+  "Email Address": "Email Address",
+  "Brand": "Brand",
+  "Duration": "Duration",
+  "Distance": "Distance",
+  "Check out nearby branches": "Check out nearby branches",
+  "Share your link Or Scan the QR code": "Share your link Or Scan the QR code",
+  "Your friend will signup using your link": "Your friend will signup using your link",
+  "You will get 100 points": "You will get 100 points",
+  "Friends scan this QR code to download the app with your referral code!": "Friends scan this QR code to download the app with your referral code!",
+  "Share Link": "Share Link",
+  "Refer and earn 100 points": "Refer and earn 100 points",
+  "Updating...": "Updating...",
+  "Station Information":"Station Information"
+
 
 }

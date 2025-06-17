@@ -49,7 +49,7 @@ const Location = () => {
           ) : branches && branches.length > 0 ? (
             <>
               <NearBranchList branches={branches} />
-              <AllBranches branches={branches} onBranchClick={(item: any) => setSelectedBranch(item)} />
+              <AllBranches   branches={branches} onBranchClick={(item: any) => setSelectedBranch(item)} />
             </>
           ) : (
             <View style={styles.emptyContainer}>

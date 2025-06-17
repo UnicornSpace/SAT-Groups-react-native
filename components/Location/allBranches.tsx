@@ -14,7 +14,7 @@ interface AllBranchesProps {
   onBranchClick: (branch: any) => void
 }
 
-const AllBranches: React.FC<AllBranchesProps> = ({ branches, onBranchClick }) => {
+const AllBranches: React.FC<AllBranchesProps> = ({ branches, onBranchClick, }) => {
   const { t } = useTranslation()
   const { userLocation, branchesWithDistance, isCalculating } = useDistanceCalculation(branches)
 

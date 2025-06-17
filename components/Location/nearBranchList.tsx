@@ -1,32 +1,35 @@
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native"
-import type React from "react"
-import { theme } from "@/infrastructure/themes"
-import { widthPercentageToDP as wp, heightPercentageToDP as hp } from "react-native-responsive-screen"
-import { useTranslation } from "react-i18next"
-import { FontAwesome, MaterialCommunityIcons } from "@expo/vector-icons"
-import LocationIcon from "./locationIcon"
-import { openDirectGoogleMapsLink } from "./helpers/location-helper"
-import { sentenceCase } from "@/utils"
-import { useDistanceCalculation } from "@/hooks/use-distance-calc"
-
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import type React from "react";
+import { theme } from "@/infrastructure/themes";
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from "react-native-responsive-screen";
+import { useTranslation } from "react-i18next";
+import { FontAwesome, MaterialCommunityIcons } from "@expo/vector-icons";
+import LocationIcon from "./locationIcon";
+import { openDirectGoogleMapsLink } from "./helpers/location-helper";
+import { sentenceCase } from "@/utils";
+import { useDistanceCalculation } from "@/hooks/use-distance-calc";
+import { size } from "react-native-responsive-sizes";
 
 interface NearBranchListProps {
-  branches: any[]
+  branches: any[];
 }
 
 const Branches = ({ data, userLocation }: any) => {
-  const { t } = useTranslation()
+  const { t } = useTranslation();
 
-  console.log("Branches component - received data:", data?.length || 0)
+  console.log("Branches component - received data:", data?.length || 0);
 
   // Data handling
   if (!data || !Array.isArray(data)) {
-    console.log("No branch data available in Branches component")
+    console.log("No branch data available in Branches component");
     return (
       <View style={styles.emptyContainer}>
         <Text style={styles.emptyText}>No branch data available</Text>
       </View>
-    )
+    );
   }
 
   if (data.length === 0) {
@@ -34,12 +37,12 @@ const Branches = ({ data, userLocation }: any) => {
       <View style={styles.emptyContainer}>
         <Text style={styles.emptyText}>No branches found</Text>
       </View>
-    )
+    );
   }
 
   // Limit to first 3 branches based on distance
-  const branchesToShow = data.slice(0, 3)
-  console.log("Showing", branchesToShow.length, "branches")
+  const branchesToShow = data.slice(0, 3);
+  console.log("Showing", branchesToShow.length, "branches");
 
   return (
     <View style={{ display: "flex", flexDirection: "column", gap: 20 }}>
@@ -49,9 +52,9 @@ const Branches = ({ data, userLocation }: any) => {
             key={item.location_code || item.id || `branch-${index}`}
             onPress={() => {
               if (item.google_map_link) {
-                openDirectGoogleMapsLink(item.google_map_link)
+                openDirectGoogleMapsLink(item.google_map_link);
               } else {
-                console.log("No Google Maps link available for this branch")
+                console.log("No Google Maps link available for this branch");
               }
             }}
             style={styles.card}
@@ -74,6 +77,14 @@ const Branches = ({ data, userLocation }: any) => {
                 >
                   {sentenceCase(item.location_name || item.name || "Branch")}
                 </Text>
+
+                {(item.brand || item.location_code) && (
+                  <View style={styles.dateContainer}>
+                    <Text style={styles.date}>
+                      { item.brand}
+                    </Text>
+                  </View>
+                )}
               </View>
               <View
                 style={{
@@ -110,7 +121,11 @@ const Branches = ({ data, userLocation }: any) => {
                     alignItems: "baseline",
                   }}
                 >
-                  <MaterialCommunityIcons name="timer-sand-full" size={10} color="black" />
+                  <MaterialCommunityIcons
+                    name="timer-sand-full"
+                    size={10}
+                    color="black"
+                  />
                   <Text
                     style={{
                       fontFamily: theme.fontFamily.medium,
@@ -125,24 +140,26 @@ const Branches = ({ data, userLocation }: any) => {
             </View>
             <LocationIcon />
           </TouchableOpacity>
-        )
+        );
       })}
     </View>
-  )
-}
+  );
+};
 
 const NearBranchList: React.FC<NearBranchListProps> = ({ branches }) => {
-  const { userLocation, branchesWithDistance, isCalculating } = useDistanceCalculation(branches)
+  const { userLocation, branchesWithDistance, isCalculating } =
+    useDistanceCalculation(branches);
 
   console.log(
     "NearBranchList - branches:",
     branches?.length || 0,
     "branchesWithDistance:",
-    branchesWithDistance?.length || 0,
-  )
+    branchesWithDistance?.length || 0
+  );
 
   // Use original branches if distance calculation hasn't completed yet
-  const dataToShow = branchesWithDistance.length > 0 ? branchesWithDistance : branches
+  const dataToShow =
+    branchesWithDistance.length > 0 ? branchesWithDistance : branches;
 
   return (
     <View
@@ -161,10 +178,10 @@ const NearBranchList: React.FC<NearBranchListProps> = ({ branches }) => {
         <Branches data={dataToShow} userLocation={userLocation} />
       )}
     </View>
-  )
-}
+  );
+};
 
-export default NearBranchList
+export default NearBranchList;
 
 const styles = StyleSheet.create({
   card: {
@@ -179,6 +196,21 @@ const styles = StyleSheet.create({
     paddingHorizontal: wp(4),
     paddingVertical: hp(0.3),
     elevation: 2.5,
+  },
+  date: {
+    fontSize: size(8),
+    color: theme.colors.text.primary,
+    fontFamily: theme.fontFamily.medium,
+    textAlign: "center",
+  },
+  dateContainer: {
+    borderRadius: 5,
+    width: "auto",
+    backgroundColor: theme.colors.brand.blue,
+    paddingVertical: size(1),
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: size(8),
   },
   loadingContainer: {
     alignItems: "center",
@@ -199,4 +231,4 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontFamily: theme.fontFamily.medium,
   },
-})
+});
