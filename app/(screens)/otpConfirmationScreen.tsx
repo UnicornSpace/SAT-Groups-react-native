@@ -38,7 +38,7 @@ const OtpConfirmationScreen = () => {
     UserExist: any;
   }>();
   // console.log("Number from params:👍", number);
-  const [count, setCount] = useState(60);
+  const [count, setCount] = useState(30);
   const [loading, setLoading] = useState(false);
   const [otp, setOtp] = useState("");
   const [referralCode, setReferralCode] = useState("");

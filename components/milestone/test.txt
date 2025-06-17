@@ -1,0 +1,628 @@
+"use client";
+
+import { iconPaths } from "@/components/icons";
+import { theme } from "@/infrastructure/themes";
+import { generatePathSegments } from "@/utils";
+import { Ionicons } from "@expo/vector-icons";
+import { t } from "i18next";
+import React, { useEffect, useRef, useMemo, useState } from "react";
+import {
+  ScrollView,
+  View,
+  StyleSheet,
+  ImageBackground,
+  Text as RNText,
+  TouchableOpacity,
+  Animated,
+} from "react-native";
+import { Button, Modal, Portal, Card } from "react-native-paper";
+import Svg, { Path, Circle, Text, G } from "react-native-svg";
+
+// Enhanced types
+type Milestone = {
+  id: string;
+  status: "unclaimed" | "claimed" | "pending";
+  requiredPoints: string | number;
+  isCurrent?: boolean;
+  rewardPoints: string;
+  rewardType?: "Gift" | "Points";
+  position: number;
+};
+
+interface MilestonePathProps {
+  milestones: Milestone[];
+  totalPoints: number;
+}
+
+interface ProcessedMilestone extends Milestone {
+  isAchieved: boolean;
+  isCurrent: boolean;
+}
+
+const MilestoneComponent: React.FC<MilestonePathProps> = ({
+  milestones: milestoneData,
+  totalPoints,
+}) => {
+  const scrollRef = useRef<ScrollView>(null);
+  const [selectedMilestone, setSelectedMilestone] = useState<ProcessedMilestone | null>(null);
+  const [modalVisible, setModalVisible] = useState(false);
+  const scaleAnim = useRef(new Animated.Value(1)).current;
+
+  // Process milestones based on user points
+  const processedMilestones = useMemo(() => {
+    return milestoneData.map((milestone, index) => {
+      const milestonePoints = Number(milestone.requiredPoints) ?? 0;
+      const isAchieved = totalPoints >= milestonePoints;
+
+      const isNext =
+        !isAchieved &&
+        (index === 0 ||
+          totalPoints >= (Number(milestoneData[index - 1].requiredPoints) ?? 0)) &&
+        totalPoints < milestonePoints;
+
+      return {
+        ...milestone,
+        isAchieved,
+        isCurrent: isNext,
+      } as ProcessedMilestone;
+    });
+  }, [totalPoints, milestoneData]);
+
+  // SVG dimensions and spacing
+  const svgWidth = 300;
+  const verticalSpacing = 100;
+  const leftPosition = 60;
+  const rightPosition = 240;
+  const startY = 15;
+
+  // Calculate coordinates for each milestone
+  const calculatePoints = (items: ProcessedMilestone[]) => {
+    const points = [];
+    const totalItems = items.length;
+    const totalPathHeight = (totalItems - 1) * verticalSpacing;
+    let currentY = totalPathHeight + startY;
+
+    for (let index = 0; index < totalItems; index++) {
+      const item = items[index];
+      const isEven = index % 2 === 0;
+
+      const x = index === 0 ? svgWidth / 2 : isEven ? leftPosition : rightPosition;
+      const y = currentY - index * verticalSpacing;
+
+      points.push({
+        x,
+        y,
+        label: `${item.requiredPoints} L`,
+        points: Number(item.requiredPoints) || 0,
+        isCurrent: item.isCurrent,
+        isAchieved: item.isAchieved,
+        rewardType: item.rewardType,
+        milestone: item,
+      });
+    }
+
+    return points;
+  };
+
+  // Get dynamic points
+  const points = calculatePoints(processedMilestones);
+
+  // Generate path segments based on user progress
+  const { completedPath, remainingPath } = generatePathSegments(
+    points.map((p) => ({ x: p.x, y: p.y, points: p.points })),
+    totalPoints
+  );
+
+  // Calculate the SVG height
+  const totalPathHeight = (processedMilestones.length - 1) * verticalSpacing;
+  const totalSvgHeight = totalPathHeight + startY * 2.2;
+
+  // Find current milestone for displaying progress
+  const currentMilestoneIndex = processedMilestones.findIndex((m) => m.isCurrent);
+  const previousMilestone =
+    currentMilestoneIndex > 0
+      ? processedMilestones[currentMilestoneIndex - 1]
+      : processedMilestones[0];
+
+  const currentMilestone =
+    currentMilestoneIndex >= 0
+      ? processedMilestones[currentMilestoneIndex]
+      : processedMilestones[processedMilestones.length - 1];
+
+  // Calculate progress percentage
+  const pointsToNextMilestone =
+    (Number(currentMilestone?.requiredPoints) ?? 0) -
+    (Number(previousMilestone?.requiredPoints) ?? 0);
+  const userProgressInSegment =
+    totalPoints - (Number(previousMilestone?.requiredPoints) ?? 0);
+  const progressPercentage =
+    pointsToNextMilestone > 0
+      ? Math.min(100, Math.floor((userProgressInSegment / pointsToNextMilestone) * 100))
+      : 100;
+
+  useEffect(() => {
+    setTimeout(() => {
+      scrollRef.current?.scrollToEnd({ animated: false });
+    }, 50);
+  }, []);
+
+  // Enhanced milestone press handler
+  const handleMilestonePress = (point: any) => {
+    // Simple scale animation
+    Animated.sequence([
+      Animated.timing(scaleAnim, {
+        toValue: 0.95,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+      Animated.timing(scaleAnim, {
+        toValue: 1,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+    ]).start();
+
+    // Set selected milestone and show modal
+    setSelectedMilestone(point.milestone);
+    setModalVisible(true);
+  };
+
+  // Get status color
+  const getStatusColor = (milestone: ProcessedMilestone) => {
+    if (milestone.isAchieved) return "#26456C";
+    if (milestone.isCurrent) return "#FF6B35";
+    return "#DBDBDB";
+  };
+
+  // Get status text
+  const getStatusText = (milestone: ProcessedMilestone) => {
+    if (milestone.isAchieved) return "Completed";
+    if (milestone.isCurrent) return "In Progress";
+    return "Locked";
+  };
+
+  // Modal content
+  const renderModal = () => (
+    <Portal>
+      <Modal
+        visible={modalVisible}
+        onDismiss={() => setModalVisible(false)}
+        contentContainerStyle={styles.modalContainer}
+      >
+        {selectedMilestone && (
+          <Card style={styles.modalCard}>
+            <Card.Content>
+              {/* Header */}
+              <View style={styles.modalHeader}>
+                <View style={styles.modalIconContainer}>
+                  <View
+                    style={[
+                      styles.modalIcon,
+                      { backgroundColor: getStatusColor(selectedMilestone) },
+                    ]}
+                  >
+                    <Ionicons
+                      name={selectedMilestone.rewardType === "Gift" ? "gift" : "star"}
+                      size={24}
+                      color="white"
+                    />
+                  </View>
+                  <View style={styles.modalTitleContainer}>
+                    <RNText style={styles.modalTitle}>
+                      {selectedMilestone.requiredPoints} Points
+                    </RNText>
+                    <RNText style={styles.modalSubtitle}>
+                      {getStatusText(selectedMilestone)}
+                    </RNText>
+                  </View>
+                </View>
+                <TouchableOpacity
+                  onPress={() => setModalVisible(false)}
+                  style={styles.closeButton}
+                >
+                  <Ionicons name="close" size={24} color="#666" />
+                </TouchableOpacity>
+              </View>
+
+              {/* Reward Info */}
+              <View style={styles.rewardContainer}>
+                <RNText style={styles.rewardLabel}>Reward</RNText>
+                <View style={styles.rewardBox}>
+                  <Ionicons
+                    name={selectedMilestone.rewardType === "Gift" ? "gift" : "star"}
+                    size={20}
+                    color="#FFB800"
+                  />
+                  <RNText style={styles.rewardText}>
+                    {selectedMilestone.rewardType === "Gift"
+                      ? "Special Gift"
+                      : `${selectedMilestone.rewardPoints} Points`}
+                  </RNText>
+                </View>
+              </View>
+
+              {/* Progress for current milestone */}
+              {selectedMilestone.isCurrent && (
+                <View style={styles.progressContainer}>
+                  <RNText style={styles.progressLabel}>Progress</RNText>
+                  <View style={styles.progressBarContainer}>
+                    <View
+                      style={[
+                        styles.progressBar,
+                        { width: `${progressPercentage}%` },
+                      ]}
+                    />
+                  </View>
+                  <RNText style={styles.progressText}>
+                    {progressPercentage}% complete
+                  </RNText>
+                </View>
+              )}
+
+              {/* Action Button */}
+              <View style={styles.actionContainer}>
+                {selectedMilestone.isAchieved ? (
+                  <TouchableOpacity style={[styles.actionButton, styles.completedButton]}>
+                    <RNText style={styles.actionButtonText}>View Reward</RNText>
+                  </TouchableOpacity>
+                ) : selectedMilestone.isCurrent ? (
+                  <TouchableOpacity style={[styles.actionButton, styles.currentButton]}>
+                    <RNText style={styles.actionButtonText}>Continue</RNText>
+                  </TouchableOpacity>
+                ) : (
+                  <TouchableOpacity style={[styles.actionButton, styles.lockedButton]} disabled>
+                    <RNText style={[styles.actionButtonText, styles.lockedButtonText]}>
+                      Locked
+                    </RNText>
+                  </TouchableOpacity>
+                )}
+              </View>
+            </Card.Content>
+          </Card>
+        )}
+      </Modal>
+    </Portal>
+  );
+
+  return (
+    <View style={styles.container}>
+      {/* Fixed Progress Card at Top */}
+      <View style={styles.fixedProgressContainer}>
+        <View style={styles.progressCard}>
+          <RNText style={styles.pointsText}>
+            {t("Your Points")}: {totalPoints}
+          </RNText>
+          <View style={styles.nextMilestoneContainer}>
+            <RNText style={styles.milestoneText}>
+              {totalPoints >=
+              (Number(milestoneData[milestoneData.length - 1].requiredPoints) ?? 0)
+                ? t("All milestones achieved")
+                : `${progressPercentage}% to ${currentMilestone?.requiredPoints} L`}
+            </RNText>
+            <View style={styles.progressBarContainer}>
+              <View
+                style={[
+                  styles.progressBar,
+                  { width: `${progressPercentage}%` },
+                ]}
+              />
+            </View>
+          </View>
+        </View>
+      </View>
+
+      {/* Scrollable Content */}
+      <ScrollView
+        ref={scrollRef}
+        contentContainerStyle={styles.scrollContainer}
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={styles.topPadding} />
+
+        <View style={{ height: totalSvgHeight }}>
+          <ImageBackground
+            source={require("@/assets/images/satgroups/tile_background.png")}
+            resizeMode="cover"
+            style={styles.backgroundImage}
+          >
+            <Svg
+              fill="none"
+              height={totalSvgHeight}
+              viewBox={`0 0 ${svgWidth} ${totalSvgHeight}`}
+            >
+              <G>
+                {/* Path segments */}
+                {completedPath && (
+                  <Path
+                    stroke="#26456C"
+                    strokeLinecap="square"
+                    strokeWidth={30}
+                    d={completedPath}
+                  />
+                )}
+
+                {remainingPath && (
+                  <Path
+                    stroke="#DBDBDB"
+                    strokeLinecap="square"
+                    strokeWidth={30}
+                    d={remainingPath}
+                  />
+                )}
+
+                {/* Milestone circles and labels */}
+                {points.map((point, index) => {
+                  const isStart = index === 0;
+                  const circleRadius = isStart ? 38 : 25;
+                  const labelOffset = isStart ? 5 : 35;
+                  const isEven = index % 2 === 0;
+
+                  const labelX = isStart
+                    ? point.x
+                    : isEven && !isStart
+                    ? point.x - 10
+                    : point.x + 10;
+
+                  return (
+                    <React.Fragment key={index}>
+                      {/* Clickable Circle */}
+                      <Circle
+                        onPress={() => handleMilestonePress(point)}
+                        cx={point.x}
+                        cy={point.y}
+                        r={circleRadius}
+                        fill={
+                          point.isAchieved
+                            ? "#26456C"
+                            : isStart
+                            ? "#26456C"
+                            : point.isCurrent
+                            ? "#FF6B35"
+                            : "#DBDBDB"
+                        }
+                        stroke={
+                          isStart
+                            ? "#fff"
+                            : point.isCurrent
+                            ? "#FF6B35"
+                            : "#fff"
+                        }
+                        strokeWidth={point.isCurrent ? 5 : 3}
+                      />
+
+                      {/* Icon inside circle */}
+                      {point.rewardType && (
+                        <G
+                          transform={`translate(${point.x - 10}, ${point.y - 10}) scale(0.8)`}
+                          fill={
+                            point.isAchieved || isStart
+                              ? "#fff"
+                              : point.isCurrent
+                              ? "#fff"
+                              : "#999"
+                          }
+                        >
+                          <Path d={iconPaths[point.rewardType]} />
+                        </G>
+                      )}
+
+                      {/* Label */}
+                      <Text
+                        x={labelX}
+                        y={point.y + labelOffset}
+                        fill={isStart ? "#fff" : "#26456C"}
+                        fontFamily={
+                          isStart
+                            ? theme.fontFamily.bold
+                            : theme.fontFamily.regular
+                        }
+                        fontSize={isStart ? 14 : 12}
+                        textAnchor={
+                          isStart
+                            ? "middle"
+                            : isEven && !isStart
+                            ? "end"
+                            : "start"
+                        }
+                      >
+                        {point.points} L
+                      </Text>
+                    </React.Fragment>
+                  );
+                })}
+              </G>
+            </Svg>
+          </ImageBackground>
+        </View>
+      </ScrollView>
+
+      {/* Modal */}
+      {renderModal()}
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    position: "relative",
+  },
+  scrollContainer: {
+    flexGrow: 1,
+  },
+  topPadding: {
+    height: 100,
+  },
+  backgroundImage: {
+    flex: 1,
+    justifyContent: "center",
+  },
+  fixedProgressContainer: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    zIndex: 10,
+    backgroundColor: "rgba(255, 255, 255, 0.95)",
+    paddingTop: 10,
+    paddingBottom: 10,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 3,
+    elevation: 5,
+  },
+  progressCard: {
+    padding: 16,
+    backgroundColor: "#f5f5f5",
+    borderRadius: 8,
+    marginHorizontal: 16,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  pointsText: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#26456C",
+    marginBottom: 8,
+    fontFamily: theme.fontFamily.regular,
+  },
+  nextMilestoneContainer: {
+    marginTop: 8,
+  },
+  milestoneText: {
+    fontSize: 14,
+    color: "#666",
+    marginBottom: 4,
+    fontFamily: theme.fontFamily.light,
+  },
+  progressBarContainer: {
+    height: 8,
+    backgroundColor: "#DBDBDB",
+    borderRadius: 4,
+    overflow: "hidden",
+  },
+  progressBar: {
+    height: "100%",
+    backgroundColor: "#26456C",
+    borderRadius: 4,
+  },
+  // Modal styles
+  modalContainer: {
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+  },
+  modalCard: {
+    width: "100%",
+    maxWidth: 400,
+    borderRadius: 16,
+    elevation: 8,
+  },
+  modalHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 20,
+  },
+  modalIconContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  modalIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 12,
+  },
+  modalTitleContainer: {
+    flex: 1,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#333",
+  },
+  modalSubtitle: {
+    fontSize: 14,
+    color: "#666",
+    marginTop: 2,
+  },
+  closeButton: {
+    padding: 8,
+  },
+  rewardContainer: {
+    marginBottom: 20,
+  },
+  rewardLabel: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#333",
+    marginBottom: 8,
+  },
+  rewardBox: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 12,
+    backgroundColor: "#FFF8E1",
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#FFD54F",
+  },
+  rewardText: {
+    fontSize: 16,
+    fontWeight: "500",
+    color: "#F57C00",
+    marginLeft: 8,
+  },
+  progressContainer: {
+    marginBottom: 20,
+  },
+  progressLabel: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#333",
+    marginBottom: 8,
+  },
+  progressText: {
+    fontSize: 12,
+    color: "#666",
+    textAlign: "center",
+    marginTop: 4,
+  },
+  actionContainer: {
+    marginTop: 20,
+  },
+  actionButton: {
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 8,
+    alignItems: "center",
+  },
+  completedButton: {
+    backgroundColor: "#4CAF50",
+  },
+  currentButton: {
+    backgroundColor: "#FF6B35",
+  },
+  lockedButton: {
+    backgroundColor: "#E0E0E0",
+  },
+  actionButtonText: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "white",
+  },
+  lockedButtonText: {
+    color: "#999",
+  },
+});
+
+export default MilestoneComponent;

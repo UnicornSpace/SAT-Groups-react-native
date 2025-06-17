@@ -72,6 +72,7 @@ const AllBranches = ({ branch,onBranchClick }: any) => {
       .replace(/(^\w|\s\w)/g, (match) => match.toUpperCase());
   };
 
+  
   // Calculate distance between user and branch
   const calculateDistance = (branchLat: string, branchLng: string): string => {
     if (!userLocation.latitude || !userLocation.longitude) return "-- KM";

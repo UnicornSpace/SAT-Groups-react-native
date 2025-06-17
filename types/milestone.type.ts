@@ -1,10 +1,12 @@
 // Milestone data structure
 type Milestone = {
-  label: string;
-  points?: number;
+  id: string;
+  status: "unclaimed" | "claimed" | "pending";
+  requiredPoints: string | number ; // Points required to reach this milestone
   isCurrent?: boolean;
-  isAchieved?: boolean;
-  iconType?: "gift" | "coins" | "check" | "star" | "flag";
+  rewardPoints: string,
+  rewardType?: "Gift" | "Points"
+  position: number;
 };
 // Component props
 interface MilestonePathProps {
@@ -14,12 +16,3 @@ interface MilestonePathProps {
 
 
 
-
-type MilestonePath = {
-  id: string;
-  position: number;
-  requiredPoints: string;
-  rewardPoints: string;
-  rewardType: string;
-  status: string;
-}[]

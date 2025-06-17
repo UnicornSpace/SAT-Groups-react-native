@@ -22,6 +22,7 @@ import { FontAwesome, MaterialCommunityIcons } from "@expo/vector-icons";
 import LocationIcon from "./locationIcon";
 import { useAuth } from "@/utils/AuthContext";
 import axios from "axios";
+import { sentenceCase } from "@/utils";
 
 const Branches = ({ data }: any) => {
   const [userLocation, setUserLocation] = useState<{
@@ -242,13 +243,7 @@ const Branches = ({ data }: any) => {
     );
   }
 
-  // Helper function to convert string to sentence case
-  const sentenceCase = (str: string): string => {
-    if (!str) return "";
-    return str
-      .toLowerCase()
-      .replace(/(^\w|\s\w)/g, (match) => match.toUpperCase());
-  };
+  
 
   // Use sortedBranches if available, otherwise use original data
   // Limit to first 3 branches based on distance

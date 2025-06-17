@@ -1,8 +1,11 @@
 import { StyleSheet, View } from "react-native";
 import MilestoneComponent from "@/components/milestone/milestone-component";
+import { useEffect, useState } from "react";
+import { useAuth } from "@/utils/AuthContext";
+import axiosInstance from "@/utils/axionsInstance";
 
 const milestone = () => {
-  const milestoneData = [
+  const milestoneData: Milestone[] = [
     {
       id: "1",
       position: 1,
@@ -52,41 +55,73 @@ const milestone = () => {
       status: "unclaimed",
     },
   ];
+const { token, isLoading, driverId } = useAuth();
 
-  const totalPoints = 200;
-  const transformedMilestones: Milestone[] = milestoneData.map(
-    (item, index) => {
-      const points = parseInt(item.requiredPoints);
-      const isStart = index === 0 && points === 0;
+  const [data, setData] = useState(milestoneData);
+  const [totalPoints, setTotalPoints] = useState(0);
 
-      return {
-        label: isStart ? "START" : `${points} L`,
-        points: points,
-        isAchieved: false, // Will be calculated in MilestoneComponent
-        iconType: item.rewardType === "Gift" ? "gift" : "coins",
-      };
-    }
-  );
-  const defaultMilestones: Milestone[] = [
-    { label: "START", points: 0, isAchieved: false },
-    { label: "1 L", points: 1, isAchieved: false, iconType: "coins" },
-    { label: "50 L", points: 50, isAchieved: false, iconType: "coins" },
-    { label: "100 L", points: 100, isAchieved: false, iconType: "coins" },
-    { label: "200 L", points: 200, isAchieved: false, iconType: "coins" },
-    { label: "250 L", points: 250, isAchieved: false, iconType: "coins" },
-    { label: "500 L", points: 500, isAchieved: false, iconType: "gift" },
-    { label: "550 L", points: 550, isAchieved: false, iconType: "coins" },
-    { label: "600 L", points: 600, isAchieved: false, iconType: "coins" },
-    { label: "700 L", points: 700, isAchieved: false, iconType: "coins" },
-    { label: "750 L", points: 750, isAchieved: false, iconType: "coins" },
-    { label: "1000 L", points: 1000, isAchieved: false, iconType: "gift" },
-  ];
+  useEffect(() => {
+    // Fetch milestones from API if custom milestones are not provided
+    const fetchMilestones = async () => {
+      try {
+        const response = await axiosInstance.post(
+          `/get-user-milestones.php`,
+          {
+            driver_id: driverId,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
 
-  console.log("Transformed milestones:", transformedMilestones);
+        console.log("Fetched milestones:", response.data.mileStones, response.data.totalPoints);
+         // Add validation for the response data
+      const fetchedMilestones = response.data.mileStones;
+      const fetchedTotalPoints = response.data.totalPoints;
+      // Validate that milestones is an array and has valid data
+      if (Array.isArray(fetchedMilestones) && fetchedMilestones.length > 0) {
+        // Validate each milestone has required properties
+        const validMilestones = fetchedMilestones.filter(milestone => 
+          milestone && 
+          milestone.hasOwnProperty('requiredPoints') && 
+          milestone.requiredPoints !== undefined &&
+          milestone.requiredPoints !== null
+        );
+        
+        if (validMilestones.length > 0) {
+          setData(validMilestones);
+        } else {
+          console.warn("No valid milestones found, using default data");
+          setData(milestoneData); // Use default data
+        }
+      } else {
+        console.warn("Invalid milestones data received, using default data");
+        setData(milestoneData); // Use default data
+      }
+      
+      // Set total points with validation
+      setTotalPoints(typeof fetchedTotalPoints === 'number' ? fetchedTotalPoints : 0);
+      
+      } catch (error) {
+        console.error("Error fetching milestones:", error);
+          // Use default data on error
+      setData(milestoneData);
+      setTotalPoints(0);
+      }
+    };
+
+    if (driverId && token) { // Only fetch if we have required data
+    fetchMilestones();
+  }
+  }, [driverId, token   ]);
+
+  // console.log("Transformed milestones:", transformedMilestones);
   return (
     <View style={{ flex: 1, backgroundColor: "#fff" }}>
       <MilestoneComponent
-        milestones={transformedMilestones}
+        milestones={data}
         totalPoints={totalPoints}
       />
     </View>
@@ -97,35 +132,23 @@ export default milestone;
 
 const styles = StyleSheet.create({});
 
-// const { token, isLoading, driverId } = useAuth();
+/*
 
+ const transformedMilestones: Milestone[] = milestoneData.map(
+    (item, index) => {
+      const points = parseInt(item.requiredPoints);
+      const isStart = index === 0 && points === 0;
+
+      return {
+        label: isStart ? "START" : `${points} L`,
+        points: points,
+        isAchieved: false, // Will be calculated in MilestoneComponent
+        iconType: item.rewardType === "Gift" ? "Gift" : "Points",
+      };
+    }
+  );
+*/
 //   // api call
-//   useEffect(() => {
-//     // Fetch milestones from API if custom milestones are not provided
-//     const fetchMilestones = async () => {
-//       try {
-//         const response = await axiosInstance.post(
-//           `/get-user-milestones.php`,
-//           {
-//             driver_id: driverId,
-//           },
-//           {
-//             headers: {
-//               Authorization: `Bearer ${token}`,
-//             },
-//           }
-//         );
-
-//         console.log("Fetched milestones:", response.data.mileStones);
-//         return response.data.milestones || [];
-//       } catch (error) {
-//         console.error("Error fetching milestones:", error);
-//         return [];
-//       }
-//     };
-
-//     fetchMilestones();
-//   }, []);
 
 // import React, { useEffect } from "react";
 // import axiosInstance from "@/utils/axionsInstance";
