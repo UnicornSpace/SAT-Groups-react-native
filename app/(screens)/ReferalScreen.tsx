@@ -11,6 +11,7 @@ import RefferalSteps from "@/components/Profile/RefferalSteps";
 import { t } from "i18next";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
+
 const ReferalScreen = (props: any) => {
   return (
     <View style={styles.container}>
@@ -31,8 +32,8 @@ const ReferalScreen = (props: any) => {
       >
         <Svg
           xmlns="http://www.w3.org/2000/svg"
-          width={360}
-          height={245}
+          width={wp(100)}
+          height={hp(30)}
           fill="none"
           {...props}
         >
@@ -46,8 +47,8 @@ const ReferalScreen = (props: any) => {
       </View>
       <Image
         style={{
-          width: 120,
-          height: 80,
+          width: wp(30),
+          height: hp(10),
           position: "absolute",
           top: hp(14),
           right: wp(5),

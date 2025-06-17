@@ -55,6 +55,7 @@ const milestone = () => {
       status: "unclaimed",
     },
   ];
+  const totalpoints = 200
 const { token, isLoading, driverId } = useAuth();
 
   const [data, setData] = useState(milestoneData);
@@ -117,16 +118,18 @@ const { token, isLoading, driverId } = useAuth();
   }
   }, [driverId, token   ]);
 
+
   // console.log("Transformed milestones:", transformedMilestones);
   return (
     <View style={{ flex: 1, backgroundColor: "#fff" }}>
       <MilestoneComponent
-        milestones={data}
-        totalPoints={totalPoints}
+        milestones={milestoneData}
+        totalPoints={totalpoints}
       />
     </View>
   );
 };
+
 
 export default milestone;
 

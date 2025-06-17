@@ -181,10 +181,20 @@
       .replace(/(^\w|\s\w)/g, (match) => match.toUpperCase());
   };
 
+
+const parseBranchName = (locationName: string) => {
+  const locationParts = locationName.split("-")
+  return {
+    branchName: locationParts[0] || "",
+    branchLocation: locationParts[1] || "",
+  }
+}
+
 export {
   calculateProgressPercentage,
   generatePathSegments,
   calculateBezierPoint,
   splitCubicBezier,
   sentenceCase,
+  parseBranchName
 }

@@ -1,105 +1,40 @@
-import {
-  Alert,
-  Image,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
-import React, { useEffect, useState } from "react";
-import { theme } from "@/infrastructure/themes";
-import { Ionicons } from "@expo/vector-icons";
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from "react-native-responsive-screen";
-import { useTranslation } from "react-i18next";
-import { size } from "react-native-responsive-sizes";
-import * as Location from "expo-location";
-import * as Linking from "expo-linking";
-import { getDistance } from "geolib";
+import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native"
+import type React from "react"
+import { theme } from "@/infrastructure/themes"
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from "react-native-responsive-screen"
+import { useTranslation } from "react-i18next"
+import { size } from "react-native-responsive-sizes"
+import { useDistanceCalculation } from "@/hooks/use-distance-calc"
+import { parseBranchName, sentenceCase } from "@/utils"
+import { calculateBasicDistance } from "./helpers/distance-helper"
 
-const AllBranches = ({ branch,onBranchClick }: any) => {
-  const { t } = useTranslation();
-  const [userLocation, setUserLocation] = useState<{
-    latitude: number;
-    longitude: number;
-  }>({ latitude: 0, longitude: 0 });
 
-  // Get user location
-  useEffect(() => {
-    const fetchLocation = async () => {
-      const { status } = await Location.requestForegroundPermissionsAsync();
-      if (status === "granted") {
-        const location = await Location.getCurrentPositionAsync({});
-        setUserLocation(location.coords);
-      }
-    };
-    fetchLocation();
-  }, []);
+interface AllBranchesProps {
+  branches: any[]
+  onBranchClick: (branch: any) => void
+}
 
-  const openInGoogleMaps = async (lat: string, lng: string) => {
-    const { status } = await Location.requestForegroundPermissionsAsync();
+const AllBranches: React.FC<AllBranchesProps> = ({ branches, onBranchClick }) => {
+  const { t } = useTranslation()
+  const { userLocation, branchesWithDistance, isCalculating } = useDistanceCalculation(branches)
 
-    if (status !== "granted") {
-      Alert.alert(
-        "Location Permission Required",
-        "Allow location access to use this feature smoothly.",
-        [
-          { text: "Open Settings", onPress: () => Linking.openSettings() },
-          { text: "Cancel", style: "cancel" },
-        ]
-      );
-      return;
-    }
+  console.log(
+    "AllBranches - branches:",
+    branches?.length || 0,
+    "branchesWithDistance:",
+    branchesWithDistance?.length || 0,
+  )
 
-    // Clean coordinates from any spaces or extra characters
-    const cleanLat = parseFloat(lat.replace(/[^0-9.-]/g, ""));
-    const cleanLng = parseFloat(lng.replace(/[^0-9.-]/g, ""));
-
-    if (isNaN(cleanLat) || isNaN(cleanLng)) {
-      Alert.alert("Error", "Invalid location coordinates");
-      return;
-    }
-
-    const url = `https://www.google.com/maps/dir/?api=1&origin=${userLocation.latitude},${userLocation.longitude}&destination=${cleanLat},${cleanLng}`;
-    Linking.openURL(url);
-  };
-
-  const sentenceCase = (str: string): string => {
-    return str
-      .toLowerCase()
-      .replace(/(^\w|\s\w)/g, (match) => match.toUpperCase());
-  };
-
-  
-  // Calculate distance between user and branch
-  const calculateDistance = (branchLat: string, branchLng: string): string => {
-    if (!userLocation.latitude || !userLocation.longitude) return "-- KM";
-
-    const cleanLat = parseFloat(branchLat.replace(/[^0-9.-]/g, ""));
-    const cleanLng = parseFloat(branchLng.replace(/[^0-9.-]/g, ""));
-
-    if (isNaN(cleanLat) || isNaN(cleanLng)) return "-- KM";
-
-    const distance = getDistance(
-      {
-        latitude: userLocation.latitude,
-        longitude: userLocation.longitude,
-      },
-      { latitude: cleanLat, longitude: cleanLng }
-    );
-
-    return `${(distance / 1000).toFixed(1)} KM`;
-  };
-
-  if (!branch || branch.length === 0) {
+  if (!branches || branches.length === 0) {
     return (
-      <View style={{ width: wp("90%"), alignItems: "center", padding: 20 }}>
-        <Text>No branch data available</Text>
+      <View style={styles.emptyContainer}>
+        <Text style={styles.emptyText}>No branch data available</Text>
       </View>
-    );
+    )
   }
+
+  // Use original branches with basic distance if advanced calculation hasn't completed
+  const dataToShow = branchesWithDistance.length > 0 ? branchesWithDistance : branches
 
   return (
     <View
@@ -120,47 +55,52 @@ const AllBranches = ({ branch,onBranchClick }: any) => {
       >
         {t("All Branch")}
       </Text>
+
+      {isCalculating && branchesWithDistance.length === 0 && (
+        <View style={styles.loadingContainer}>
+          <Text>Calculating distances...</Text>
+        </View>
+      )}
+
       <View style={styles.branchesContainer}>
-        {branch.map((item: any) => {
-          const locationName = item.location_name.split("-");
-          const branchName = locationName[0] || "";
-          const branchLocation = locationName[1] || "";
-          const distance = calculateDistance(item.lat, item.lng);
+        {dataToShow.map((item: any, index: number) => {
+          const { branchName } = parseBranchName(item.location_name || item.name || "Branch")
+
+          // Use calculated distance or fallback to basic calculation
+          let distance = item.distance || "-- KM"
+          if (!item.distance && userLocation.latitude && userLocation.longitude && item.lat && item.lng) {
+            distance = calculateBasicDistance(userLocation, item.lat, item.lng)
+          }
 
           return (
             <TouchableOpacity
-            key={item.id || item.location_code}
+              key={item.id || item.location_code || `branch-${index}`}
               style={styles.branchItem}
-              onPress={()=>onBranchClick(item)}
+              onPress={() => onBranchClick(item)}
             >
               <Image
                 style={styles.branchImage}
-                // source={require("@/assets/images/satgroups/branch.png")}
-                source={ { uri:item.brand_logo}}
+                source={{ uri: item.brand_logo || item.logo || "https://via.placeholder.com/100" }}
                 resizeMode="contain"
               />
               <View style={styles.branchInfo}>
-                <Text style={styles.branchName}>
-                  {sentenceCase(branchName)}
-                </Text>
-                {item.brand && (
+                <Text style={styles.branchName}>{sentenceCase(branchName)}</Text>
+                {(item.brand || item.location_code) && (
                   <View style={styles.dateContainer}>
-                    <Text style={styles.date}>
-                      {item.location_code}
-                    </Text>
+                    <Text style={styles.date}>{item.location_code || item.brand}</Text>
                   </View>
                 )}
                 <Text style={styles.distanceText}>{distance}</Text>
               </View>
             </TouchableOpacity>
-          );
+          )
         })}
       </View>
     </View>
-  );
-};
+  )
+}
 
-export default AllBranches;
+export default AllBranches
 
 const styles = StyleSheet.create({
   branchesContainer: {
@@ -188,16 +128,12 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.1,
     shadowRadius: 3,
-    // elevation: 1,
   },
   branchImage: {
     width: wp("20%"),
     height: hp("10%"),
-    // aspectRatio: 1,
     borderRadius: 100,
     marginBottom: 8,
-    // borderWidth: 1,
-    // borderColor: "gray",
   },
   branchInfo: {
     display: "flex",
@@ -234,4 +170,23 @@ const styles = StyleSheet.create({
     color: theme.colors.text.secondary,
     marginTop: size(4),
   },
-});
+  loadingContainer: {
+    alignItems: "center",
+    justifyContent: "center",
+    padding: hp(1),
+  },
+  emptyContainer: {
+    width: wp("90%"),
+    alignItems: "center",
+    padding: 20,
+    backgroundColor: "#F7FAFC",
+    borderRadius: 8,
+    borderColor: "#E2E8F0",
+    borderWidth: 1,
+  },
+  emptyText: {
+    color: theme.colors.text.secondary,
+    textAlign: "center",
+    fontFamily: theme.fontFamily.medium,
+  },
+})

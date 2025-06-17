@@ -1,6 +1,8 @@
-
 "use client";
-
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from "react-native-responsive-screen";
 import { iconPaths } from "@/components/icons";
 import { theme } from "@/infrastructure/themes";
 import { generatePathSegments } from "@/utils";
@@ -17,6 +19,8 @@ import {
 } from "react-native";
 import { Button, Modal, Portal } from "react-native-paper";
 import Svg, { Path, Circle, Text, G, SvgUri, Rect } from "react-native-svg";
+import axiosInstance from "@/utils/axionsInstance";
+import { useAuth } from "@/utils/AuthContext";
 
 const MilestoneComponent: React.FC<MilestonePathProps> = ({
   milestones: milestoneData,
@@ -62,10 +66,10 @@ const MilestoneComponent: React.FC<MilestonePathProps> = ({
 
   // SVG dimensions and spacing
   const svgWidth = 300;
-  const verticalSpacing = 100;
+  const verticalSpacing = 120;
   const leftPosition = 60;
   const rightPosition = 240;
-  const startY = 15;
+  const startY = 20;
 
   // Calculate coordinates for each milestone
   const calculatePoints = (items: Milestone[]) => {
@@ -90,7 +94,7 @@ const MilestoneComponent: React.FC<MilestonePathProps> = ({
         isCurrent: item.isCurrent,
         isAchieved: Number(item.requiredPoints) <= totalPoints,
         rewardType: item.rewardType,
-        milestone: item, // Store the full milestone data
+        milestone: item,
       });
     }
 
@@ -138,11 +142,12 @@ const MilestoneComponent: React.FC<MilestonePathProps> = ({
       : 100;
 
   useEffect(() => {
+    const HEADER_HEIGHT = hp(8);
     if (scrollRef.current && currentMilestoneIndex !== -1) {
       scrollRef.current.scrollTo({
         y:
           (processedMilestones.length - 1 - currentMilestoneIndex) *
-          verticalSpacing,
+          HEADER_HEIGHT,
         animated: true,
       });
     }
@@ -159,25 +164,83 @@ const MilestoneComponent: React.FC<MilestonePathProps> = ({
   };
 
   const handleMilestonePress = (point: any) => {
-    console.log("Pressed milestone:♥️", point);
+    console.log("Pressed milestone:", point);
     showModal(point.milestone);
   };
 
-  const panResponder = PanResponder.create({
-    onStartShouldSetPanResponder: () => true,
-    onPanResponderGrant: (evt) => {
-      const { locationX, locationY } = evt.nativeEvent;
-      const tappedIndex = points.findIndex(
-        (point) => Math.hypot(locationX - point.x, locationY - point.y) < 30
+const { token, driverId } = useAuth();
+  const handleClaim = (milestone: Milestone) => {
+    console.log("Claiming milestone:", milestone);
+    const updatedMilestone = async () => {
+      try {
+        const response = await axiosInstance.post("/claim-user-milestones.php", {
+          driver_id: driverId,
+          mileStoneId: milestone.id
+        },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
       );
+      
+        console.log("Claim response:", response.data);
+      } catch (error) {
+        console.error("Error claiming milestone:", error);
+      }
+
+    };
+    updatedMilestone();
+    hideModal();
+  }
+
+  // Fixed PanResponder implementation
+  const panResponder = PanResponder.create({
+    onStartShouldSetPanResponder: (evt, gestureState) => true,
+    onStartShouldSetPanResponderCapture: (evt, gestureState) => false,
+    onMoveShouldSetPanResponder: (evt, gestureState) => false,
+    onMoveShouldSetPanResponderCapture: (evt, gestureState) => false,
+
+    onPanResponderGrant: (evt, gestureState) => {
+      const { locationX, locationY } = evt.nativeEvent;
+      console.log("Touch coordinates:", locationX, locationY);
+
+      // Calculate touch tolerance (responsive)
+      const touchTolerance = wp(10);
+
+      const tappedIndex = points.findIndex((point) => {
+        const distance = Math.hypot(locationX - point.x, locationY - point.y);
+        console.log(
+          `Point ${point.points}L - Distance: ${distance}, Tolerance: ${touchTolerance}`
+        );
+        return distance < touchTolerance;
+      });
+
+      console.log("Tapped index:", tappedIndex);
+
       if (tappedIndex !== -1) {
         handleMilestonePress(points[tappedIndex]);
       }
     },
+
+    onPanResponderMove: (evt, gestureState) => {
+      // Allow scrolling while still detecting taps
+      return false;
+    },
+
+    onPanResponderTerminationRequest: (evt, gestureState) => true,
+    onPanResponderRelease: (evt, gestureState) => {
+      // Handle release if needed
+    },
+    onPanResponderTerminate: (evt, gestureState) => {
+      // Handle termination if needed
+    },
+    onShouldBlockNativeResponder: (evt, gestureState) => false,
   });
 
   return (
     <View style={styles.container}>
+      {/* Fixed Progress Container */}
       <View style={styles.fixedProgressContainer}>
         <View style={styles.progressCard}>
           <RNText style={styles.pointsText}>
@@ -205,6 +268,7 @@ const MilestoneComponent: React.FC<MilestonePathProps> = ({
           </View>
         </View>
       </View>
+
       {/* Modal */}
       <Portal>
         <Modal
@@ -300,11 +364,7 @@ const MilestoneComponent: React.FC<MilestonePathProps> = ({
                     selectedMilestone.isAchieved &&
                     selectedMilestone.status === "unclaimed"
                   ) {
-                    // Handle claim reward logic here
-                    console.log(
-                      "Claiming reward for milestone:",
-                      selectedMilestone.id
-                    );
+                    handleClaim(selectedMilestone);
                   }
                 }}
               >
@@ -332,15 +392,18 @@ const MilestoneComponent: React.FC<MilestonePathProps> = ({
         </Modal>
       </Portal>
 
-      {/* Scrollable Content */}
+      {/* Scrollable Content with PanResponder */}
       <ScrollView
         ref={scrollRef}
         contentContainerStyle={styles.scrollContainer}
         showsVerticalScrollIndicator={true}
+        style={styles.scrollView}
+        // Remove panHandlers from ScrollView to prevent conflicts
       >
-        <View style={styles.topPadding} />
-
-        <View style={{ height: totalSvgHeight }} {...panResponder.panHandlers}>
+        <View
+          style={styles.svgContainer}
+          {...panResponder.panHandlers} // Apply panHandlers to the SVG container instead
+        >
           <ImageBackground
             opacity={0.3}
             source={require("@/assets/images/satgroups/tile_background.png")}
@@ -348,7 +411,7 @@ const MilestoneComponent: React.FC<MilestonePathProps> = ({
             style={styles.backgroundImage}
           >
             <Svg
-              fill="none"
+              width={svgWidth}
               height={totalSvgHeight}
               viewBox={`0 0 ${svgWidth} ${totalSvgHeight}`}
             >
@@ -357,7 +420,7 @@ const MilestoneComponent: React.FC<MilestonePathProps> = ({
                   <Path
                     stroke="#26456C"
                     strokeLinecap="square"
-                    strokeWidth={30}
+                    strokeWidth={wp(8)}
                     d={completedPath}
                   />
                 )}
@@ -366,22 +429,22 @@ const MilestoneComponent: React.FC<MilestonePathProps> = ({
                   <Path
                     stroke="#DBDBDB"
                     strokeLinecap="square"
-                    strokeWidth={30}
+                    strokeWidth={wp(8)}
                     d={remainingPath}
                   />
                 )}
 
                 {points.map((point, index) => {
                   const isStart = index === 0;
-                  const circleRadius = isStart ? 38 : 25;
-                  const labelOffset = isStart ? 5 : 35;
+                  const circleRadius = isStart ? wp(10) : wp(6);
+                  const labelOffset = isStart ? wp(1.5) : wp(9);
                   const isEven = index % 2 === 0;
 
                   const labelX = isStart
                     ? point.x
                     : isEven && !isStart
-                    ? point.x - 10
-                    : point.x + 10;
+                    ? point.x - wp(2.5)
+                    : point.x + wp(2.5);
 
                   return (
                     <React.Fragment key={index}>
@@ -405,14 +468,14 @@ const MilestoneComponent: React.FC<MilestonePathProps> = ({
                             ? "#26456C"
                             : "#fff"
                         }
-                        strokeWidth={point.isCurrent ? 5 : 3}
+                        strokeWidth={point.isCurrent ? wp(1.5) : wp(0.8)}
                       />
 
                       {point.rewardType && (
                         <G
-                          transform={`translate(${point.x - 10}, ${
-                            point.y - 10
-                          }) scale(0.8)`}
+                          transform={`translate(${point.x - wp(2.5)}, ${
+                            point.y - wp(2.5)
+                          }) scale(${wp(0.2)})`}
                           fill={
                             point.isAchieved || isStart
                               ? "#fff"
@@ -434,7 +497,7 @@ const MilestoneComponent: React.FC<MilestonePathProps> = ({
                             ? theme.fontFamily.bold
                             : theme.fontFamily.regular
                         }
-                        fontSize={isStart ? 14 : 12}
+                        fontSize={isStart ? wp(3.5) : wp(3)}
                         textAnchor={
                           isStart
                             ? "middle"
@@ -462,22 +525,30 @@ const styles = StyleSheet.create({
     flex: 1,
     position: "relative",
   },
+  scrollView: {
+    flex: 1,
+  },
   scrollContainer: {
     flexGrow: 1,
+    paddingTop: hp(20), // Responsive padding for fixed header
   },
-  topPadding: {
-    height: 50,
+  svgContainer: {
+    flex: 1,
+    minHeight: hp(100), // Ensure minimum height for proper touch handling
+    alignItems: "center",
+    justifyContent: "center",
   },
   backgroundImage: {
     flex: 1,
     justifyContent: "center",
+    minHeight: hp(100),
   },
   // Modal Styles
   modalContent: {
     backgroundColor: "white",
-    margin: 20,
-    borderRadius: 12,
-    maxHeight: "80%",
+    margin: wp(5),
+    borderRadius: wp(3),
+    maxHeight: hp(80),
     elevation: 5,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
@@ -488,57 +559,57 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    padding: 20,
+    padding: wp(5),
     borderBottomWidth: 1,
     borderBottomColor: "#f0f0f0",
   },
   modalTitle: {
-    fontSize: 20,
+    fontSize: wp(5),
     fontWeight: "bold",
     color: "#26456C",
   },
   closeButton: {
-    width: 30,
-    height: 30,
-    borderRadius: 15,
+    width: wp(8),
+    height: wp(8),
+    borderRadius: wp(4),
     backgroundColor: "#f0f0f0",
     justifyContent: "center",
     alignItems: "center",
   },
   closeButtonText: {
-    fontSize: 20,
+    fontSize: wp(5),
     color: "#666",
     fontWeight: "bold",
   },
   modalBody: {
-    padding: 20,
+    padding: wp(5),
   },
   milestoneInfoCard: {
     backgroundColor: "#f8f9fa",
-    borderRadius: 8,
-    padding: 16,
-    marginBottom: 20,
+    borderRadius: wp(2),
+    padding: wp(4),
+    marginBottom: wp(5),
   },
   milestonePointsText: {
-    fontSize: 24,
+    fontSize: wp(6),
     fontWeight: "bold",
     color: "#26456C",
     textAlign: "center",
-    marginBottom: 16,
+    marginBottom: wp(4),
   },
   rewardSection: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 12,
+    marginBottom: wp(3),
   },
   rewardLabel: {
-    fontSize: 16,
+    fontSize: wp(4),
     color: "#666",
     fontWeight: "500",
   },
   rewardText: {
-    fontSize: 16,
+    fontSize: wp(4),
     color: "#26456C",
     fontWeight: "bold",
   },
@@ -546,78 +617,78 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 16,
+    marginBottom: wp(4),
   },
   statusLabel: {
-    fontSize: 16,
+    fontSize: wp(4),
     color: "#666",
     fontWeight: "500",
   },
   statusBadge: {
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    borderRadius: 12,
+    paddingHorizontal: wp(3),
+    paddingVertical: wp(1),
+    borderRadius: wp(3),
   },
   statusText: {
     color: "white",
-    fontSize: 14,
+    fontSize: wp(3.5),
     fontWeight: "bold",
   },
   progressSection: {
-    marginTop: 16,
+    marginTop: wp(4),
   },
   progressLabel: {
-    fontSize: 14,
+    fontSize: wp(3.5),
     color: "#666",
-    marginBottom: 8,
+    marginBottom: wp(2),
   },
   progressBarContainer: {
-    height: 8,
+    height: wp(2),
     backgroundColor: "#e0e0e0",
-    borderRadius: 4,
+    borderRadius: wp(1),
     overflow: "hidden",
-    marginBottom: 8,
+    marginBottom: wp(2),
   },
   progressBar: {
     height: "100%",
     backgroundColor: "#26456C",
-    borderRadius: 4,
+    borderRadius: wp(1),
   },
   progressPercentage: {
-    fontSize: 12,
+    fontSize: wp(3),
     color: "#26456C",
     textAlign: "right",
     fontWeight: "bold",
   },
   actionButton: {
-    padding: 16,
-    borderRadius: 8,
+    padding: wp(4),
+    borderRadius: wp(2),
     alignItems: "center",
   },
   actionButtonText: {
-    fontSize: 16,
+    fontSize: wp(4),
     fontWeight: "bold",
   },
-   fixedProgressContainer: {
+  fixedProgressContainer: {
     position: "absolute",
     top: 0,
     left: 0,
     right: 0,
     zIndex: 10,
     backgroundColor: "rgba(255, 255, 255, 0.95)",
-    paddingTop: 10,
-    paddingBottom: 10,
+    paddingTop: hp(1.5),
+    paddingBottom: hp(1.5),
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 3,
     elevation: 5,
   },
-   progressCard: {
-    padding: 16,
+  progressCard: {
+    padding: wp(4),
     backgroundColor: "#f5f5f5",
-    borderRadius: 8,
-    marginHorizontal: 16,
+    borderRadius: wp(2),
+    marginHorizontal: wp(4),
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
@@ -625,19 +696,19 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   pointsText: {
-    fontSize: 18,
+    fontSize: wp(4.5),
     fontWeight: "bold",
     color: "#26456C",
-    marginBottom: 8,
+    marginBottom: wp(2),
     fontFamily: theme.fontFamily.regular,
   },
-   nextMilestoneContainer: {
-    marginTop: 8,
+  nextMilestoneContainer: {
+    marginTop: wp(2),
   },
   milestoneText: {
-    fontSize: 14,
+    fontSize: wp(3.5),
     color: "#666",
-    marginBottom: 4,
+    marginBottom: wp(1),
     fontFamily: theme.fontFamily.light,
   },
 });
