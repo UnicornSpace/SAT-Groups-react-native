@@ -13,5 +13,5 @@
     "**/*.tsx",
     ".expo/types/**/*.ts",
     "expo-env.d.ts"
-, "components/Home/language-selectiom.js", "components/milestone", "components/error-boundry.jsx", ]
+, "components/home/language-selectiom.js", "components/milestone", "components/error-boundry.jsx", ]
 }

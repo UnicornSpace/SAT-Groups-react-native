@@ -7,7 +7,7 @@ import {
 import { FontAwesome } from "@expo/vector-icons";
 import { theme } from "@/infrastructure/themes";
 import { useTranslation } from "react-i18next";
-import LanguageSelection from "../Home/lang-dropdown";
+import LanguageSelection from "../home/lang-dropdown";
 import { router } from "expo-router";
 const LanguageSetting = () => {
   const { t } = useTranslation();

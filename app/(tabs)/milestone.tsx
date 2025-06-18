@@ -55,8 +55,8 @@ const milestone = () => {
       status: "unclaimed",
     },
   ];
-  const totalpoints = 50
-const { token, isLoading, driverId } = useAuth();
+  const totalpoints = 40;
+  const { token, isLoading, driverId } = useAuth();
 
   const [data, setData] = useState(milestoneData);
   const [totalPoints, setTotalPoints] = useState(0);
@@ -76,61 +76,65 @@ const { token, isLoading, driverId } = useAuth();
             },
           }
         );
+        console.log("Response from API: --------------👀👀👀👀👀👀👀👀👀\n\n", JSON.parse(JSON.stringify(response.status, null, 2)));
+        if(!response.data || !response.data.mileStones || response.status !== 200) {
+          console.warn("Invalid response structure or status code, using default data");
+          setData(milestoneData); // Use default data
+          return;
 
-        // console.log("Fetched milestones:✅", response.data);
+        }
+        console.log("Fetched milestones:✅", response.data);
 
-         // Add validation for the response data
-      const fetchedMilestones = response.data.mileStones;
-      const fetchedTotalPoints = response.data.totalPoints;
-      // Validate that milestones is an array and has valid data
-      if (Array.isArray(fetchedMilestones) && fetchedMilestones.length > 0) {
-        // Validate each milestone has required properties
-        const validMilestones = fetchedMilestones.filter(milestone => 
-          milestone && 
-          milestone.hasOwnProperty('requiredPoints') && 
-          milestone.requiredPoints !== undefined &&
-          milestone.requiredPoints !== null
-        );
-        
-        if (validMilestones.length > 0) {
-          setData(validMilestones);
+        // Add validation for the response data
+        const fetchedMilestones = response.data.mileStones;
+        const fetchedTotalPoints = response.data.totalPoints;
+        console.log("Fetched milestones:✅", fetchedTotalPoints);
+        // Validate that milestones is an array and has valid data
+        if (Array.isArray(fetchedMilestones) && fetchedMilestones.length > 0) {
+          // Validate each milestone has required properties
+          const validMilestones = fetchedMilestones.filter(
+            (milestone) =>
+              milestone &&
+              milestone.hasOwnProperty("requiredPoints") &&
+              milestone.requiredPoints !== undefined &&
+              milestone.requiredPoints !== null
+          );
+
+          if (validMilestones.length > 0) {
+            setData(validMilestones);
+          } else {
+            console.warn("No valid milestones found, using default data");
+            setData(milestoneData); // Use default data
+          }
         } else {
-          console.warn("No valid milestones found, using default data");
+          console.warn("Invalid milestones data received, using default data");
           setData(milestoneData); // Use default data
         }
-      } else {
-        console.warn("Invalid milestones data received, using default data");
-        setData(milestoneData); // Use default data
-      }
-      
-      // Set total points with validation
-      setTotalPoints(typeof fetchedTotalPoints === 'number' ? fetchedTotalPoints : 0);
-      
+
+        // Set total points with validation
+        setTotalPoints(
+          typeof fetchedTotalPoints === "number" ? fetchedTotalPoints : 0
+        );
       } catch (error) {
         console.error("Error fetching milestones:", error);
-          // Use default data on error
-      setData(milestoneData);
-      setTotalPoints(0);
+        // Use default data on error
+        setData(milestoneData);
+        setTotalPoints(0);
       }
     };
 
-    if (driverId && token) { // Only fetch if we have required data
-    fetchMilestones();
-  }
-  }, [driverId, token   ]);
+    if (driverId && token) {
+      // Only fetch if we have required data
+      fetchMilestones();
+    }
+  }, [driverId, token]);
 
-
-  // console.log("Transformed milestones:", transformedMilestones);
   return (
     <View style={{ flex: 1, backgroundColor: "#fff" }}>
-      <MilestoneComponent
-        milestones={data}
-        totalPoints={totalPoints}
-      />
+      <MilestoneComponent milestones={data} totalPoints={totalPoints} />
     </View>
   );
 };
-
 
 export default milestone;
 

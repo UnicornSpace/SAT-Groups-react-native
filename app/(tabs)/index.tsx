@@ -9,28 +9,18 @@ import { width } from "react-native-responsive-sizes";
 import { useTranslation } from "react-i18next";
 import { Link } from "expo-router";
 
-import BannerContainer from "@/components/Home/banner-container";
-import UserContainer from "@/components/Home/user-container";
+import BannerContainer from "@/components/home/banner-container";
+import UserContainer from "@/components/home/user-container";
 import Title from "@/components/General/title";
-import TabsComponent from "@/components/Home/tabs";
+import TabsComponent from "@/components/home/tabs";
 import HomeSkeleton from "@/components/skeleton/home/home-skeleton";
 import axiosInstance from "@/utils/axionsInstance";
 import { useAuth } from "@/utils/AuthContext";
 import { theme } from "@/infrastructure/themes";
 import { Ionicons } from "@expo/vector-icons";
-import NoInternetScreen from "@/components/network/no-intenet";
-
-type RedeemItem = {
-  status: string;
-  redeem_points: string;
-  branch: string;
-  date: string;
-  invoice_no: string;
-  authorization_status: string;
-  id: string;
-};
-
 import { useInternetStatus } from "@/infrastructure/themes/hooks/internet-hook";
+
+
 const Home = () => {
   const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
@@ -38,7 +28,6 @@ const Home = () => {
   const [visible, setVisible] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFirstLoad, setIsFirstLoad] = useState(true);
-  const { checkInternet } = useInternetStatus();
   const { token, driverId } = useAuth();
 
   useEffect(() => {
@@ -61,6 +50,7 @@ const Home = () => {
           }
         );
         const redeemData = response.data;
+        
         // Check if redeemData is empty
         if (!redeemData || redeemData.length === 0) {
           console.log("No redeem data available, so not showing modal.");

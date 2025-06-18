@@ -30,9 +30,17 @@ const MilestoneComponent: React.FC<MilestonePathProps> = ({
   const [visible, setVisible] = useState(false);
   const [selectedMilestone, setSelectedMilestone] = useState<any>(null);
 
+  console.log("TOtal POints:✅", initialTotalPoints, typeof initialTotalPoints);
+
   // Add state for total points and milestones to handle updates
-  const [totalPoints, setTotalPoints] = useState(initialTotalPoints);
-  const [milestones, setMilestones] = useState(milestoneData);
+  const [totalPoints, setTotalPoints] = useState<number>(0);
+  useEffect(() => {
+    // Initialize total points with the initial value
+    setTotalPoints(initialTotalPoints);
+  }, [initialTotalPoints]);
+
+  const [milestones, setMilestones] = useState<Milestone[]>(milestoneData);
+    console.log("Total Points:----", totalPoints, initialTotalPoints);
 
   // Process milestones based on user points
   const processedMilestones = useMemo(() => {
@@ -67,8 +75,6 @@ const MilestoneComponent: React.FC<MilestonePathProps> = ({
     });
   }, [totalPoints, milestones]);
 
-
-
   // SVG dimensions and spacing
   const svgWidth = 300;
   const verticalSpacing = 120;
@@ -78,7 +84,6 @@ const MilestoneComponent: React.FC<MilestonePathProps> = ({
 
   // Calculate coordinates for each milestone
   const calculatePoints = (items: Milestone[]) => {
-    
     const points = [];
     const totalItems = items.length;
     const totalPathHeight = (totalItems - 1) * verticalSpacing;
@@ -87,7 +92,7 @@ const MilestoneComponent: React.FC<MilestonePathProps> = ({
     for (let index = 0; index < totalItems; index++) {
       const item = items[index];
       const isEven = index % 2 === 0;
-     
+
       const x =
         index === 0 ? svgWidth / 2 : isEven ? leftPosition : rightPosition;
       const y = currentY - index * verticalSpacing;
@@ -176,8 +181,37 @@ const MilestoneComponent: React.FC<MilestonePathProps> = ({
 
   const { token, driverId } = useAuth();
 
+  const fetchUserMilestones = async () => {
+    try {
+      const response = await axiosInstance.get("/get-user-milestones.php", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        params: {
+          driver_id: driverId,
+        },
+      });
+
+      console.log("Fetched milestones:", response.data);
+
+      if (response.data && response.data.milestones) {
+        setMilestones(response.data.milestones);
+
+        // If the API also returns updated total points, you can update that too
+        if (response.data.totalPoints !== undefined) {
+          setTotalPoints(response.data.totalPoints);
+        }
+      }
+
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching milestones:", error);
+      throw error;
+    }
+  };
+
   const handleClaim = async (milestone: Milestone) => {
-    console.log("Claiming milestone:", milestone);
+    console.log("Claiming milestone:✅✅", milestone);
 
     try {
       const response = await axiosInstance.post(
@@ -195,12 +229,13 @@ const MilestoneComponent: React.FC<MilestonePathProps> = ({
 
       console.log("Claim response:", response.data);
 
+      await fetchUserMilestones(); // Refresh milestones after claiming
       // Update the milestone status to claimed
-      setMilestones((prevMilestones) =>
-        prevMilestones.map((m) =>
-          m.id === milestone.id ? { ...m, status: "claimed" as const } : m
-        )
-      );
+      // setMilestones((prevMilestones) =>
+      //   prevMilestones.map((m) =>
+      //     m.id === milestone.id ? { ...m, status: "claimed" } : m
+      //   )
+      // );
 
       // Add reward points to total points
       const rewardPoints = Number(milestone.rewardPoints) || 0;
@@ -403,7 +438,6 @@ const MilestoneComponent: React.FC<MilestonePathProps> = ({
                     },
                   ]}
                 >
-                  
                   {selectedMilestone.status === "claimed"
                     ? "Already Claimed"
                     : selectedMilestone.isAchieved
@@ -508,17 +542,21 @@ const MilestoneComponent: React.FC<MilestonePathProps> = ({
                               : "#fff"
                           }
                         >
-                          {isStart ? " " : <Path d={iconPaths[point.rewardType]} />}
+                          {isStart ? (
+                            " "
+                          ) : (
+                            <Path d={iconPaths[point.rewardType]} />
+                          )}
                         </G>
                       )}
 
                       <Text
                         x={
-                          isStart? point.x
+                          isStart
+                            ? point.x
                             : isEven && !isStart
                             ? labelX - wp(2.5)
                             : labelX + wp(2.5)
-                            
                         }
                         y={point.y + labelOffset}
                         fill={isStart ? "#fff" : "#26456C"}
@@ -554,6 +592,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     position: "relative",
+    // backgroundColor: "skyblue",
   },
   scrollView: {
     flex: 1,
@@ -622,7 +661,7 @@ const styles = StyleSheet.create({
   },
   milestonePointsText: {
     fontSize: wp(6),
-fontFamily: theme.fontFamily.semiBold,
+    fontFamily: theme.fontFamily.semiBold,
     color: "#26456C",
     textAlign: "center",
     marginBottom: wp(4),
@@ -642,7 +681,6 @@ fontFamily: theme.fontFamily.semiBold,
     fontSize: wp(4),
     color: "#26456C",
     fontFamily: theme.fontFamily.semiBold,
-
   },
   statusSection: {
     flexDirection: "row",

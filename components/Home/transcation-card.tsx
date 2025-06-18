@@ -22,17 +22,17 @@ const TransactionCard = ({
   location = "Perundurai",
   date = "9th march",
   points = "+50",
-  transactionType = "Received"
+  transactionType = "Received",
 }: TransactionCardProps) => {
   const { t } = useTranslation();
-  
+
   // Determine if points are positive or negative
-  const isPositive = !points.startsWith('-');
-  
+  const isPositive = !points.startsWith("-");
+
   // Set color based on transaction type
-  const pointsColor = isPositive 
-    ? theme.colors.brand.green 
-    : theme.colors.brand.red || '#FF4D4F';
+  const pointsColor = isPositive
+    ? theme.colors.brand.green
+    : theme.colors.brand.red || "#FF4D4F";
 
   return (
     <View style={styles.card}>
@@ -51,14 +51,9 @@ const TransactionCard = ({
           </View>
         </View>
       </View>
-
       <View style={styles.rightContainer}>
-        <Text style={[styles.points, { color: pointsColor }]}>
-          {t(points)}
-        </Text>
-        <Text style={styles.transactionType}>
-          {t(transactionType)}
-        </Text>
+        <Text style={[styles.points, { color: pointsColor }]}>{t(points)}</Text>
+        <Text style={styles.transactionType}>{t(transactionType)}</Text>
       </View>
     </View>
   );
@@ -68,7 +63,6 @@ export default TransactionCard;
 
 const styles = StyleSheet.create({
   card: {
-    // width: width(100),
     backgroundColor: "#F2F3F5",
     borderRadius: 8,
     borderColor: "#C5C5C5",
@@ -83,7 +77,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     display: "flex",
-    
+
     gap: size(10),
   },
   logo: {
@@ -120,7 +114,7 @@ const styles = StyleSheet.create({
     fontFamily: theme.fontFamily.medium,
   },
   rightContainer: {
-    alignItems: 'flex-end',
+    alignItems: "flex-end",
   },
   points: {
     fontSize: size(15),
