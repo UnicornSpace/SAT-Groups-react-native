@@ -19,9 +19,9 @@ import {
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
 import { useTranslation } from "react-i18next";
-import axiosInstance from "@/utils/axionsInstance";
-import ReferalCard from "@/components/Profile/referalCard";
-import SimpleDatePicker from "@/components/General/dob-input";
+import axiosInstance from "@/utils/axions-instance";
+import ReferalCard from "@/components/profile/referal-card";
+import SimpleDatePicker from "@/components/general/dob-input";
 import RNPickerSelect from "react-native-picker-select";
 import { Dropdown } from "react-native-element-dropdown";
 import { indianStates } from "@/utils/data";

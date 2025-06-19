@@ -6,7 +6,7 @@ import {
 } from "react-native-responsive-screen";
 import { width, height, size, fontSize } from "react-native-responsive-sizes";
 import { theme } from "@/infrastructure/themes";
-import { useAuth } from "@/utils/AuthContext";
+import { useAuth } from "@/utils/auth-context";
 import { t } from "i18next";
 const UserBentogrids = () => {
    const { myDynamicPoints } = useAuth();

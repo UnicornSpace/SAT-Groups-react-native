@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { useAuth } from "@/utils/AuthContext";
+import { useAuth } from "@/utils/auth-context";
 import { useRouter } from "expo-router";
 import { ActivityIndicator, View } from "react-native";
 

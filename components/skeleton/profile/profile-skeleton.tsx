@@ -8,7 +8,7 @@ import {
 } from "react-native-responsive-screen";
 
 // Skeleton Component
-const SkeletonLoader = ({ width, height, style }:any) => {
+export const ProfileSkeletonLoader = ({ width, height, style }:any) => {
   const opacity = useRef(new Animated.Value(0.3)).current;
 
   useEffect(() => {
@@ -65,7 +65,7 @@ const ProfileSkeleton = () => {
           }}
         >
           {/* Avatar Skeleton */}
-          <SkeletonLoader 
+          <ProfileSkeletonLoader 
             width={size(100)} 
             height={size(100)} 
             style={{ borderRadius: 50 }}
@@ -81,10 +81,10 @@ const ProfileSkeleton = () => {
             }}
           >
             {/* Name Skeleton */}
-            <SkeletonLoader width={150} height={24} style={{ marginBottom: 8 }} />
+            <ProfileSkeletonLoader width={150} height={24} style={{ marginBottom: 8 }} />
             
             {/* Driver ID Skeleton */}
-            <SkeletonLoader width={120} height={22} style={{ borderRadius: 10 }} />
+            <ProfileSkeletonLoader width={120} height={22} style={{ borderRadius: 10 }} />
           </View>
         </View>
       </View>
@@ -92,22 +92,22 @@ const ProfileSkeleton = () => {
       <View style={styles.container}>
         {/* Bentogrids Skeleton */}
         <View style={{ width: "100%", flexDirection: "row", justifyContent: "space-between" }}>
-          <SkeletonLoader width={wp(28)} height={hp(14)} style={{ borderRadius: 12 }} />
-          <SkeletonLoader width={wp(28)} height={hp(14)} style={{ borderRadius: 12 }} />
-          <SkeletonLoader width={wp(28)} height={hp(14)} style={{ borderRadius: 12 }} />
+          <ProfileSkeletonLoader width={wp(28)} height={hp(14)} style={{ borderRadius: 12 }} />
+          <ProfileSkeletonLoader width={wp(28)} height={hp(14)} style={{ borderRadius: 12 }} />
+          <ProfileSkeletonLoader width={wp(28)} height={hp(14)} style={{ borderRadius: 12 }} />
         </View>
         
         {/* Referal Card Skeleton */}
-        <SkeletonLoader width="100%" height={hp(18)} style={{ borderRadius: 12 }} />
+        <ProfileSkeletonLoader width="100%" height={hp(18)} style={{ borderRadius: 12 }} />
         
         {/* User Details Skeleton */}
-        <SkeletonLoader width="100%" height={hp(20)} style={{ borderRadius: 12 }} />
+        <ProfileSkeletonLoader width="100%" height={hp(20)} style={{ borderRadius: 12 }} />
         
         {/* Language Setting Skeleton */}
-        <SkeletonLoader width="100%" height={hp(8)} style={{ borderRadius: 8 }} />
+        <ProfileSkeletonLoader width="100%" height={hp(8)} style={{ borderRadius: 8 }} />
         
         {/* Logout Button Skeleton */}
-        <SkeletonLoader width="100%" height={hp(6)} style={{ borderRadius: 8 }} />
+        <ProfileSkeletonLoader width="100%" height={hp(6)} style={{ borderRadius: 8 }} />
       </View>
     </ScrollView>
   );

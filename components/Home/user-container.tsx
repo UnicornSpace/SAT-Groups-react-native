@@ -1,42 +1,24 @@
 import { StyleSheet, Text, View } from "react-native";
 import React, { useEffect, useState } from "react";
-import CustomizedCard from "../General/card-container";
-import { Badge } from "react-native-paper";
 import { theme } from "@/infrastructure/themes";
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from "react-native-responsive-screen";
-import { width, height, size, fontSize } from "react-native-responsive-sizes";
+import { Link } from "expo-router";
+import { heightPercentageToDP as hp } from "react-native-responsive-screen";
+import { width, size, fontSize } from "react-native-responsive-sizes";
 import { useTranslation } from "react-i18next";
-import axiosInstance from "@/utils/axionsInstance";
-import CustomizedBadge from "./CustomizedBadge";
-import { useAuth } from "@/utils/AuthContext";
+import axiosInstance from "@/utils/axions-instance";
+import CustomizedBadge from "./customized-badge";
+import { useAuth } from "@/utils/auth-context";
 import { t } from "i18next";
-const getGreetingMessage = () => {
-  const currentHour = new Date().toLocaleString("en-IN", {
-    hour: "numeric",
-    hour12: false,
-    timeZone: "Asia/Kolkata",
-  });
-  const hour = parseInt(currentHour);
+import { SkeletonLoader } from "../skeleton/home/home-skeleton";
 
-  if (hour >= 5 && hour < 12) {
-    return t("Good Morning");
-  } else if (hour >= 12 && hour < 17) {
-    return t("Good Afternoon");
-  } else {
-    return t("Good Evening");
-  }
-};
-
-console.log(getGreetingMessage(), "currentHour");
-const UserContainer = () => {
-  const {token, driverId} = useAuth()
+const UserDetailsContainer = () => {
+  const { token, driverId } = useAuth();
   const [userInfo, setuserInfo] = useState<{ id?: number; name?: string }>({});
+  const [isLoading, setIsLoading] = useState(true);
+
   useEffect(() => {
     const driver_id = driverId;
-    const userToken =token
+    const userToken = token;
 
     const getUserDetails = async () => {
       try {
@@ -50,9 +32,8 @@ const UserContainer = () => {
           }
         );
         const userDetails = response.data;
-        // console.log("User Details Responseeeee:", userDetails);
         setuserInfo(userDetails.driver);
-        // console.log("User Details:", userDetails.driver);
+        setIsLoading(false);
       } catch (error) {
         console.error("Error fetching user details:", error);
       }
@@ -62,8 +43,36 @@ const UserContainer = () => {
   }, []);
   const { t } = useTranslation();
   const greeting = getGreetingMessage();
+
+  if (isLoading) {
+    return (
+      <View
+        style={{
+          width: width(90),
+          flexDirection: "row",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: 10,
+        }}
+      >
+        <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
+          <SkeletonLoader width={50} height={50} style={{ borderRadius: 25 }} />
+          <View>
+            <SkeletonLoader
+              width={120}
+              height={20}
+              style={{ marginBottom: 5 }}
+            />
+            <SkeletonLoader width={80} height={15} />
+          </View>
+        </View>
+        <SkeletonLoader width={80} height={40} />
+      </View>
+    );
+  }
+
   return (
-    <View style={styles.userContainer}>
+    <Link href="/(tabs)/profile" style={styles.userContainer}>
       <View
         style={{
           flexDirection: "row",
@@ -86,11 +95,28 @@ const UserContainer = () => {
           {/* <Badge size={30} style={styles.badge}>{userInfo.name?.charAt(0)}</Badge> */}
         </View>
       </View>
-    </View>
+    </Link>
   );
 };
 
-export default UserContainer;
+export default UserDetailsContainer;
+
+const getGreetingMessage = () => {
+  const currentHour = new Date().toLocaleString("en-IN", {
+    hour: "numeric",
+    hour12: false,
+    timeZone: "Asia/Kolkata",
+  });
+  const hour = parseInt(currentHour);
+
+  if (hour >= 5 && hour < 12) {
+    return t("Good Morning");
+  } else if (hour >= 12 && hour < 17) {
+    return t("Good Afternoon");
+  } else {
+    return t("Good Evening");
+  }
+};
 
 const styles = StyleSheet.create({
   cardText: {

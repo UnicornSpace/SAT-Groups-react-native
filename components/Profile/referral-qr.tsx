@@ -1,6 +1,6 @@
 import { Alert, Share, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import React from 'react'
-import { useAuth } from '@/utils/AuthContext';
+import { useAuth } from '@/utils/auth-context';
 import QRCode from 'react-native-qrcode-svg';
 import { theme } from '@/infrastructure/themes';
 import { t } from 'i18next';

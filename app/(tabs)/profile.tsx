@@ -4,87 +4,48 @@ import {
   Text,
   TouchableOpacity,
   View,
-  Animated,
 } from "react-native";
-import React, { useEffect, useState, useRef, useCallback } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { theme } from "@/infrastructure/themes";
-import { router, useFocusEffect } from "expo-router";
+import { router } from "expo-router";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
 import { useTranslation } from "react-i18next";
-import { LinearGradient } from "expo-linear-gradient";
-import UserBentogrids from "@/components/Profile/bentogrids";
-import UserDetails from "@/components/Profile/UserDetails";
-import LanguageSetting from "@/components/Profile/languageSetting";
-import axiosInstance from "@/utils/axionsInstance";
-import ReferalCard from "@/components/Profile/referalCard";
-import { size, fontSize } from "react-native-responsive-sizes";
-import { useAuth } from "@/utils/AuthContext";
+import UserBentogrids from "@/components/profile/bento-grids";
+import UserDetails from "@/components/profile/user-details";
+import LanguageSetting from "@/components/profile/language-setting";
+import ReferalCard from "@/components/profile/referal-card";
+import { useAuth } from "@/utils/auth-context";
 import ProfileSkeleton from "@/components/skeleton/profile/profile-skeleton";
+import ProfileHeader from "@/components/profile/profile-header";
+import { getUserDetails } from "@/api/user-details";
 
 const profile = () => {
-  const [userInfo, setuserInfo] = useState<{
-    id?: string;
-    name?: string;
-    points?: number;
-  }>({
-    id: undefined,
-    name: undefined,
-    points: 0,
-  });
+  const [userInfo, setuserInfo] = useState();
   const [loading, setLoading] = useState(true);
-  const { token, driverId, clearAuthData, logout: authLogout } = useAuth();
+  const { token, driverId, logout: authLogout } = useAuth();
   const { t } = useTranslation();
 
-  // Extract getUserDetails as a separate function so we can call it multiple times
-  const getUserDetails = async () => {
-    try {
-      setLoading(true);
-      const response = await axiosInstance.post(
-        "/user-details.php",
-        { driver_id: driverId },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      const userDetails = response.data;
-      setuserInfo(userDetails.driver);
-      // console.log("User Details refreshed:", userDetails.driver);
-    } catch (error) {
-      console.error("Error fetching user details:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Use this hook to refresh data when screen comes into focus
-  useFocusEffect(
-    useCallback(() => {
-      // console.log("Profile screen focused - refreshing data");
-      getUserDetails();
-      return () => {
-        // Cleanup if needed
-      };
-    }, [driverId, token])
-  );
-
-  // Initial data loading
   useEffect(() => {
-    getUserDetails();
+    const fetchuserDetails = async () => {
+      try {
+        const user = await getUserDetails(driverId, token);
+        setuserInfo(user.driver);
+      } catch (error) {
+        console.error("Error fetching user details:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchuserDetails();
   }, []);
 
-  // Fixed logout function that properly calls the logout from AuthContext
   const handleLogout = async () => {
     try {
-      // console.log("Logging out user");
-      // Use the logout function from AuthContext
       await authLogout();
-      // Then navigate to language selection screen
-      router.replace("/(screens)/LanguageSeletionScreen");
+      router.replace("/(screens)/language-selection-screen");
     } catch (error) {
       console.error("Error during logout:", error);
     }
@@ -96,67 +57,14 @@ const profile = () => {
 
   return (
     <ScrollView>
-      <View>
-        <View
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
-        >
-          <View>
-            <View style={styles.badge}>
-              <Text
-                style={{
-                  color: theme.colors.text.primary,
-                  fontFamily: theme.fontFamily.semiBold,
-                  fontSize: fontSize(32),
-                }}
-              >
-                {userInfo.name?.charAt(0)}
-              </Text>
-            </View>
-          </View>
-          <View
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            <Text
-              style={{ fontSize: hp(3), fontFamily: theme.fontFamily.semiBold }}
-            >
-              {userInfo.name}
-            </Text>
-
-            <LinearGradient
-              colors={["#4A86D2", theme.colors.brand.blue]}
-              style={styles.gradient}
-            >
-              <Text style={styles.date}>{t(`Driver ID : ${userInfo.id}`)}</Text>
-            </LinearGradient>
-          </View>
-        </View>
-      </View>
+      <ProfileHeader userInfo={userInfo} />
       <View style={styles.container}>
         <UserBentogrids />
         <ReferalCard />
         <UserDetails data={userInfo} />
-
         <LanguageSetting />
-        <TouchableOpacity onPress={handleLogout} style={styles.btn}>
-          <Text
-            style={{
-              color: theme.colors.text.primary,
-              fontFamily: theme.fontFamily.medium,
-              fontSize: hp(2.5),
-            }}
-          >
-            {t("Logout")}
-          </Text>
+        <TouchableOpacity onPress={handleLogout} style={styles.logoutbtn}>
+          <Text style={styles.logoutbtnText}>{t("Logout")}</Text>
         </TouchableOpacity>
       </View>
     </ScrollView>
@@ -178,26 +86,12 @@ const styles = StyleSheet.create({
     height: "100%",
     width: "90%",
   },
-  gradient: {
-    paddingVertical: hp(0.45),
-    paddingHorizontal: hp(2),
-    justifyContent: "center",
-    alignItems: "center",
-    borderRadius: 10,
-  },
-  dateContainer: {
-    borderRadius: 5,
-    backgroundColor: theme.colors.brand.blue,
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  date: {
-    fontSize: hp(1.5),
+  logoutbtnText: {
     color: theme.colors.text.primary,
     fontFamily: theme.fontFamily.medium,
+    fontSize: hp(2.5),
   },
-  btn: {
+  logoutbtn: {
     backgroundColor: theme.colors.brand.blue,
     borderRadius: 8,
     display: "flex",
@@ -205,24 +99,5 @@ const styles = StyleSheet.create({
     alignItems: "center",
     width: wp(90),
     paddingVertical: hp(1.2),
-  },
-  input: {
-    height: hp("7%"),
-    width: wp("90%"),
-    borderWidth: 0.2,
-    boxShadow: "2px 2px 10px rgba(72, 72, 72, 0.2)",
-    color: theme.colors.ui.black,
-    fontFamily: theme.fontFamily.semiBold,
-    borderRadius: 5,
-    borderColor: theme.colors.brand.blue,
-  },
-  badge: {
-    width: size(100),
-    height: size(100),
-    borderRadius: 50,
-    backgroundColor: theme.colors.brand.blue,
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
   },
 });

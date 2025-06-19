@@ -17,8 +17,8 @@ import {
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
 import { useTranslation } from "react-i18next";
-import axiosInstance from "@/utils/axionsInstance";
-import { useAuth } from "@/utils/AuthContext";
+import axiosInstance from "@/utils/axions-instance";
+import { useAuth } from "@/utils/auth-context";
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {

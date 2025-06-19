@@ -1,41 +1,72 @@
-import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native"
-import type React from "react"
-import { theme } from "@/infrastructure/themes"
-import { widthPercentageToDP as wp, heightPercentageToDP as hp } from "react-native-responsive-screen"
-import { useTranslation } from "react-i18next"
-import { size } from "react-native-responsive-sizes"
-import { useDistanceCalculation } from "@/hooks/use-distance-calc"
-import { parseBranchName, sentenceCase } from "@/utils"
-import { calculateBasicDistance } from "./helpers/distance-helper"
-
+import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import type React from "react";
+import { theme } from "@/infrastructure/themes";
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from "react-native-responsive-screen";
+import { useTranslation } from "react-i18next";
+import { size } from "react-native-responsive-sizes";
+import { useDistanceCalculation } from "@/hooks/use-distance-calc";
+import { parseBranchName, sentenceCase } from "@/utils";
+import { calculateBasicDistance } from "./helpers/distance-helper";
+import { LoactionSkeletonLoader } from "../skeleton/location/location-skeleton";
 
 interface AllBranchesProps {
-  branches: any[]
-  onBranchClick: (branch: any) => void
+  branches: any[];
+  onBranchClick: (branch: any) => void;
+  loading?: boolean;
 }
 
-const AllBranches: React.FC<AllBranchesProps> = ({ branches, onBranchClick, }) => {
-  const { t } = useTranslation()
-  const { userLocation, branchesWithDistance, isCalculating } = useDistanceCalculation(branches)
+const AllBranches: React.FC<AllBranchesProps> = ({
+  branches,
+  onBranchClick,
+  loading,
+}) => {
+  const { t } = useTranslation();
+  const { userLocation, branchesWithDistance, isCalculating } =
+    useDistanceCalculation(branches);
 
   console.log(
     "AllBranches - branches:",
     branches?.length || 0,
     "branchesWithDistance:",
-    branchesWithDistance?.length || 0,
-  )
+    branchesWithDistance?.length || 0
+  );
 
   if (!branches || branches.length === 0) {
     return (
       <View style={styles.emptyContainer}>
         <Text style={styles.emptyText}>No branch data available</Text>
       </View>
-    )
+    );
   }
 
   // Use original branches with basic distance if advanced calculation hasn't completed
-  const dataToShow = branchesWithDistance.length > 0 ? branchesWithDistance : branches
+  const dataToShow =
+    branchesWithDistance.length > 0 ? branchesWithDistance : branches;
 
+  if (loading) {
+    return (
+      <View style={{ width: "100%" }}>
+        <LoactionSkeletonLoader
+          width={150}
+          height={22}
+          style={{ marginBottom: 10 }}
+        />
+        <View style={{ gap: 15, width: "100%" }}>
+          {[1, 2, 3, 4].map((_, index) => (
+            <LoactionSkeletonLoader
+              key={index}
+              width="100%"
+              height={hp(12)}
+              style={{ borderRadius: 12 }}
+            />
+          ))}
+        </View>
+      </View>
+    );
+  }
   return (
     <View
       style={{
@@ -64,12 +95,20 @@ const AllBranches: React.FC<AllBranchesProps> = ({ branches, onBranchClick, }) =
 
       <View style={styles.branchesContainer}>
         {dataToShow.map((item: any, index: number) => {
-          const { branchName } = parseBranchName(item.location_name || item.name || "Branch")
+          const { branchName } = parseBranchName(
+            item.location_name || item.name || "Branch"
+          );
 
           // Use calculated distance or fallback to basic calculation
-          let distance = item.distance || "-- KM"
-          if (!item.distance && userLocation.latitude && userLocation.longitude && item.lat && item.lng) {
-            distance = calculateBasicDistance(userLocation, item.lat, item.lng)
+          let distance = item.distance || "-- KM";
+          if (
+            !item.distance &&
+            userLocation.latitude &&
+            userLocation.longitude &&
+            item.lat &&
+            item.lng
+          ) {
+            distance = calculateBasicDistance(userLocation, item.lat, item.lng);
           }
 
           return (
@@ -80,27 +119,36 @@ const AllBranches: React.FC<AllBranchesProps> = ({ branches, onBranchClick, }) =
             >
               <Image
                 style={styles.branchImage}
-                source={{ uri: item.brand_logo || item.logo || "https://via.placeholder.com/100" }}
+                source={{
+                  uri:
+                    item.brand_logo ||
+                    item.logo ||
+                    "https://via.placeholder.com/100",
+                }}
                 resizeMode="contain"
               />
               <View style={styles.branchInfo}>
-                <Text style={styles.branchName}>{sentenceCase(branchName)}</Text>
+                <Text style={styles.branchName}>
+                  {sentenceCase(branchName)}
+                </Text>
                 {(item.brand || item.location_code) && (
                   <View style={styles.dateContainer}>
-                    <Text style={styles.date}>{item.location_code || item.brand}</Text>
+                    <Text style={styles.date}>
+                      {item.location_code || item.brand}
+                    </Text>
                   </View>
                 )}
                 <Text style={styles.distanceText}>{distance}</Text>
               </View>
             </TouchableOpacity>
-          )
+          );
         })}
       </View>
     </View>
-  )
-}
+  );
+};
 
-export default AllBranches
+export default AllBranches;
 
 const styles = StyleSheet.create({
   branchesContainer: {
@@ -189,4 +237,4 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontFamily: theme.fontFamily.medium,
   },
-})
+});

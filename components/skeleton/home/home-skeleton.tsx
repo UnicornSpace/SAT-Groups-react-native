@@ -8,7 +8,7 @@ import {
 
 
 // Skeleton Component
-const SkeletonLoader = ({ width, height, style }: any) => {
+export const SkeletonLoader = ({ width, height, style }: any) => {
   const opacity = useRef(new Animated.Value(0.3)).current;
 
   useEffect(() => {

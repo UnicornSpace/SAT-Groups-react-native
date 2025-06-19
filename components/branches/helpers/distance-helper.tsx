@@ -1,6 +1,6 @@
 import axios from "axios"
 import { getDistance } from "geolib"
-import type { UserLocation } from "@/components/Location/helpers/location-helper"
+import type { UserLocation } from "@/components/branches/helpers/location-helper"
 
 export interface BranchWithDistance {
   distance: string

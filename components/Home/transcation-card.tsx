@@ -1,5 +1,5 @@
 // TransactionCard.tsx
-import { Image, StyleSheet, Text, View } from "react-native";
+import { Image, ScrollView, StyleSheet, Text, View } from "react-native";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { theme } from "@/infrastructure/themes";
@@ -38,7 +38,7 @@ const TransactionCard = ({
     <View style={styles.card}>
       <View style={styles.cardLeft}>
         <Image
-          source={require("@/assets/images/satgroups/noxBlue-Logo.png")}
+          source={require("@/assets/images/satgroups/nox-blue-logo.png")}
           style={styles.logo}
         />
 

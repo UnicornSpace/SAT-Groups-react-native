@@ -7,7 +7,7 @@ import {
 import Svg, { Path } from "react-native-svg";
 import { theme } from "@/infrastructure/themes";
 import { Button } from "react-native-paper";
-import RefferalSteps from "@/components/Profile/RefferalSteps";
+import RefferalSteps from "@/components/profile/refferal-steps";
 import { t } from "i18next";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
@@ -91,6 +91,9 @@ const ReferalScreen = (props: any) => {
           </Text>
         </Button>
       </View>
+
+
+
       <View style={styles.subContainer}>
         <RefferalSteps/>
         
@@ -104,12 +107,13 @@ export default ReferalScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-   
     backgroundColor: "#36629A",
+
   },
   subContainer: {
     width: wp(100),
     height: hp(70),
+    maxHeight: hp(105),
     backgroundColor: "#fff",
 
     // padding: 20,

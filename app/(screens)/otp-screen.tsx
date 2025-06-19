@@ -19,7 +19,7 @@ import {
 } from "react-native-responsive-screen";
 import { useTranslation } from "react-i18next";
 import { ActivityIndicator } from "react-native-paper";
-import axiosInstance from "@/utils/axionsInstance";
+import axiosInstance from "@/utils/axions-instance";
 
 const UserOTPScreen = () => {
   const [number, onChangeNumber] = useState("");

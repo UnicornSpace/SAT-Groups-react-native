@@ -12,8 +12,8 @@ import { Ionicons } from "@expo/vector-icons";
 import { useFonts } from "expo-font";
 import { theme } from "@/infrastructure/themes";
 import { router } from "expo-router";
-import { useAuth } from "@/utils/AuthContext";
-import axiosInstance from "@/utils/axionsInstance";
+import { useAuth } from "@/utils/auth-context";
+import axiosInstance from "@/utils/axions-instance";
 import { t } from "i18next";
 
 const RedeemPointsScreen: React.FC = () => {

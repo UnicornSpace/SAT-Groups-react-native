@@ -2,12 +2,12 @@ import { Image, StyleSheet, View, Text, BackHandler } from "react-native";
 import { Link, Tabs, useRouter } from "expo-router";
 import { FontAwesome, Ionicons } from "@expo/vector-icons";
 import React, { useEffect } from "react";
-import '@/app/language-selectiom'
+import '@/app/language-selection'
 import { theme } from "@/infrastructure/themes";
 
-import EditButton from "@/components/Profile/edit";
-import { useAuth } from "@/utils/AuthContext";
-import ProtectedRoute from "@/components/General/proteted-route";
+import EditButton from "@/components/profile/edit";
+import { useAuth } from "@/utils/auth-context";
+import ProtectedRoute from "@/components/general/proteted-route";
 import { useInternetStatus } from "@/infrastructure/themes/hooks/internet-hook";
 import NoInternetScreen from "@/components/network/no-intenet";
 
@@ -32,7 +32,7 @@ function LogoTitle() {
     >
       <Image
         style={{ width: 80, height: 50 }}
-        source={require("../../assets/images/satgroups/Logo.png")}
+        source={require("../../assets/images/satgroups/logo.png")}
         resizeMode="contain"
       />
       {/* <LanguageSelection/> */}
@@ -81,7 +81,7 @@ const TabLayout = () => {
           }}
         />
         <Tabs.Screen
-          name="location"
+          name="branches"
           options={{
             title: "Branches",
             tabBarIcon: ({ color }) => (

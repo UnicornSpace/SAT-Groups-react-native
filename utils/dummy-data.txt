@@ -1,0 +1,51 @@
+ const milestoneDataDummy: Milestone[] = [
+    {
+      id: "1",
+      position: 1,
+      requiredPoints: "0",
+      rewardPoints: "0",
+      rewardType: "Points",
+      status: "unclaimed",
+    },
+    {
+      id: "2",
+      position: 2,
+      requiredPoints: "50",
+      rewardPoints: "60",
+      rewardType: "Points",
+      status: "unclaimed",
+    },
+    {
+      id: "3",
+      position: 3,
+      requiredPoints: "100",
+      rewardPoints: "60",
+      rewardType: "Points",
+      status: "unclaimed",
+    },
+    {
+      id: "4",
+      position: 4,
+      requiredPoints: "150",
+      rewardPoints: "60",
+      rewardType: "Points",
+      status: "unclaimed",
+    },
+    {
+      id: "5",
+      position: 5,
+      requiredPoints: "250",
+      rewardPoints: "120",
+      rewardType: "Points",
+      status: "unclaimed",
+    },
+    {
+      id: "6",
+      position: 6,
+      requiredPoints: "500",
+      rewardPoints: "Gift",
+      rewardType: "Gift",
+      status: "unclaimed",
+    },
+  ];
+  const totalpointsDummy = 40;

@@ -1,4 +1,10 @@
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import type React from "react";
 import { theme } from "@/infrastructure/themes";
 import {
@@ -7,14 +13,16 @@ import {
 } from "react-native-responsive-screen";
 import { useTranslation } from "react-i18next";
 import { FontAwesome, MaterialCommunityIcons } from "@expo/vector-icons";
-import LocationIcon from "./locationIcon";
+import LocationIcon from "./branch-icon";
 import { openDirectGoogleMapsLink } from "./helpers/location-helper";
 import { sentenceCase } from "@/utils";
 import { useDistanceCalculation } from "@/hooks/use-distance-calc";
 import { size } from "react-native-responsive-sizes";
+import { LoactionSkeletonLoader } from "../skeleton/location/location-skeleton";
 
 interface NearBranchListProps {
   branches: any[];
+  loading?: boolean;
 }
 
 const Branches = ({ data, userLocation }: any) => {
@@ -80,9 +88,7 @@ const Branches = ({ data, userLocation }: any) => {
 
                 {(item.brand || item.location_code) && (
                   <View style={styles.dateContainer}>
-                    <Text style={styles.date}>
-                      { item.brand}
-                    </Text>
+                    <Text style={styles.date}>{item.brand}</Text>
                   </View>
                 )}
               </View>
@@ -146,7 +152,10 @@ const Branches = ({ data, userLocation }: any) => {
   );
 };
 
-const NearBranchList: React.FC<NearBranchListProps> = ({ branches }) => {
+const NearBranchList: React.FC<NearBranchListProps> = ({
+  branches,
+  loading,
+}) => {
   const { userLocation, branchesWithDistance, isCalculating } =
     useDistanceCalculation(branches);
 
@@ -161,6 +170,29 @@ const NearBranchList: React.FC<NearBranchListProps> = ({ branches }) => {
   const dataToShow =
     branchesWithDistance.length > 0 ? branchesWithDistance : branches;
 
+  if (loading) {
+    return (
+      <View style={{ width: "100%" }}>
+        <LoactionSkeletonLoader
+          width={150}
+          height={22}
+          style={{ marginBottom: 10 }}
+        />
+        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+          <View style={{ flexDirection: "row", gap: 12, paddingVertical: 5 }}>
+            {[1, 2, 3].map((_, index) => (
+              <LoactionSkeletonLoader
+                key={index}
+                width={wp(42)}
+                height={hp(22)}
+                style={{ borderRadius: 12 }}
+              />
+            ))}
+          </View>
+        </ScrollView>
+      </View>
+    );
+  }
   return (
     <View
       style={{

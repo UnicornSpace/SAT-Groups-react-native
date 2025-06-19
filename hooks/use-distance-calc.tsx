@@ -1,7 +1,7 @@
 "use client"
 
-import { BranchWithDistance, fetchDistancesWithGoogleAPI } from "@/components/Location/helpers/distance-helper"
-import { getCurrentLocation,type UserLocation } from "@/components/Location/helpers/location-helper"
+import { BranchWithDistance, fetchDistancesWithGoogleAPI } from "@/components/branches/helpers/distance-helper"
+import { getCurrentLocation,type UserLocation } from "@/components/branches/helpers/location-helper"
 import { useState, useEffect } from "react"
 
 export const useDistanceCalculation = (branches: any[]) => {

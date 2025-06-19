@@ -8,7 +8,7 @@ import {
 
 
 // Skeleton Component
-const SkeletonLoader = ({ width, height, style }:any) => {
+export const LoactionSkeletonLoader = ({ width, height, style }:any) => {
   const opacity = useRef(new Animated.Value(0.3)).current;
 
   useEffect(() => {
@@ -62,17 +62,17 @@ const LocationSkeleton = () => {
             width: "100%",
           }}
         >
-          <SkeletonLoader width={180} height={30} style={{ marginBottom: 8 }} />
-          <SkeletonLoader width={250} height={18} />
+          <LoactionSkeletonLoader width={180} height={30} style={{ marginBottom: 8 }} />
+          <LoactionSkeletonLoader width={250} height={18} />
         </View>
 
         {/* Near Branch List Skeleton */}
         <View style={{ width: "100%" }}>
-          <SkeletonLoader width={150} height={22} style={{ marginBottom: 10 }} />
+          <LoactionSkeletonLoader width={150} height={22} style={{ marginBottom: 10 }} />
           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
             <View style={{ flexDirection: "row", gap: 12, paddingVertical: 5 }}>
               {[1, 2, 3].map((_, index) => (
-                <SkeletonLoader
+                <LoactionSkeletonLoader
                   key={index}
                   width={wp(42)}
                   height={hp(22)}
@@ -85,10 +85,10 @@ const LocationSkeleton = () => {
 
         {/* All Branches Skeleton */}
         <View style={{ width: "100%" }}>
-          <SkeletonLoader width={150} height={22} style={{ marginBottom: 10 }} />
+          <LoactionSkeletonLoader width={150} height={22} style={{ marginBottom: 10 }} />
           <View style={{ gap: 15, width: "100%" }}>
             {[1, 2, 3, 4].map((_, index) => (
-              <SkeletonLoader
+              <LoactionSkeletonLoader
                 key={index}
                 width="100%"
                 height={hp(12)}

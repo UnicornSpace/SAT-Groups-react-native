@@ -1,8 +1,8 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import axiosInstance from "@/utils/axionsInstance"
-import { useAuth } from "@/utils/AuthContext"
+import axiosInstance from "@/utils/axions-instance"
+import { useAuth } from "@/utils/auth-context"
 
 export const useBranchData = () => {
   const [branches, setBranches] = useState([])
@@ -32,7 +32,7 @@ export const useBranchData = () => {
       console.log("API Response:👍", response.data)
 
       const branchResponse = response.data
-
+setLoading(false)
       // Handle different response structures
       let branchData = []
       if (branchResponse?.data && Array.isArray(branchResponse.data)) {

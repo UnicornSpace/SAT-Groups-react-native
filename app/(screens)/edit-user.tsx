@@ -21,11 +21,11 @@ import {
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
 import { useTranslation } from "react-i18next";
-import axiosInstance from "@/utils/axionsInstance";
-import SimpleDatePicker from "@/components/General/dob-input";
+import axiosInstance from "@/utils/axions-instance";
+import SimpleDatePicker from "@/components/general/dob-input";
 import { Dropdown } from "react-native-element-dropdown";
 import { indianStates } from "@/utils/data";
-import { useAuth } from "@/utils/AuthContext";
+import { useAuth } from "@/utils/auth-context";
 
 // Enhanced Skeleton Component with shimmer effect
 const SkeletonLoader = ({ width, height, style }: any) => {

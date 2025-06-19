@@ -4,7 +4,7 @@
     "slug": "satGroups",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/satgroups/applogo.png",
+    "icon": "./assets/images/satgroups/app-logo.png",
     "scheme": "myapp",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
@@ -28,7 +28,7 @@
         }
       ],
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/satgroups/applogo.png",
+        "foregroundImage": "./assets/images/satgroups/app-logo.png",
         "backgroundColor": "#ffffff"
       },
       // TODO: change before release
@@ -38,7 +38,7 @@
     "web": {
       "bundler": "metro",
       "output": "static",
-      "favicon": "./assets/images/satgroups/applogo.png"
+      "favicon": "./assets/images/satgroups/app-logo.png"
     },
     "plugins": [
       "expo-router",
@@ -46,7 +46,7 @@
         
         "expo-splash-screen",
         {
-          "image": "./assets/images/satgroups/Splash.png",
+          "image": "./assets/images/satgroups/splash-screen.png",
           "imageWidth": 200,
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"

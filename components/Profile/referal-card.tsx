@@ -7,7 +7,7 @@ import {
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
 import { router } from "expo-router";
-import ReferralSteps from "@/components/Profile/referalSteps";
+import ReferralSteps from "@/components/profile/referal-steps";
 import { width, height, size, fontSize } from "react-native-responsive-sizes";
 import { t } from "i18next";
 const deviceWidth = Dimensions.get('window').width;
@@ -15,7 +15,7 @@ const ReferalCard = () => {
   return (
     <TouchableOpacity
       onPress={() => {
-        router.push("/(screens)/ReferalScreen");
+        router.push("/(screens)/referal-screen");
       }}
       style={styles.container}
     >

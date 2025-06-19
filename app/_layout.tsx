@@ -17,7 +17,7 @@ import {
 } from "@expo-google-fonts/poppins";
 import { PaperProvider } from "react-native-paper";
 import { I18nextProvider } from "react-i18next";
-import { AuthProvider } from "@/utils/AuthContext";
+import { AuthProvider } from "@/utils/auth-context";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const TextComponent = Text as any;

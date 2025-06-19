@@ -5,7 +5,7 @@ import {
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
 import { theme } from '@/infrastructure/themes';
-import ReferralStepsVisual from './referalSteps';
+import ReferralStepsVisual from './referal-steps';
 import { t } from 'i18next';
 import ReferralQR from './referral-qr';
 const RefferalSteps = () => {
