@@ -22,7 +22,7 @@ interface Transaction {
   points: string;
   type: string; // "Received" or "Redeemed"
   referred_date: string;
-  // Add any other fields from your API response
+  branch: string;
 }
 
 export default function RecentTransactionTabs() {
@@ -112,8 +112,7 @@ export default function RecentTransactionTabs() {
 
     return (
       <TransactionCard
-        companyName="Nox Solution" // You might want to replace this with actual data
-        location="Perundurai" // You might want to replace this with actual data
+        companyName={item.branch} 
         date={formatDate(item.referred_date)}
         points={pointsDisplay}
         transactionType={item.type}
@@ -195,26 +194,25 @@ export default function RecentTransactionTabs() {
           </TouchableOpacity>
         </View>
 
-        <ScrollView style={styles.transactionsContainer}>
-          {loading ? (
-            <View style={{ width: width(90), gap: 15, marginTop: 10 }}>
-              <SkeletonLoader width="100%" height={70} />
-              <SkeletonLoader width="100%" height={70} />
-              <SkeletonLoader width="100%" height={70} />
-            </View>
-          ) : (
-            <FlatList
-              nestedScrollEnabled={true}
-              keyboardShouldPersistTaps="handled"
-              data={filteredTransactions.reverse()}
-              renderItem={EachTransactionCard}
-              keyExtractor={(item, index) => `transaction-${index}`}
-              contentContainerStyle={styles.listContainer}
-              ListEmptyComponent={renderEmptyList}
-              ItemSeparatorComponent={() => <View style={styles.separator} />}
-            />
-          )}
-        </ScrollView>
+        <FlatList
+          keyboardShouldPersistTaps="handled"
+          data={loading ? [] : [...filteredTransactions].reverse()}
+          renderItem={EachTransactionCard}
+          keyExtractor={(item, index) => `transaction-${index}`}
+          contentContainerStyle={styles.listContainer}
+          ListEmptyComponent={
+            loading ? (
+              <View style={{ width: width(90), gap: 15, marginTop: 10 }}>
+                <SkeletonLoader width="100%" height={70} />
+                <SkeletonLoader width="100%" height={70} />
+                <SkeletonLoader width="100%" height={70} />
+              </View>
+            ) : (
+              renderEmptyList()
+            )
+          }
+          ItemSeparatorComponent={() => <View style={styles.separator} />}
+        />
       </View>
     </View>
   );

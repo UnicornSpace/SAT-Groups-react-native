@@ -1,3 +1,4 @@
+// 1. Updated AllBranches.tsx - Enhanced to pass complete data including distance/duration
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import type React from "react";
 import { theme } from "@/infrastructure/themes";
@@ -67,6 +68,34 @@ const AllBranches: React.FC<AllBranchesProps> = ({
       </View>
     );
   }
+
+  const handleBranchClick = (item: any, index: number) => {
+    // Create enhanced branch data with distance and duration
+    const enhancedBranchData = {
+      ...item,
+      // Ensure we have distance and duration data
+      calculatedDistance: item.distance || item.calculatedDistance,
+      calculatedDuration: item.duration || item.calculatedDuration,
+      userLocation: userLocation, // Pass user location for reference
+    };
+
+    // If we don't have calculated distance/duration, add basic calculation
+    if (!enhancedBranchData.calculatedDistance && 
+        userLocation.latitude && userLocation.longitude && 
+        item.lat && item.lng) {
+      enhancedBranchData.calculatedDistance = calculateBasicDistance(
+        userLocation, 
+        item.lat, 
+        item.lng
+      );
+      // You might want to add basic duration calculation here too
+      // For now, setting a placeholder
+      enhancedBranchData.calculatedDuration = "-- min";
+    }
+
+    onBranchClick(enhancedBranchData);
+  };
+
   return (
     <View
       style={{
@@ -115,7 +144,7 @@ const AllBranches: React.FC<AllBranchesProps> = ({
             <TouchableOpacity
               key={item.id || item.location_code || `branch-${index}`}
               style={styles.branchItem}
-              onPress={() => onBranchClick(item)}
+              onPress={() => handleBranchClick(item, index)}
             >
               <Image
                 style={styles.branchImage}
@@ -139,6 +168,9 @@ const AllBranches: React.FC<AllBranchesProps> = ({
                   </View>
                 )}
                 <Text style={styles.distanceText}>{distance}</Text>
+                {item.duration && (
+                  <Text style={styles.durationText}>{item.duration}</Text>
+                )}
               </View>
             </TouchableOpacity>
           );
@@ -150,6 +182,7 @@ const AllBranches: React.FC<AllBranchesProps> = ({
 
 export default AllBranches;
 
+// Add duration text style
 const styles = StyleSheet.create({
   branchesContainer: {
     display: "flex",
@@ -217,6 +250,12 @@ const styles = StyleSheet.create({
     fontSize: size(12),
     color: theme.colors.text.secondary,
     marginTop: size(4),
+  },
+  durationText: {
+    fontFamily: theme.fontFamily.medium,
+    fontSize: size(10),
+    color: theme.colors.text.secondary,
+    marginTop: size(2),
   },
   loadingContainer: {
     alignItems: "center",

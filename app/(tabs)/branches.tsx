@@ -1,3 +1,4 @@
+// 2. Updated Location.tsx - Enhanced to pass complete branch data
 import { ScrollView, StyleSheet, View } from "react-native";
 import { useState } from "react";
 import LocationSkeleton from "@/components/skeleton/location/location-skeleton";
@@ -7,20 +8,41 @@ import BranchHeader from "@/components/branches/branch-header";
 
 const Location = () => {
   const [selectedBranch, setSelectedBranch] = useState(null);
-const {  error,refetch,branches,loading} = useBranchData();
+  const { error, refetch, branches, loading } = useBranchData();
+
+  const handleBranchSelection = (branchData: any) => {
+    console.log("Selected branch with distance data:", {
+      name: branchData.location_name || branchData.name,
+      distance: branchData.calculatedDistance || branchData.distance,
+      duration: branchData.calculatedDuration || branchData.duration,
+    });
+    
+    setSelectedBranch(branchData);
+  };
+
   if (loading) {
-    return <LocationSkeleton  />;
+    return <LocationSkeleton />;
   }
 
   return (
     <ScrollView style={{ flex: 1 }}>
       {!selectedBranch ? (
-        <BranchHeader isSeleted={setSelectedBranch} error={error} refetch={refetch} branches={branches} />
+        <BranchHeader 
+          isSeleted={handleBranchSelection} 
+          error={error} 
+          refetch={refetch} 
+          branches={branches} 
+        />
       ) : (
         <View>
           <FuelStationDetails
             data={selectedBranch}
             onBack={() => setSelectedBranch(null)}
+            // Now selectedBranch includes:
+            // - calculatedDistance
+            // - calculatedDuration
+            // - userLocation
+            // - all original branch data
           />
         </View>
       )}
@@ -29,4 +51,3 @@ const {  error,refetch,branches,loading} = useBranchData();
 };
 
 export default Location;
-

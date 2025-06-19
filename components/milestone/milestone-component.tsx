@@ -1,3 +1,4 @@
+
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -5,21 +6,20 @@ import {
 import { iconPaths } from "@/components/icons";
 import { generatePathSegments } from "@/utils";
 import React, { useEffect, useRef, useMemo, useState } from "react";
-import { ScrollView, View, StyleSheet } from "react-native";
+import {
+  ScrollView,
+  View,
+  StyleSheet,
+  PanResponder,
+} from "react-native";
+import { useAuth } from "@/utils/auth-context";
 import { router } from "expo-router";
 import { getMilestoneData } from "@/api/milestone/milestone-data";
 import { claimMilestone } from "@/api/milestone/claim-milestone";
 import MilestoneHeader from "./milestone-header";
 import MilestoneModal from "./milestone-modal";
 import MilestonePath from "./milestone-path";
-import {
-  startY,
-  svgWidth,
-  verticalSpacing,
-} from "@/infrastructure/constants/milestone-path-constants";
-import { createMilestonePanResponder } from "@/utils/milestonetap";
-import { CalculateMilestonePoints } from "@/utils/milestone-co-ordinates";
-import { useAuth } from "@/utils/auth-context";
+import { leftPosition, rightPosition, startY, svgWidth, verticalSpacing } from "@/infrastructure/constants/milestone-path-constants";
 
 const MilestoneComponent: React.FC<MilestonePathProps> = ({
   milestones: milestoneData,
@@ -33,13 +33,12 @@ const MilestoneComponent: React.FC<MilestonePathProps> = ({
   // Add state for total points and milestones to handle updates
   const [totalPoints, setTotalPoints] = useState<number>(0);
   const [milestones, setMilestones] = useState<Milestone[]>([]);
-  
-  const { token, driverId } = useAuth();
   useEffect(() => {
     // Initialize total points with the initial value
     setTotalPoints(initialTotalPoints);
     setMilestones(milestoneData);
   }, [initialTotalPoints, milestoneData]);
+
 
   // Process milestones based on user points
   const processedMilestones = useMemo(() => {
@@ -74,7 +73,39 @@ const MilestoneComponent: React.FC<MilestonePathProps> = ({
     });
   }, [totalPoints, milestones]);
 
-  const points = CalculateMilestonePoints(processedMilestones, totalPoints);
+
+
+  // Calculate coordinates for each milestone
+  const calculatePoints = (items: Milestone[]) => {
+    const points = [];
+    const totalItems = items.length;
+    const totalPathHeight = (totalItems - 1) * verticalSpacing;
+    let currentY = totalPathHeight + startY;
+
+    for (let index = 0; index < totalItems; index++) {
+      const item = items[index];
+      const isEven = index % 2 === 0;
+
+      const x =
+        index === 0 ? svgWidth / 2 : isEven ? leftPosition : rightPosition;
+      const y = currentY - index * verticalSpacing;
+
+      points.push({
+        x,
+        y,
+        label: `${item.requiredPoints} L`,
+        points: item.requiredPoints ?? 0,
+        isCurrent: item.isCurrent,
+        isAchieved: Number(item.requiredPoints) <= totalPoints,
+        rewardType: item.rewardType,
+        milestone: item,
+      });
+    }
+
+    return points;
+  };
+
+  const points = calculatePoints(processedMilestones);
 
   const { completedPath, remainingPath } = generatePathSegments(
     points.map((p) => ({ x: p.x, y: p.y, points: Number(p.points) })),
@@ -87,7 +118,6 @@ const MilestoneComponent: React.FC<MilestonePathProps> = ({
   const currentMilestoneIndex = processedMilestones.findIndex(
     (m) => m.isCurrent
   );
-
   const previousMilestone =
     currentMilestoneIndex > 0
       ? processedMilestones[currentMilestoneIndex - 1]
@@ -137,6 +167,13 @@ const MilestoneComponent: React.FC<MilestonePathProps> = ({
     setSelectedMilestone(null);
   };
 
+  const handleMilestonePress = (point: any) => {
+    // console.log("Pressed milestone:", point);
+    showModal(point.milestone);
+  };
+
+  const { token, driverId } = useAuth();
+
   const fetchUserMilestones = async () => {
     try {
       const response = await getMilestoneData(driverId, token);
@@ -178,14 +215,43 @@ const MilestoneComponent: React.FC<MilestonePathProps> = ({
     hideModal();
   };
 
-  const handleMilestonePress = (point: any) => {
-    showModal(point.milestone);
-  };
-  const panResponder = createMilestonePanResponder({
-    points: points,
-    handleMilestonePress: (point: any) => {
-      console.log("Milestone pressed:", point);
+ 
+  const panResponder = PanResponder.create({
+    onStartShouldSetPanResponder: (evt, gestureState) => true,
+    onStartShouldSetPanResponderCapture: (evt, gestureState) => false,
+    onMoveShouldSetPanResponder: (evt, gestureState) => false,
+    onMoveShouldSetPanResponderCapture: (evt, gestureState) => false,
+
+    onPanResponderGrant: (evt, gestureState) => {
+      const { locationX, locationY } = evt.nativeEvent;
+      // console.log("Touch coordinates:", locationX, locationY);
+
+      // Calculate touch tolerance (responsive)
+      const touchTolerance = wp(10);
+
+      const tappedIndex = points.findIndex((point) => {
+        const distance = Math.hypot(locationX - point.x, locationY - point.y);
+        return distance < touchTolerance;
+      });
+
+      if (tappedIndex !== -1) {
+        handleMilestonePress(points[tappedIndex]);
+      }
     },
+
+    onPanResponderMove: (evt, gestureState) => {
+      // Allow scrolling while still detecting taps
+      return false;
+    },
+
+    onPanResponderTerminationRequest: (evt, gestureState) => true,
+    onPanResponderRelease: (evt, gestureState) => {
+      // Handle release if needed
+    },
+    onPanResponderTerminate: (evt, gestureState) => {
+      // Handle termination if needed
+    },
+    onShouldBlockNativeResponder: (evt, gestureState) => false,
   });
 
   const onRefresh = () => {
@@ -195,36 +261,13 @@ const MilestoneComponent: React.FC<MilestonePathProps> = ({
   return (
     <View style={styles.container}>
       {/* Fixed Header */}
-      <MilestoneHeader
-        totalPoints={totalPoints}
-        milestones={milestones}
-        currentMilestone={currentMilestone}
-        progressPercentage={progressPercentage}
-      />
+      <MilestoneHeader totalPoints={totalPoints} milestones={milestones} currentMilestone={currentMilestone} progressPercentage={progressPercentage} />
 
       {/* Modal */}
-      <MilestoneModal
-        visible={visible}
-        hideModal={hideModal}
-        selectedMilestone={selectedMilestone}
-        totalPoints={totalPoints}
-        progressPercentage={progressPercentage}
-        handleClaim={handleClaim}
-      />
+      <MilestoneModal visible={visible} hideModal={hideModal} selectedMilestone={selectedMilestone} totalPoints={totalPoints} progressPercentage={progressPercentage} handleClaim={handleClaim} />
 
       {/* Scrollable Content with PanResponder */}
-      <MilestonePath
-        refreshing={refreshing}
-        onRefresh={onRefresh}
-        scrollRef={scrollRef}
-        panResponder={panResponder}
-        svgWidth={svgWidth}
-        totalSvgHeight={totalSvgHeight}
-        completedPath={completedPath}
-        remainingPath={remainingPath}
-        points={points}
-        iconPaths={iconPaths}
-      />
+      <MilestonePath refreshing={refreshing } onRefresh={onRefresh } scrollRef={scrollRef } panResponder={panResponder } svgWidth={svgWidth } totalSvgHeight={totalSvgHeight } completedPath={completedPath } remainingPath={remainingPath } points={points } iconPaths={iconPaths } />
     </View>
   );
 };
@@ -234,6 +277,7 @@ const styles = StyleSheet.create({
     flex: 1,
     position: "relative",
   },
+ 
 });
 
 export default MilestoneComponent;

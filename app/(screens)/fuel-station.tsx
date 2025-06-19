@@ -36,6 +36,9 @@ const FuelStationDetails: React.FC<FuelStationDetailsProps> = ({
       Linking.openURL(`tel:${phoneNumber}`);
     }
   };
+  const distance = data.calculatedDistance || data.distance || "-- KM";
+  const duration = data.calculatedDuration || data.duration || "-- min";
+  const userLocation = data.userLocation;
 
   const QuickActionButton = ({
     icon,
@@ -164,15 +167,24 @@ const FuelStationDetails: React.FC<FuelStationDetailsProps> = ({
         <View style={styles.infoSection}>
           <Text style={styles.sectionTitle}>Station Information</Text>
 
-          {/* <InfoCard
-            icon="location"
-            title="Address"
-            value={data.address}
-            iconColor="#EF4444"
-            actionIcon="chevron-forward"
-            onPress={()=> Linking.openURL(`${data.address}`)}
-          /> */}
+          
 
+          <InfoCard
+            icon="location"
+            title={t("Distance")}
+            value={distance}
+            iconColor="#10B981"
+            actionIcon="location"
+            onPress={() => handlePhoneCall(data.address)}
+          />
+          <InfoCard
+            icon="time"
+            title="Duration"
+            value={duration}
+            iconColor="#EF4444"
+            actionIcon="hourglass"
+            onPress={()=> Linking.openURL(`${data.address}`)}
+          />
           <InfoCard
             icon="call"
             title={t("Phone Number")}
@@ -186,7 +198,7 @@ const FuelStationDetails: React.FC<FuelStationDetailsProps> = ({
             icon="phone-portrait"
             title={t("Mobile Number")}
             value={data.mobile_no}
-            iconColor="#10B981"
+            iconColor="#3B82F5"
             actionIcon="call"
             onPress={() => handlePhoneCall(data.mobile_no)}
           />

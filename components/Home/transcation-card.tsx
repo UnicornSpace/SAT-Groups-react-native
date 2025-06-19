@@ -11,18 +11,16 @@ import { width, height, size, fontSize } from "react-native-responsive-sizes";
 
 interface TransactionCardProps {
   companyName: string;
-  location: string;
   date: string;
   points: string;
   transactionType: string;
 }
 
 const TransactionCard = ({
-  companyName = "Nox Solution",
-  location = "Perundurai",
-  date = "9th march",
-  points = "+50",
-  transactionType = "Received",
+  companyName ,
+  date ,
+  points ,
+  transactionType ,
 }: TransactionCardProps) => {
   const { t } = useTranslation();
 
@@ -33,7 +31,8 @@ const TransactionCard = ({
   const pointsColor = isPositive
     ? theme.colors.brand.green
     : theme.colors.brand.red || "#FF4D4F";
-
+const location = companyName.split("-")[1];
+const Name = companyName.split("-")[0];
   return (
     <View style={styles.card}>
       <View style={styles.cardLeft}>
@@ -43,8 +42,9 @@ const TransactionCard = ({
         />
 
         <View style={styles.detailsContainer}>
+          {/* <Text style={styles.heading}>{t(Name).trim()}</Text> */}
           <Text style={styles.heading}>{t(companyName).trim()}</Text>
-          <Text style={styles.place}>{t(location)}</Text>
+          {/* <Text style={styles.place}>{t(location)}</Text> */}
 
           <View style={styles.dateContainer}>
             <Text style={styles.date}>{t(date)}</Text>
@@ -70,8 +70,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    // paddingVertical: size(8),
-    paddingHorizontal: size(10),
+    paddingHorizontal: size(8),
+    width: width(90),
   },
   cardLeft: {
     flexDirection: "row",
@@ -97,7 +97,7 @@ const styles = StyleSheet.create({
     fontSize: fontSize(8),
     marginTop: hp("-0.5%"),
     color: theme.colors.text.secondary,
-    fontFamily: theme.fontFamily.regular,
+    fontFamily: theme.fontFamily.medium,
   },
   dateContainer: {
     borderRadius: 5,

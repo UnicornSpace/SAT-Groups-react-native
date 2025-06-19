@@ -10,6 +10,7 @@ import { useBranchData } from "@/hooks/use-branch-data";
 import NearBranchList from "./near-branch-list";
 import AllBranches from "./all-branches";
 import { theme } from "@/infrastructure/themes";
+import { size } from "react-native-responsive-sizes";
 const BranchHeader = ({error,branches,loading,refetch,isSeleted}:any) => {
   const { t } = useTranslation();
   
@@ -22,7 +23,7 @@ const BranchHeader = ({error,branches,loading,refetch,isSeleted}:any) => {
           alignItems: "flex-start",
         }}
       >
-        <Title>{t("Our Branches").trim()}</Title>
+        <Title style={{fontFamily:theme.fontFamily.semiBold,fontSize:size(18)}}>{t("Our Branches").trim()}</Title>
         <Text style={styles.description}>{t("Check out nearby branches")}</Text>
       </View>
 

@@ -1,4 +1,12 @@
-import { Image, StyleSheet, Text, View } from "react-native";
+import {
+  Image,
+  Platform,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import React from "react";
 import {
   widthPercentageToDP as wp,
@@ -11,92 +19,34 @@ import RefferalSteps from "@/components/profile/refferal-steps";
 import { t } from "i18next";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
+import { LinearGradient } from "expo-linear-gradient";
+import { size } from "react-native-responsive-sizes";
 
 const ReferalScreen = (props: any) => {
   return (
     <View style={styles.container}>
-      <Ionicons
-        name="arrow-back"
-        size={24}
-        color="white"
-        style={{
-          position: "absolute",
-          top: hp(3),
-          left: wp(5),
-          zIndex: 1,
-        }}
-        onPress={() => router.push("/(tabs)/profile")}
-      />
-      <View
-        style={{ position: "absolute", top: hp(8), left: wp(0), zIndex: 0 }}
+      <StatusBar barStyle="light-content" backgroundColor="#1a365d" />
+
+      {/* Enhanced Header */}
+      <LinearGradient
+        colors={["#1a365d", "#2d5a87", "#4a90c2"]}
+        style={styles.headerGradient}
       >
-        <Svg
-          xmlns="http://www.w3.org/2000/svg"
-          width={wp(100)}
-          height={hp(30)}
-          fill="none"
-          {...props}
-        >
-          <Path
-            stroke="#EBEFF5"
-            strokeOpacity={0.9}
-            strokeWidth={125}
-            d="M-57.338 179.995c93.559-27.108 214.444 25.255 291.558-53.608 77.114-78.862 124.897-59.164 223-48.5"
-          />
-        </Svg>
-      </View>
-      <Image
-        style={{
-          width: wp(30),
-          height: hp(10),
-          position: "absolute",
-          top: hp(14),
-          right: wp(5),
-        }}
-        source={require("../../assets/images/satgroups/referal.png")}
-      />
-      <View style={{ paddingTop: wp(17),paddingLeft:hp(2),display:"flex",justifyContent:"center",gap:hp(2), }}>
-        <Text
-        adjustsFontSizeToFit={true}
-        minimumFontScale={0.7}
-        numberOfLines={2}
-          style={{
-            fontFamily: theme.fontFamily.medium,
-            color: theme.colors.text.primary,
-            // maxWidth: wp(60),
-            fontSize: 17,
-            // lineHeight: 25,
-          }}
-
-        >
-          {t("Refer and earn 100 points")}
-        </Text>
-        <Button
-          style={{
-            width: wp(40),
-          }}
-          // icon="camera"
-          buttonColor="#5A96D0"
-          textColor="#fff"
-          mode="elevated"
-          onPress={() => console.log("Pressed")}
-        >
-          <Text
-            style={{
-              fontFamily: theme.fontFamily.medium,
-              fontSize: theme.fontSize.p2,
-            }}
+        <View style={styles.headerContent}>
+          <TouchableOpacity
+            onPress={() => router.back()}
+            style={styles.backButton}
           >
-            {t("Invite Friends")}
+            <Ionicons name="arrow-back" size={24} color="white" />
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>
+            {t("Refer and earn 100 points")}
           </Text>
-        </Button>
-      </View>
-
-
-
+          {/* <View style={{ width: 40,backgroundColor:"red" }} /> */}
+        </View>
+      </LinearGradient>
       <View style={styles.subContainer}>
-        <RefferalSteps/>
-        
+        <RefferalSteps />
       </View>
     </View>
   );
@@ -107,18 +57,46 @@ export default ReferalScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#36629A",
-
+    // backgroundColor: "#36629A",
   },
   subContainer: {
     width: wp(100),
-    height: hp(70),
+    height: hp(84),
     maxHeight: hp(105),
     backgroundColor: "#fff",
-
-    // padding: 20,
     position: "absolute",
     bottom: 0,
     zIndex: 1,
+  },
+  headerGradient: {
+    paddingTop: Platform.OS === "ios" ? 50 : 30,
+    paddingBottom: 20,
+    elevation: 8,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    // height: hp(100) * 0.25,
+  },
+  headerContent: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 14,
+    // justifyContent: "space-between",
+    paddingHorizontal: 20,
+  },
+  backButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: "rgba(255,255,255,0.2)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  headerTitle: {
+    fontSize: size(18),
+    fontFamily: theme.fontFamily.semiBold,
+    color: "white",
+    textAlign: "center",
   },
 });
