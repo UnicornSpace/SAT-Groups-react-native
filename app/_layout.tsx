@@ -1,5 +1,5 @@
 import { StatusBar, StyleSheet, Text, View } from "react-native";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Stack } from "expo-router";
 import { ThemeProvider } from "styled-components";
 import { theme } from "@/infrastructure/themes";
@@ -19,6 +19,8 @@ import { PaperProvider } from "react-native-paper";
 import { I18nextProvider } from "react-i18next";
 import { AuthProvider } from "@/utils/auth-context";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { registerGlobalErrorSetter } from "@/utils/global-error";
+import ErrorFallback from "@/components/general/ErrorFallback";
 
 const TextComponent = Text as any;
 if (TextComponent.defaultProps == null) {
@@ -57,6 +59,16 @@ const processReferralLink = async (url: string) => {
 };
 
 const _layout = () => {
+  const [hasGlobalError, setHasGlobalError] = useState(false);
+
+  useEffect(() => {
+    registerGlobalErrorSetter(setHasGlobalError);
+  }, []);
+
+  if (hasGlobalError) {
+    return <ErrorFallback onRetry={() => setHasGlobalError(false)} />;
+  }
+
   let [poppinsLoaded] = useFonts({
     Poppins_300Light,
     Poppins_400Regular,
@@ -106,6 +118,7 @@ const _layout = () => {
         </ThemeProvider>
       </I18nextProvider>
     </AuthProvider>
+    
     // </ErrorHandler>
   );
 };
