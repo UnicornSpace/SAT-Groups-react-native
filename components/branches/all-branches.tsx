@@ -12,6 +12,7 @@ import { useDistanceCalculation } from "@/hooks/use-distance-calc";
 import { parseBranchName, sentenceCase } from "@/utils";
 import { calculateBasicDistance } from "./helpers/distance-helper";
 import { LoactionSkeletonLoader } from "../skeleton/location/location-skeleton";
+import LoadingDots from "./dot-animation";
 
 interface AllBranchesProps {
   branches: any[];
@@ -90,7 +91,7 @@ const AllBranches: React.FC<AllBranchesProps> = ({
       );
       // You might want to add basic duration calculation here too
       // For now, setting a placeholder
-      enhancedBranchData.calculatedDuration = "-- min";
+      enhancedBranchData.calculatedDuration = <LoadingDots style={{ fontSize: 20, color: theme.colors.brand.blue }}  />;
     }
 
     onBranchClick(enhancedBranchData);
@@ -129,7 +130,7 @@ const AllBranches: React.FC<AllBranchesProps> = ({
           );
 
           // Use calculated distance or fallback to basic calculation
-          let distance = item.distance || "-- KM";
+          let distance = item.distance || <LoadingDots style={{ fontSize: 20, color: theme.colors.brand.blue }}  />;
           if (
             !item.distance &&
             userLocation.latitude &&

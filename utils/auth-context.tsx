@@ -141,6 +141,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setMyDynamicPoints,
         login,
         logout,
+        
       }}
     >
       {children}

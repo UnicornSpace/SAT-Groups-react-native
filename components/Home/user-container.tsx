@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View } from "react-native";
 import React, { useEffect, useState } from "react";
 import { theme } from "@/infrastructure/themes";
-import { Link } from "expo-router";
+import { Link, useFocusEffect } from "expo-router";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import { width, size, fontSize } from "react-native-responsive-sizes";
 import { useTranslation } from "react-i18next";
@@ -15,9 +15,7 @@ const UserDetailsContainer = () => {
   const { token, driverId } = useAuth();
   const [userInfo, setuserInfo] = useState<{ id?: number; name?: string }>({});
   const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    const driver_id = driverId;
+const driver_id = driverId;
     const userToken = token;
 
     const getUserDetails = async () => {
@@ -39,8 +37,15 @@ const UserDetailsContainer = () => {
       }
     };
 
+  useEffect(() => {
+    
     getUserDetails();
   }, []);
+   useFocusEffect(
+    React.useCallback(() => {
+      getUserDetails(); // Automatically refetch on tab focus
+    }, [])
+  );
   const { t } = useTranslation();
   const greeting = getGreetingMessage();
 

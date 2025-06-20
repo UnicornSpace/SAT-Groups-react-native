@@ -44,7 +44,7 @@ const UserOTPScreen = () => {
 
       if (response.status === 200) {
         router.replace({
-          pathname: "/(screens)/otpConfirmationScreen",
+          pathname: "/(screens)/otp-confirmation-screen",
           params: {
             number: formattedNumber,
             UserExist: response.data.is_new_user,

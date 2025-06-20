@@ -1,67 +1,96 @@
-import { View,StyleSheet } from "react-native";
+import { View, StyleSheet } from "react-native";
 import React, { useEffect, useState } from "react";
 import axiosInstance from "@/utils/axions-instance";
 import { useAuth } from "@/utils/auth-context";
-import { Modal, Portal, Text, Button, PaperProvider } from "react-native-paper";
+import { Modal, Portal, Text, Button } from "react-native-paper";
 import { theme } from "@/infrastructure/themes";
 import { Ionicons } from "@expo/vector-icons";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
+import { useFocusEffect } from "expo-router";
 
 export default function RedeemPoints() {
   const { token, driverId } = useAuth();
   const [visible, setVisible] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [isFirstLoad, setIsFirstLoad] = useState(true);
   const [redeemList, setRedeemList] = useState<RedeemItem[]>([]);
+  const [dataChecked, setDataChecked] = useState(false);
+
   const currentItem =
     redeemList && redeemList.length > 0 ? redeemList[currentIndex] : null;
 
-  useEffect(() => {
-    const fetchRedeemList = async () => {
-      try {
-        const response = await axiosInstance.post(
-          "/user-redeem-list.php",
-          { driver_id: driverId },
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        const redeemData = response.data;
+  const fetchRedeemList = async () => {
+    // Don't fetch if already checked or missing credentials
+    if (dataChecked || !token || !driverId) return;
 
-        // Check if redeemData is empty
-        if (!redeemData || redeemData.length === 0) {
-          console.log("No redeem data available, so not showing modal.");
-          setIsFirstLoad(false);
-          return;
+    try {
+      console.log("Checking for redeem data...");
+      const response = await axiosInstance.post(
+        "/user-redeem-list.php",
+        { driver_id: driverId },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
+      );
 
-        const fixed = `[${redeemData.replace(/}\s*{/g, "},{")}]`;
-        const parsed = JSON.parse(fixed);
-        setRedeemList(parsed);
-        console.log("Redeem Data:", parsed);
+      const redeemData = response.data;
+      console.log("Raw API Response🏅🏅🏅:", redeemData);
 
-        // Show modal automatically on first load if data exists
-        if (isFirstLoad && parsed.length > 0) {
-          setVisible(true);
-          setCurrentIndex(0);
-          setIsFirstLoad(false);
-        }
-      } catch (error) {
-        console.error("Error fetching redeem list:", error);
-        setIsFirstLoad(false);
+      // Check if redeemData is empty or null
+      if (!redeemData || redeemData.length === 0) {
+        console.log("No redeem data available - modal will not show");
+        setDataChecked(true);
+        return;
       }
-    };
 
-    if (token && driverId) {
-      fetchRedeemList();
+      // Parse the data (assuming it needs JSON fixing)
+      let parsed;
+      try {
+        if (typeof redeemData === "string") {
+          const fixed = `[${redeemData.replace(/}\s*{/g, "},{")}]`;
+          parsed = JSON.parse(fixed);
+        } else {
+          parsed = Array.isArray(redeemData) ? redeemData : [redeemData];
+        }
+      } catch (parseError) {
+        console.error("Error parsing redeem data:", parseError);
+        setDataChecked(true);
+        return;
+      }
+
+      console.log("Parsed Redeem Data:", parsed);
+
+      // If we have valid data, set it and show modal immediately
+      if (parsed && parsed.length > 0) {
+        setRedeemList(parsed);
+        setCurrentIndex(0);
+        setVisible(true); // Show modal immediately
+        console.log("Modal should now be visible with", parsed.length, "items");
+      }
+
+      setDataChecked(true);
+    } catch (error) {
+      console.error("Error fetching redeem list:", error);
+      setDataChecked(true);
     }
-  }, [driverId, token, isFirstLoad]);
-
+  };
+   useFocusEffect(
+    React.useCallback(() => {
+      fetchRedeemList(); // Automatically refetch on tab focus
+    }, [])
+  );
+  useEffect(() => {
+    fetchRedeemList();
+  }, [token, driverId, dataChecked]);
+  // useFocusEffect(
+  //   React.useCallback(() => {
+  //     fetchRedeemList(); // Automatically refetch on tab focus
+  //   }, [])
+  // );
   const hideModal = () => setVisible(false);
 
   const showNextModal = () => {
@@ -135,16 +164,18 @@ export default function RedeemPoints() {
       console.error("Error declining redemption:", error);
     }
   };
+
+  // Always render the Portal, but only show modal when visible is true
   return (
-    <View>
-      {currentItem && (
-        <Portal>
-          <Modal
-            visible={visible}
-            onDismiss={hideModal}
-            dismissable={false} // Prevent dismissing by tapping outside
-            contentContainerStyle={styles.modalContainer}
-          >
+    <Portal>
+      <Modal
+        visible={visible}
+        onDismiss={hideModal}
+        dismissable={false} // Prevent dismissing by tapping outside
+        contentContainerStyle={styles.modalContainer}
+      >
+        {currentItem && (
+          <>
             {/* Progress indicator */}
             <View style={styles.progressContainer}>
               <Text style={styles.progressText}>
@@ -185,15 +216,14 @@ export default function RedeemPoints() {
                 Accept
               </Button>
             </View>
-          </Modal>
-        </Portal>
-      )}
-    </View>
+          </>
+        )}
+      </Modal>
+    </Portal>
   );
 }
 
 const styles = StyleSheet.create({
-
   modalContainer: {
     backgroundColor: "white",
     padding: 20,
@@ -234,11 +264,6 @@ const styles = StyleSheet.create({
     color: theme.colors.brand.blue,
     marginTop: 5,
   },
-  detailsContainer: {
-    alignItems: "center",
-    width: "100%",
-    marginTop: 15,
-  },
   buttonContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -253,14 +278,5 @@ const styles = StyleSheet.create({
   },
   acceptButton: {
     backgroundColor: "#4CAF50",
-  },
-  detailText: {
-    fontSize: 14,
-    marginBottom: 8,
-    lineHeight: 20,
-  },
-  labelText: {
-    fontWeight: "bold",
-    color: "#333",
   },
 });

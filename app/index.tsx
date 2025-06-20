@@ -15,7 +15,7 @@ export default function Index() {
   }
 
   if (!token) {
-    return <Redirect href="/(screens)/LanguageSeletionScreen" />;
+    return <Redirect href="/(screens)/language-selection-screen" />;
   }
 
   return <Redirect href="/(tabs)" />;

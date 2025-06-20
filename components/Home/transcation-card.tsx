@@ -31,8 +31,8 @@ const TransactionCard = ({
   const pointsColor = isPositive
     ? theme.colors.brand.green
     : theme.colors.brand.red || "#FF4D4F";
-const location = companyName.split("-")[1];
-const Name = companyName.split("-")[0];
+// const location = companyName.split("-")[1];
+// const Name = companyName.split("-")[0];
   return (
     <View style={styles.card}>
       <View style={styles.cardLeft}>

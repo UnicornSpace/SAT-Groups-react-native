@@ -1,4 +1,4 @@
-import { ImageBackground, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { ImageBackground, RefreshControl, ScrollView, StyleSheet, Text,  View } from 'react-native'
 import React from 'react'
 import { theme } from '@/infrastructure/themes';
 import {
@@ -7,9 +7,23 @@ import {
 } from "react-native-responsive-screen";
 import Svg, { Circle, G, Path,Text as SvgText } from 'react-native-svg';
 
-const MilestonePath = ({refreshing,onRefresh,scrollRef,panResponder,svgWidth,totalSvgHeight,completedPath,remainingPath,points,iconPaths}:any) => {
+const MilestonePath = ({
+  refreshing,
+  onRefresh,
+  scrollRef,
+  panResponder,
+  svgWidth,
+  totalSvgHeight,
+  completedPath,
+  remainingPath,
+  points,
+  iconPaths,
+  onScroll,
+  scrollEventThrottle
+}: any) => {
   return (
     <ScrollView
+    
       refreshControl={
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
       }
@@ -17,11 +31,12 @@ const MilestonePath = ({refreshing,onRefresh,scrollRef,panResponder,svgWidth,tot
       contentContainerStyle={styles.scrollContainer}
       showsVerticalScrollIndicator={true}
       style={styles.scrollView}
-      // Remove panHandlers from ScrollView to prevent conflicts
+      onScroll={onScroll}
+      scrollEventThrottle={scrollEventThrottle}
     >
       <View
         style={styles.svgContainer}
-        {...panResponder.panHandlers} // Apply panHandlers to the SVG container instead
+        {...panResponder.panHandlers}
       >
         <ImageBackground
           // @ts-ignore
@@ -150,25 +165,19 @@ export default MilestonePath;
 const styles = StyleSheet.create({
   scrollView: {
     flex: 1,
-
   },
   scrollContainer: {
     flexGrow: 1,
-    paddingTop: hp(3),
-    
+    paddingTop: hp(18),
   },
   svgContainer: {
     flex: 1,
-    minHeight: hp(100), // Ensure minimum height for proper touch handling
     alignItems: "center",
     justifyContent: "center",
-    
   },
   backgroundImage: {
     flex: 1,
     justifyContent: "flex-end",
     minHeight: hp(100),
-
   },
-  
 });

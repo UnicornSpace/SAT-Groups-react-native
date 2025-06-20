@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View } from "react-native";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -8,8 +8,53 @@ import { width, height, size, fontSize } from "react-native-responsive-sizes";
 import { theme } from "@/infrastructure/themes";
 import { useAuth } from "@/utils/auth-context";
 import { t } from "i18next";
+import axiosInstance from "@/utils/axions-instance";
+import { useFocusEffect } from "expo-router";
 const UserBentogrids = () => {
-   const { myDynamicPoints } = useAuth();
+  const { driverId, token } = useAuth();
+  const [points, setpoints] = useState("");
+  const [referral_points, setreferral_points] = useState("");
+  const driver_id = driverId;
+  const usertoken = token;
+
+  const getPoints = async () => {
+    try {
+      const response = await axiosInstance.post(
+        "/driver-points.php",
+        { driver_id, take: 20, skip: 0 },
+        {
+          headers: {
+            Authorization: `Bearer ${usertoken}`,
+          },
+        }
+      );
+
+      const referalResponse = await axiosInstance.post(
+        "/user-details.php",
+        { driver_id },
+        {
+          headers: {
+            Authorization: `Bearer ${usertoken}`,
+          },
+        }
+      );
+      const userPoints = response.data;
+      setpoints(userPoints.total_points);
+      setreferral_points(referalResponse.data.driver.referral_code);
+      return userPoints.total_points;
+    } catch (error) {
+      console.error("Error fetching user details:", error);
+    }
+  };
+  useEffect(() => {
+    getPoints();
+  }, []);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      getPoints(); // Automatically refetch on tab focus
+    }, [])
+  );
   return (
     <View
       style={{
@@ -28,7 +73,7 @@ const UserBentogrids = () => {
             color: theme.colors.brand.blue,
           }}
         >
-         {myDynamicPoints}
+          {Number(points).toFixed(2)}
         </Text>
         <Text
           style={{
@@ -44,13 +89,13 @@ const UserBentogrids = () => {
       <View style={styles.box2}>
         <Text
           style={{
-            fontSize: hp(3.2),
+            fontSize: hp(3),
             fontFamily: theme.fontFamily.semiBold,
             textAlign: "center",
             color: theme.colors.brand.blue,
           }}
         >
-          0
+          {referral_points}
         </Text>
         <Text
           style={{
@@ -60,7 +105,7 @@ const UserBentogrids = () => {
             color: "#8E8F8F",
           }}
         >
-          {t("Referal")}
+          {t("Referal Code")}
         </Text>
       </View>
     </View>

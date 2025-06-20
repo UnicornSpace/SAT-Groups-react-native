@@ -16,6 +16,7 @@ import { useAuth } from "@/utils/auth-context";
 import { t } from "i18next";
 import { SkeletonLoader } from "../skeleton/home/home-skeleton";
 import Title from "../general/title";
+import { useFocusEffect } from "expo-router";
 
 // Define the transaction type
 interface Transaction {
@@ -31,9 +32,7 @@ export default function RecentTransactionTabs() {
   const [loading, setLoading] = useState(true);
   const [totalPoints, setTotalPoints] = useState(0);
   const { token, driverId } = useAuth();
-
-  useEffect(() => {
-    const fetchTransactions = async () => {
+const fetchTransactions = async () => {
       try {
         setLoading(true);
 
@@ -44,7 +43,7 @@ export default function RecentTransactionTabs() {
           "/driver-points.php",
           {
             driver_id,
-            take: 10,
+            take: 20,
             skip: 0,
           },
           {
@@ -69,8 +68,17 @@ export default function RecentTransactionTabs() {
       }
     };
 
+  useEffect(() => {
+    
     fetchTransactions();
   }, []);
+
+   useFocusEffect(
+    React.useCallback(() => {
+      fetchTransactions(); // Automatically refetch on tab focus
+    }, [])
+  );
+
 
   // Filter transactions based on active tab
   const getFilteredTransactions = () => {
@@ -112,7 +120,7 @@ export default function RecentTransactionTabs() {
 
     return (
       <TransactionCard
-        companyName={item.branch} 
+        companyName={item.branch} //
         date={formatDate(item.referred_date)}
         points={pointsDisplay}
         transactionType={item.type}
@@ -196,7 +204,7 @@ export default function RecentTransactionTabs() {
 
         <FlatList
           keyboardShouldPersistTaps="handled"
-          data={loading ? [] : [...filteredTransactions].reverse()}
+          data={loading ? [] : [...filteredTransactions]}
           renderItem={EachTransactionCard}
           keyExtractor={(item, index) => `transaction-${index}`}
           contentContainerStyle={styles.listContainer}

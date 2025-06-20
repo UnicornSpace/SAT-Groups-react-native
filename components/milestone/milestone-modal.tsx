@@ -1,4 +1,4 @@
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { StyleSheet, Text, TouchableOpacity, View, ActivityIndicator } from 'react-native'
 import React from 'react'
 import { Modal, Portal } from 'react-native-paper';
 import { theme } from '@/infrastructure/themes';
@@ -8,7 +8,7 @@ import {
 } from "react-native-responsive-screen";
 
 
-const MilestoneModal = ({visible,hideModal,selectedMilestone,totalPoints,progressPercentage,handleClaim}:any) => {
+const MilestoneModal = ({visible,hideModal,selectedMilestone,totalPoints,progressPercentage,handleClaim,claiming}:any) => {
   return (
      <Portal>
         <Modal
@@ -93,39 +93,55 @@ const MilestoneModal = ({visible,hideModal,selectedMilestone,totalPoints,progres
                       selectedMilestone.status === "unclaimed"
                         ? "#4CAF50"
                         : "#ccc",
+                    opacity: claiming ? 0.7 : 1, // Reduce opacity when claiming
                   },
                 ]}
                 disabled={
                   !selectedMilestone.isAchieved ||
-                  selectedMilestone.status === "claimed"
+                  selectedMilestone.status === "claimed" ||
+                  claiming // Disable button when claiming
                 }
                 onPress={() => {
                   if (
                     selectedMilestone.isAchieved &&
-                    selectedMilestone.status === "unclaimed"
+                    selectedMilestone.status === "unclaimed" &&
+                    !claiming
                   ) {
                     handleClaim(selectedMilestone);
                   }
                 }}
               >
-                <Text
-                  style={[
-                    styles.actionButtonText,
-                    {
-                      color:
-                        selectedMilestone.isAchieved &&
-                        selectedMilestone.status === "unclaimed"
-                          ? "white"
-                          : "#666",
-                    },
-                  ]}
-                >
-                  {selectedMilestone.status === "claimed"
-                    ? "Already Claimed"
-                    : selectedMilestone.isAchieved
-                    ? "Claim Reward"
-                    : "Not Available"}
-                </Text>
+                {claiming ? (
+                  <View style={styles.loadingContainer}>
+                    <ActivityIndicator 
+                      size="small" 
+                      color="white" 
+                      style={styles.loadingSpinner}
+                    />
+                    <Text style={styles.loadingText}>
+                      Claiming...
+                    </Text>
+                  </View>
+                ) : (
+                  <Text
+                    style={[
+                      styles.actionButtonText,
+                      {
+                        color:
+                          selectedMilestone.isAchieved &&
+                          selectedMilestone.status === "unclaimed"
+                            ? "white"
+                            : "#666",
+                      },
+                    ]}
+                  >
+                    {selectedMilestone.status === "claimed"
+                      ? "Already Claimed"
+                      : selectedMilestone.isAchieved
+                      ? "Claim Reward"
+                      : "Not Available"}
+                  </Text>
+                )}
               </TouchableOpacity>
             </View>
           )}
@@ -277,9 +293,25 @@ const styles = StyleSheet.create({
     padding: wp(4),
     borderRadius: wp(2),
     alignItems: "center",
+    justifyContent: "center",
+    minHeight: wp(12), // Ensure consistent height
   },
   actionButtonText: {
     fontSize: wp(4),
+    fontFamily: theme.fontFamily.bold,
+  },
+  // Loading styles
+  loadingContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  loadingSpinner: {
+    marginRight: wp(2),
+  },
+  loadingText: {
+    fontSize: wp(4),
+    color: "white",
     fontFamily: theme.fontFamily.bold,
   },
   fixedProgressContainer: {

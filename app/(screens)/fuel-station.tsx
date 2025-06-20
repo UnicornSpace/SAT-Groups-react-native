@@ -13,6 +13,7 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { theme } from "@/infrastructure/themes";
 import { t } from "i18next";
+import LoadingDots from "@/components/branches/dot-animation";
 
 const { width } = Dimensions.get("window");
 
@@ -36,8 +37,8 @@ const FuelStationDetails: React.FC<FuelStationDetailsProps> = ({
       Linking.openURL(`tel:${phoneNumber}`);
     }
   };
-  const distance = data.calculatedDistance || data.distance || "-- KM";
-  const duration = data.calculatedDuration || data.duration || "-- min";
+  const distance = data.calculatedDistance || data.distance || <LoadingDots style={{ fontSize: 13, color: theme.colors.brand.blue }}  />;
+  const duration = data.calculatedDuration || data.duration || <LoadingDots style={{ fontSize: 13, color: theme.colors.brand.blue }}  />;
   const userLocation = data.userLocation;
 
   const QuickActionButton = ({

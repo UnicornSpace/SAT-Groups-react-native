@@ -1,16 +1,18 @@
 import MilestoneComponent from "@/components/milestone/milestone-component";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useAuth } from "@/utils/auth-context";
 import { getMilestoneData } from "@/api/milestone/milestone-data";
+import { ActivityIndicator } from "react-native-paper";
+import { View } from "react-native";
+import { useFocusEffect } from "expo-router";
 
 const milestone = () => {
   const { token, driverId } = useAuth();
   const [error, setError] = useState<string | null>(null);
-  const [data, setData] = useState<Milestone[]>([]);
+  const [data, setData] = useState([]);
   const [totalPoints, setTotalPoints] = useState(0);
-
-  useEffect(() => {
-    const fetchMilestones = async () => {
+  const [isloading, setisloading] = useState(true);
+ const fetchMilestones = async () => {
       try {
         const response = await getMilestoneData(driverId, token);
 
@@ -23,8 +25,9 @@ const milestone = () => {
           return;
         }
         const fetchedMilestones = response.data.mileStones;
-        const fetchedTotalPoints = response.data.totalPoints;
-
+        const fetchedTotalPoints = response.data.totalLitres;
+        console.log("Fetched milestones🏅:", response.data);
+        console.log("Points❌:", fetchedTotalPoints);
         // Validate that milestones is an array and has valid data
         if (Array.isArray(fetchedMilestones) && fetchedMilestones.length > 0) {
           // Validate each milestone has required properties
@@ -35,7 +38,7 @@ const milestone = () => {
               milestone.requiredPoints !== undefined &&
               milestone.requiredPoints !== null
           );
-
+          setisloading(false);
           if (validMilestones.length > 0) {
             setData(validMilestones);
           } else {
@@ -59,6 +62,9 @@ const milestone = () => {
         setTotalPoints(0);
       }
     };
+  useEffect(() => {
+
+   
 
     if (driverId && token) {
       // Only fetch if we have required data
@@ -66,7 +72,19 @@ const milestone = () => {
     }
   }, [driverId, token]);
 
-  return <MilestoneComponent milestones={data} totalPoints={totalPoints} />;
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchMilestones(); // Automatically refetch on tab focus
+    }, [])
+  );
+  return (
+    isloading ?
+    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+      <ActivityIndicator animating={true} color="#000" />
+    </View>
+    :
+    <MilestoneComponent milestones={data} totalPoints={totalPoints} />
+  );
 };
 
 export default milestone;

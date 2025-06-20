@@ -11,7 +11,7 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { useFonts } from "expo-font";
 import { theme } from "@/infrastructure/themes";
-import { router } from "expo-router";
+import { router, useFocusEffect } from "expo-router";
 import { useAuth } from "@/utils/auth-context";
 import axiosInstance from "@/utils/axions-instance";
 import { t } from "i18next";
@@ -20,31 +20,35 @@ const RedeemPointsScreen: React.FC = () => {
   const { token, driverId } = useAuth();
   const [Points, setPoints] = useState("");
   useEffect(() => {
-    const driver_id = driverId;
-    const usertoken = token;
-
-    const getPoints = async () => {
-      try {
-        const response = await axiosInstance.post(
-          "/driver-points.php",
-          { driver_id, take: 10, skip: 0 },
-          {
-            headers: {
-              Authorization: `Bearer ${usertoken}`,
-            },
-          }
-        );
-        const userPoints = response.data;
-        setPoints(userPoints.total_points);
-
-        return userPoints.total_points;
-      } catch (error) {
-        console.error("Error fetching user details:", error);
-      }
-    };
-
     getPoints();
   }, []);
+
+  const getPoints = async () => {
+    const driver_id = driverId;
+    const usertoken = token;
+    try {
+      const response = await axiosInstance.post(
+        "/driver-points.php",
+        { driver_id, take: 20, skip: 0 },
+        {
+          headers: {
+            Authorization: `Bearer ${usertoken}`,
+          },
+        }
+      );
+      const userPoints = response.data;
+      setPoints(userPoints.total_points);
+
+      return userPoints.total_points;
+    } catch (error) {
+      console.error("Error fetching user details:", error);
+    }
+  };
+  useFocusEffect(
+    React.useCallback(() => {
+      getPoints(); // Automatically refetch on tab focus
+    }, [])
+  );
 
   return (
     <SafeAreaView style={styles.container}>
@@ -82,18 +86,22 @@ const RedeemPointsScreen: React.FC = () => {
         {/* Content */}
         <Text style={styles.title}>{t("Redeem Points")}</Text>
         <Text style={styles.description}>
-          {
-            t(`You have ${Math.ceil(Number(Points) || 0)} points available to redeem.`)
-          }
+          {t(
+            `You have ${Math.ceil(
+              Number(Points) || 0
+            )} points available to redeem.`
+          )}
         </Text>
 
         {/* Button */}
         <View style={styles.buttonContainer}>
           <TouchableOpacity
-            onPress={() => router.push("/(tabs)/location")}
+            onPress={() => router.push("/(tabs)/branches")}
             style={styles.redeemButton}
           >
-            <Text style={styles.buttonText}>{t("Check the nearest Branch")}</Text>
+            <Text style={styles.buttonText}>
+              {t("Check the nearest Branch")}
+            </Text>
             <Ionicons name="chevron-forward" size={20} color="white" />
           </TouchableOpacity>
         </View>

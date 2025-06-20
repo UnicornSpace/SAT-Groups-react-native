@@ -1,8 +1,9 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import React, { useState, useEffect } from "react"
 import axiosInstance from "@/utils/axions-instance"
 import { useAuth } from "@/utils/auth-context"
+import { useFocusEffect } from "expo-router"
 
 export const useBranchData = () => {
   const [branches, setBranches] = useState([])
@@ -27,6 +28,7 @@ export const useBranchData = () => {
         headers: {
           Authorization: `Bearer ${token}`,
         },
+        
       })
 
       console.log("API Response:👍", response.data)
@@ -81,6 +83,12 @@ setLoading(false)
     setError(null)
     fetchBranches()
   }
+
+   useFocusEffect(
+    React.useCallback(() => {
+      fetchBranches(); // Automatically refetch on tab focus
+    }, [])
+  );
 
   return { branches, loading, error, refetch }
 }

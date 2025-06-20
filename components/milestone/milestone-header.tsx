@@ -37,7 +37,7 @@ const MilestoneHeader = ({totalPoints,milestones,currentMilestone,progressPercen
 export default MilestoneHeader;
 
 const styles = StyleSheet.create({
-
+ 
   scrollView: {
     flex: 1,
   },

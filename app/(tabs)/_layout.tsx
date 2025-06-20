@@ -10,6 +10,7 @@ import { useAuth } from "@/utils/auth-context";
 import ProtectedRoute from "@/components/general/proteted-route";
 import { useInternetStatus } from "@/infrastructure/themes/hooks/internet-hook";
 import NoInternetScreen from "@/components/network/no-intenet";
+import SearchInput from "@/components/branches/search-bar";
 
 const TextComponent = Text as any;
 if (TextComponent.defaultProps == null) {
@@ -87,6 +88,14 @@ const TabLayout = () => {
             tabBarIcon: ({ color }) => (
               <FontAwesome size={24} name="map-marker" color={color} />
             ),
+            header:()=>{
+              return (
+                <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between"}}>
+                  <LogoTitle />
+                  <SearchInput />
+                </View>
+              );
+            }
           }}
         />
         <Tabs.Screen
