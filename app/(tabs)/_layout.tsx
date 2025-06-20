@@ -33,7 +33,7 @@ function LogoTitle() {
     >
       <Image
         style={{ width: 80, height: 50 }}
-        source={require("../../assets/images/satgroups/logo.png")}
+        source={require("../../assets/images/satgroups/splash-screen.png")}
         resizeMode="contain"
       />
       {/* <LanguageSelection/> */}
@@ -69,7 +69,6 @@ const TabLayout = () => {
           sceneStyle: { backgroundColor: "#F8F9FA" },
           tabBarActiveTintColor: theme.colors.brand.blue,
           tabBarStyle: { paddingTop: 5, height: 60, paddingHorizontal: 16 },
-          header: () => <LogoTitle />,
         }}
       >
         <Tabs.Screen
@@ -79,6 +78,14 @@ const TabLayout = () => {
             tabBarIcon: ({ color }) => (
               <FontAwesome size={24} name="home" color={color} />
             ),
+            header:()=>{
+              return (
+                <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between"}}>
+                  <LogoTitle />
+                  {/* <SearchInput /> */}
+                </View>
+              );
+            }
           }}
         />
         <Tabs.Screen
@@ -105,6 +112,14 @@ const TabLayout = () => {
             tabBarIcon: ({ color }) => (
               <FontAwesome size={24} name="gift" color={color} />
             ),
+            header:()=>{
+              return (
+                <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between"}}>
+                  <LogoTitle />
+                  {/* <SearchInput /> */}
+                </View>
+              );
+            }
           }}
         />
         <Tabs.Screen
