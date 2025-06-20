@@ -17,7 +17,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
-      router.replace("/(screens)/LanguageSeletionScreen");
+      router.replace("/(screens)/language-selection-screen");
     }
   }, [isAuthenticated, isLoading, router]);
 

@@ -158,7 +158,7 @@ const OtpConfirmationScreen = () => {
         if (isNewUser) {
           // console.log("Routing to userDetails page for new user");
           router.replace({
-            pathname: "/(screens)/userDetails",
+            pathname: "/(screens)/user-details",
             params: {
               response: token,
               isNewUser: "true",
