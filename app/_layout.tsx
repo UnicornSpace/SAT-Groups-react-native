@@ -60,15 +60,6 @@ const processReferralLink = async (url: string) => {
 
 const _layout = () => {
   const [hasGlobalError, setHasGlobalError] = useState(false);
-
-  useEffect(() => {
-    registerGlobalErrorSetter(setHasGlobalError);
-  }, []);
-
-  if (hasGlobalError) {
-    return <ErrorFallback onRetry={() => setHasGlobalError(false)} />;
-  }
-
   let [poppinsLoaded] = useFonts({
     Poppins_300Light,
     Poppins_400Regular,
@@ -78,6 +69,9 @@ const _layout = () => {
     Poppins_800ExtraBold,
     Poppins_900Black,
   });
+  useEffect(() => {
+    registerGlobalErrorSetter(setHasGlobalError);
+  }, []);
 
   // Move useEffect BEFORE the conditional return
   useEffect(() => {
@@ -96,6 +90,10 @@ const _layout = () => {
     handleReferralLinks();
   }, []);
 
+  if (hasGlobalError) {
+    return <ErrorFallback onRetry={() => setHasGlobalError(false)} />;
+  }
+
   // Now the conditional return comes after all hooks
   if (!poppinsLoaded) {
     return null;
@@ -108,7 +106,7 @@ const _layout = () => {
           <PaperProvider>
             <Stack screenOptions={{ headerShown: false }}>
               <Stack.Screen
-                name="(screens)/LanguageSeletionScreen"
+                name="(screens)/language-selection-screen.tsx"
                 options={{ title: "Language" }}
               />
               <Stack.Screen name="(tabs)" options={{ title: "tabs" }} />
@@ -118,7 +116,7 @@ const _layout = () => {
         </ThemeProvider>
       </I18nextProvider>
     </AuthProvider>
-    
+
     // </ErrorHandler>
   );
 };

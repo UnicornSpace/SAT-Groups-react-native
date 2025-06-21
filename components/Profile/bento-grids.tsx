@@ -105,7 +105,7 @@ const UserBentogrids = () => {
             color: "#8E8F8F",
           }}
         >
-          {t("Referal Code")}
+          {t("Referral Code")}
         </Text>
       </View>
     </View>

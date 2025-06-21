@@ -41,7 +41,7 @@
   "Enter your Full Name": "మీ పూర్తి పేరును నమోదు చేయండి",
   "Enter your Age": "మీ వయస్సును నమోదు చేయండి",
   "Referral code (optional)": "రిఫరల్ కోడ్ (ఐచ్చికం)",
-  
+
   "Good Morning": "శుభోదయం",
   "Good Afternoon": "శుభ మద్యాహ్నం",
   "Good Evening": "శుభ సాయంత్రం",
@@ -86,9 +86,7 @@
   "Share Link": "లింక్‌ను షేర్ చేయండి",
   "Refer and earn 100 points": "రిఫర్ చేసి 100 పాయింట్లు సంపాదించండి",
   "Updating...": "నవీకరిస్తోంది...",
-  "Station Information":"స్టేషన్ సమాచారం",
-  "Referral Code": "రెఫరల్ కోడ్"
-
-
-
+  "Station Information": "స్టేషన్ సమాచారం",
+  "Referral Code": "రెఫరల్ కోడ్",
+  "Total Liters": "మొత్తం లీటర్లు"
 }

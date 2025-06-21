@@ -7,6 +7,7 @@ import BannerContainer from "@/components/home/banner-container";
 import UserDetailsContainer from "@/components/home/user-container";
 import RecentTransactionTabs from "@/components/home/recent-transaction-tabs";
 import RedeemPointsModel from "@/components/home/redeem-points";
+import { Text } from "react-native-paper";
 
 const Home = () => {
 

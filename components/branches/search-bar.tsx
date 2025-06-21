@@ -11,7 +11,7 @@ const SearchInput = () => {
   return (
     <TouchableOpacity
       onPress={() => router.push("/(screens)/search-screen")}
-      style={styles.editbtn}
+      style={styles.searchbtn}
     >
       <FontAwesome5 name="search" size={16} color={theme.colors.brand.blue} />
     </TouchableOpacity>
@@ -19,7 +19,7 @@ const SearchInput = () => {
 };
 
 const styles = StyleSheet.create({
-  editbtn: {
+  searchbtn: {
     backgroundColor: "#F2F3F5",
     borderRadius: 100,
     width: wp(12),
@@ -28,6 +28,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
     display: "flex",
     margin: wp(3.5),
+    elevation:4,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+
   },
 });
 export default SearchInput;

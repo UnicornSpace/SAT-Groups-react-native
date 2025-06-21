@@ -41,6 +41,7 @@ const LanguageSetting = () => {
             width: wp(85),
             alignItems: "center",
             marginTop: hp(0.5),
+
           }}
         >
           <View
@@ -50,6 +51,7 @@ const LanguageSetting = () => {
               justifyContent: "center",
               alignItems: "center",
               gap: wp(4),
+              
             }}
           >
             <TouchableOpacity style={styles.userbtn}>
@@ -104,5 +106,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     display: "flex",
+    elevation:0.5
   },
 });

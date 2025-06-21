@@ -45,7 +45,7 @@ const ReferralQR = () => {
   const shareReferralLink = async () => {
     try {
       await Share.share({
-        message: `Join me on this amazing app! Use my referral code: ${driverId}\n\nDownload here: ${referralLink}`,
+        message: `Join me on this amazing app! Use my referral code: ${refferralId}\n\nDownload here: ${referralLink}`,
         url: referralLink,
       });
     } catch (error) {
@@ -54,7 +54,7 @@ const ReferralQR = () => {
   };
   return (
     <View style={styles.container}>
-      {/* <Text style={styles.title}>Share </Text> */}
+      <Text style={styles.title}>Referral Code :<Text style={{color:theme.colors.brand.blue,fontFamily:theme.fontFamily.bold}}> {refferralId} </Text></Text>
 
       <View style={styles.qrContainer}>
         <QRCode
@@ -95,7 +95,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: theme.fontSize.medium,
     // fontWeight: 'bold',
-    marginBottom: 30,
+    marginBottom: 20,
     color: "#333",
     fontFamily: theme.fontFamily.medium,
   },

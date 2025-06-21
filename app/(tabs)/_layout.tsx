@@ -44,7 +44,7 @@ function LogoTitle() {
 const TabLayout = () => {
   const { logout } = useAuth();
   const router = useRouter();
-
+const { isConnected, checkInternet } = useInternetStatus();
   // Prevent back button from navigating to auth screens
   useEffect(() => {
     const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
@@ -55,7 +55,7 @@ const TabLayout = () => {
     return () => backHandler.remove();
   }, []);
   
-   const { isConnected, checkInternet } = useInternetStatus();
+   
 
   // If no internet, show no internet screen
   if (!isConnected) {

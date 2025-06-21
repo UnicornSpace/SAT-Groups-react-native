@@ -13,19 +13,7 @@
     },
     "android": {
       "intentFilters": [
-        {
-          "action": "VIEW",
-          "autoVerify": true,
-          "data": {
-            "scheme": "https",
-            "host": "play.google.com",
-            
-          },
-          "category": [
-            "BROWSABLE",
-            "DEFAULT"
-          ]
-        }
+        
       ],
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/satgroups/app-logo.png",
@@ -33,7 +21,7 @@
       },
       // TODO: change before release
       "package": "com.satgroups.app",
-      "versionCode": 9,
+      "versionCode": 11
     },
     "web": {
       "bundler": "metro",
