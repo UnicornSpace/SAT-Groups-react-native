@@ -6,6 +6,7 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
+import { t } from 'i18next';
 
 
 const MilestoneModal = ({visible,hideModal,selectedMilestone,totalPoints,progressPercentage,handleClaim,claiming}:any) => {
@@ -17,7 +18,7 @@ const MilestoneModal = ({visible,hideModal,selectedMilestone,totalPoints,progres
           contentContainerStyle={styles.modalContent}
         >
           <View style={styles.modalHeader}>
-            <Text style={styles.modalTitle}>Milestone Details</Text>
+            <Text style={styles.modalTitle}>{t("Milestone Details")}</Text>
             <TouchableOpacity onPress={hideModal} style={styles.closeButton}>
               <Text style={styles.closeButtonText}>×</Text>
             </TouchableOpacity>
@@ -27,11 +28,11 @@ const MilestoneModal = ({visible,hideModal,selectedMilestone,totalPoints,progres
             <View style={styles.modalBody}>
               <View style={styles.milestoneInfoCard}>
                 <Text style={styles.milestonePointsText}>
-                  {selectedMilestone.requiredPoints} Points Required
+                  {selectedMilestone.requiredPoints} {t("Points Required")}
                 </Text>
 
                 <View style={styles.rewardSection}>
-                  <Text style={styles.rewardLabel}>Reward:</Text>
+                  <Text style={styles.rewardLabel}>{t("Reward")}:</Text>
                   <Text style={styles.rewardText}>
                     {selectedMilestone.rewardType === "Gift"
                       ? "🎁 Special Gift"
@@ -40,7 +41,7 @@ const MilestoneModal = ({visible,hideModal,selectedMilestone,totalPoints,progres
                 </View>
 
                 <View style={styles.statusSection}>
-                  <Text style={styles.statusLabel}>Status:</Text>
+                  <Text style={styles.statusLabel}>{("Status")}:</Text>
                   <View
                     style={[
                       styles.statusBadge,

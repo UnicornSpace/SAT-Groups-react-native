@@ -85,6 +85,15 @@ const UserOTPScreen = () => {
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       style={{ flex: 1 }}
     >
+      <View>
+        <Ionicons
+          name="arrow-back"
+          size={24}
+          color={theme.colors.ui.black}
+          style={{ marginLeft: hp(2), marginTop: hp(2) }}
+          onPress={() => router.push("/(screens)/language-selection-screen")}
+        />
+      </View>
       <View
         style={{
           flex: 1,

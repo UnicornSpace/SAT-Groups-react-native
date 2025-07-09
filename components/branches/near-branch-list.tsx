@@ -57,7 +57,7 @@ const Branches = ({ data, userLocation }: any) => {
       {branchesToShow.map((item: any, index: number) => {
         return (
           <TouchableOpacity
-            key={item.location_code || item.id || `branch-${index}`}
+            key={item.id || `branch-${index}`}
             onPress={() => {
               if (item.google_map_link) {
                 openDirectGoogleMapsLink(item.google_map_link);
@@ -86,8 +86,21 @@ const Branches = ({ data, userLocation }: any) => {
                   {sentenceCase(item.location_name || item.name || "Branch")}
                 </Text>
 
-                {(item.brand || item.location_code) && (
-                  <View style={styles.dateContainer}>
+                {item.brand && (
+                  <View
+                    style={[
+                      styles.dateContainer,
+                      {
+                        backgroundColor: item.brand
+                          .toLowerCase()
+                          .includes("gulf")
+                          ? "#F97316" // Orange-500
+                          : item.brand.toLowerCase().includes("nox")
+                          ? "#84CC16" // Lime-500
+                          : "#1D4ED8", // Existing Blue (Tailwind Blue-700)
+                      },
+                    ]}
+                  >
                     <Text style={styles.date}>{item.brand}</Text>
                   </View>
                 )}
