@@ -14,15 +14,15 @@ interface TransactionCardProps {
   date: string;
   points: string;
   transactionType: string;
-  logo?: string; 
+  logo?: string;
 }
 
 const TransactionCard = ({
-  companyName ,
-  date ,
-  points ,
-  transactionType ,
-  logo
+  companyName,
+  date,
+  points,
+  transactionType,
+  logo,
 }: TransactionCardProps) => {
   const { t } = useTranslation();
 
@@ -33,20 +33,27 @@ const TransactionCard = ({
   const pointsColor = isPositive
     ? theme.colors.brand.green
     : theme.colors.brand.red || "#FF4D4F";
-// const location = companyName.split("-")[1];
-// const Name = companyName.split("-")[0];
+  // const location = companyName.split("-")[1];
+  // const Name = companyName.split("-")[0];
   return (
     <View style={styles.card}>
       <View style={styles.cardLeft}>
         <Image
-          source={logo ? { uri: logo } : require("@/assets/images/satgroups/fallback.jpg")}
+          source={
+            logo
+              ? { uri: logo }
+              : require("@/assets/images/satgroups/fallback.jpg")
+          }
           resizeMode="contain"
           style={styles.logo}
         />
 
         <View style={styles.detailsContainer}>
           {/* <Text style={styles.heading}>{t(Name).trim()}</Text> */}
-          <Text style={styles.heading}>{t(companyName).trim()}</Text>
+          <Text style={styles.heading} numberOfLines={1} ellipsizeMode="tail">
+            {t(companyName).trim()}
+          </Text>
+
           {/* <Text style={styles.place}>{t(location)}</Text> */}
 
           <View style={styles.dateContainer}>
@@ -85,10 +92,12 @@ const styles = StyleSheet.create({
     gap: size(20),
   },
   logo: {
-   width: wp("13%"),
-    height: hp("3%"),
-    resizeMode: "contain",
-  },
+  width: wp("13%"),
+  height: hp("6%"), 
+  borderRadius: 8,
+  backgroundColor: "#fff", 
+  resizeMode: "contain",
+},
   detailsContainer: {
     flexDirection: "column",
   },

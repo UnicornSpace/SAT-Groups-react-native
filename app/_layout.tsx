@@ -1,4 +1,4 @@
-import { StatusBar, StyleSheet, Text, View } from "react-native";
+import { StatusBar, StyleSheet, Text } from "react-native";
 import React, { useEffect, useState } from "react";
 import { Stack } from "expo-router";
 import { ThemeProvider } from "styled-components";
@@ -26,41 +26,37 @@ const TextComponent = Text as any;
 if (TextComponent.defaultProps == null) {
   TextComponent.defaultProps = {};
 }
-
 TextComponent.defaultProps.allowFontScaling = false;
 
+// ✅ Only handle URL ref query from links (e.g. ?ref=USER123 or ?referrer=ref_USER123)
 const processReferralLink = async (url: string) => {
   try {
-    console.log("Processing URL:", url);
     const { queryParams } = Linking.parse(url);
-
     let referralCode = null;
 
-    // Handle Play Store referrer parameter: referrer=ref_USER123
-    if (queryParams?.referrer) {
-      const referrer = queryParams.referrer as string;
-      if (referrer.startsWith("ref_")) {
-        referralCode = referrer.replace("ref_", "");
+    if (queryParams?.referrer && typeof queryParams.referrer === "string") {
+      if (queryParams.referrer.startsWith("ref_")) {
+        referralCode = queryParams.referrer.replace("ref_", "");
       }
     }
 
-    // Handle direct referral parameter: ref=USER123
-    if (queryParams?.ref) {
-      referralCode = queryParams.ref as string;
+    if (queryParams?.ref && typeof queryParams.ref === "string") {
+      referralCode = queryParams.ref;
     }
 
     if (referralCode) {
       await AsyncStorage.setItem("pendingReferralCode", referralCode);
-      console.log("Referral code saved:", referralCode);
+      console.log("🔗 Saved referral code from deep link:", referralCode);
     }
-  } catch (error) {
-    console.log("Error processing referral link:", error);
+  } catch (err) {
+    console.log("❌ Failed to parse referral from URL:", err);
   }
 };
-  
+
 const _layout = () => {
   const [hasGlobalError, setHasGlobalError] = useState(false);
-  let [poppinsLoaded] = useFonts({
+
+  const [fontsLoaded] = useFonts({
     Poppins_300Light,
     Poppins_400Regular,
     Poppins_500Medium,
@@ -69,46 +65,35 @@ const _layout = () => {
     Poppins_800ExtraBold,
     Poppins_900Black,
   });
+
   useEffect(() => {
     registerGlobalErrorSetter(setHasGlobalError);
   }, []);
 
-  // Move useEffect BEFORE the conditional return
-useEffect(() => {
-  const captureInstallReferrer = async () => {
-    try {
-      const { PlayInstallReferrer } = await import('react-native-play-install-referrer');
-      PlayInstallReferrer.getInstallReferrerInfo(async (info, error) => {
-        if (!error) {
-          const ref = info.installReferrer;
-          if (ref?.startsWith("ref_")) {
-            const code = ref.replace("ref_", "");
-            await AsyncStorage.setItem("pendingReferralCode", code);
-            console.log("✅ Captured referral code from install referrer:", code);
-          }
-        } else {
-          console.log("❌ Failed to get install referrer:", error);
-        }
-      });
-    } catch (e) {
-      console.log("📦 Failed to load install referrer module:", e);
-    }
-  };
+  // ✅ Handle incoming links to capture referral codes
+  useEffect(() => {
+    const checkInitialUrl = async () => {
+      const url = await Linking.getInitialURL();
+      if (url) {
+        await processReferralLink(url);
+      }
+    };
 
-  captureInstallReferrer();
-}, []);
+    const subscription = Linking.addEventListener("url", (event) => {
+      processReferralLink(event.url);
+    });
 
+    checkInitialUrl();
+    return () => subscription.remove();
+  }, []);
 
   if (hasGlobalError) {
     return <ErrorFallback onRetry={() => setHasGlobalError(false)} />;
   }
 
-  // Now the conditional return comes after all hooks
-  if (!poppinsLoaded) {
-    return null;
-  }
+  if (!fontsLoaded) return null;
+
   return (
-    // <ErrorHandler>
     <AuthProvider>
       <I18nextProvider i18n={i18n}>
         <ThemeProvider theme={theme}>
@@ -120,13 +105,11 @@ useEffect(() => {
               />
               <Stack.Screen name="(tabs)" options={{ title: "tabs" }} />
             </Stack>
-            <StatusBar backgroundColor="#000000" barStyle={"light-content"} />
+            <StatusBar backgroundColor="#000000" barStyle="light-content" />
           </PaperProvider>
         </ThemeProvider>
       </I18nextProvider>
     </AuthProvider>
-
-    // </ErrorHandler>
   );
 };
 

@@ -81,17 +81,23 @@ const AllBranches: React.FC<AllBranchesProps> = ({
     };
 
     // If we don't have calculated distance/duration, add basic calculation
-    if (!enhancedBranchData.calculatedDistance && 
-        userLocation.latitude && userLocation.longitude && 
-        item.lat && item.lng) {
+    if (
+      !enhancedBranchData.calculatedDistance &&
+      userLocation.latitude &&
+      userLocation.longitude &&
+      item.lat &&
+      item.lng
+    ) {
       enhancedBranchData.calculatedDistance = calculateBasicDistance(
-        userLocation, 
-        item.lat, 
+        userLocation,
+        item.lat,
         item.lng
       );
       // You might want to add basic duration calculation here too
       // For now, setting a placeholder
-      enhancedBranchData.calculatedDuration = <LoadingDots style={{ fontSize: 20, color: theme.colors.brand.blue }}  />;
+      enhancedBranchData.calculatedDuration = (
+        <LoadingDots style={{ fontSize: 20, color: theme.colors.brand.blue }} />
+      );
     }
 
     onBranchClick(enhancedBranchData);
@@ -130,7 +136,11 @@ const AllBranches: React.FC<AllBranchesProps> = ({
           );
 
           // Use calculated distance or fallback to basic calculation
-          let distance = item.distance || <LoadingDots style={{ fontSize: 20, color: theme.colors.brand.blue }}  />;
+          let distance = item.distance || (
+            <LoadingDots
+              style={{ fontSize: 20, color: theme.colors.brand.blue }}
+            />
+          );
           if (
             !item.distance &&
             userLocation.latitude &&
@@ -140,19 +150,17 @@ const AllBranches: React.FC<AllBranchesProps> = ({
           ) {
             distance = calculateBasicDistance(userLocation, item.lat, item.lng);
           }
-
+          console.log("AllBranches - item:", item);
           return (
             <TouchableOpacity
-              key={item.id || item.location_code || `branch-${index}`}
+              key={item.id || `branch-${index}`}
               style={styles.branchItem}
               onPress={() => handleBranchClick(item, index)}
             >
               <Image
                 style={styles.branchImage}
                 source={{
-                  uri:
-                    item.brand_logo ||
-                    ""
+                  uri: item.brand_logo || "",
                 }}
                 resizeMode="contain"
               />
@@ -160,13 +168,25 @@ const AllBranches: React.FC<AllBranchesProps> = ({
                 <Text style={styles.branchName}>
                   {sentenceCase(branchName)}
                 </Text>
-                {(item.brand || item.location_code) && (
-                  <View style={styles.dateContainer}>
-                    <Text style={styles.date}>
-                      {item.location_code || item.brand}
-                    </Text>
+                {item.brand && (
+                  <View
+                    style={[
+                      styles.dateContainer,
+                      {
+                        backgroundColor: item.brand
+                          .toLowerCase()
+                          .includes("gulf")
+                          ? "#F97316" // Orange-500
+                          : item.brand.toLowerCase().includes("nox")
+                          ? "#84CC16" // Lime-500
+                          : "#1D4ED8", // Existing Blue (Tailwind Blue-700)
+                      },
+                    ]}
+                  >
+                    <Text style={styles.date}>{item.brand}</Text>
                   </View>
                 )}
+
                 <Text style={styles.distanceText}>{distance}</Text>
                 {item.duration && (
                   <Text style={styles.durationText}>{item.duration}</Text>
@@ -190,12 +210,12 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
     justifyContent: "space-between",
     width: "100%",
-    gap: hp(2),
   },
   branchItem: {
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
+    marginBottom: hp(2),
     width: wp("43%"),
     backgroundColor: theme.colors.ui.cardbg,
     borderRadius: 12,
@@ -231,20 +251,22 @@ const styles = StyleSheet.create({
   },
   dateContainer: {
     borderRadius: 5,
-    width: "auto",
+    minHeight: size(18), // or hp('3.5%')
     backgroundColor: theme.colors.brand.blue,
-    paddingVertical: size(2),
+    paddingHorizontal: size(8),
     justifyContent: "center",
     alignItems: "center",
     marginTop: size(4),
-    paddingHorizontal: size(8),
+    paddingVertical: size(2),
   },
+
   date: {
     fontSize: size(8),
     color: theme.colors.text.primary,
     fontFamily: theme.fontFamily.medium,
     textAlign: "center",
   },
+
   distanceText: {
     fontFamily: theme.fontFamily.medium,
     fontSize: size(12),

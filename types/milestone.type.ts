@@ -15,4 +15,6 @@ interface MilestonePathProps {
 }
 
 
+export type { Milestone, MilestonePathProps };
+
 

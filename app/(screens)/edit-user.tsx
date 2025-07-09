@@ -14,7 +14,12 @@ import {
 import { useState, useEffect, useRef } from "react";
 import { theme } from "@/infrastructure/themes";
 import { LinearGradient } from "expo-linear-gradient";
-import { AntDesign, Ionicons, MaterialIcons, Feather } from "@expo/vector-icons";
+import {
+  AntDesign,
+  Ionicons,
+  MaterialIcons,
+  Feather,
+} from "@expo/vector-icons";
 import { router } from "expo-router";
 import {
   widthPercentageToDP as wp,
@@ -86,7 +91,7 @@ const EditProfileSkeleton = () => {
   return (
     <View style={styles.skeletonContainer}>
       <StatusBar barStyle="light-content" backgroundColor="#1a365d" />
-      
+
       {/* Header Skeleton */}
       <LinearGradient
         colors={["#1a365d", "#2d5a87", "#4a90c2"]}
@@ -102,15 +107,27 @@ const EditProfileSkeleton = () => {
       <ScrollView contentContainerStyle={styles.skeletonContent}>
         {/* Profile Avatar Skeleton */}
         <View style={styles.avatarSection}>
-          <SkeletonLoader width={120} height={120} style={{ borderRadius: 60 }} />
-          <SkeletonLoader width={100} height={20} style={{ marginTop: 12, borderRadius: 4 }} />
+          <SkeletonLoader
+            width={120}
+            height={120}
+            style={{ borderRadius: 60 }}
+          />
+          <SkeletonLoader
+            width={100}
+            height={20}
+            style={{ marginTop: 12, borderRadius: 4 }}
+          />
         </View>
 
         {/* Form Fields Skeleton */}
         <View style={styles.formContainer}>
           {[...Array(5)].map((_, index) => (
             <View key={index} style={styles.inputContainer}>
-              <SkeletonLoader width={wp("85%")} height={60} style={{ borderRadius: 12 }} />
+              <SkeletonLoader
+                width={wp("85%")}
+                height={60}
+                style={{ borderRadius: 12 }}
+              />
             </View>
           ))}
         </View>
@@ -135,10 +152,10 @@ const EditProfile = () => {
   const [address, setAddress] = useState("");
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState(false);
-  
+
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(50)).current;
-  
+
   const { t } = useTranslation();
 
   // Form validation states
@@ -183,7 +200,7 @@ const EditProfile = () => {
         );
 
         const user = getUserDetails.data.driver;
-        
+
         if (user) {
           setUserName(user.name || "");
           if (user.dob && user.dob.match(/^\d{4}-\d{2}-\d{2}$/)) {
@@ -210,8 +227,14 @@ const EditProfile = () => {
     return "";
   };
 
+  // const validateEmail = (email: any) => {
+  //   if (!email.trim()) return "Email is required";
+  //   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  //   if (!emailRegex.test(email)) return "Please enter a valid email address";
+  //   return "";
+  // };
   const validateEmail = (email: any) => {
-    if (!email.trim()) return "Email is required";
+    if (!email.trim()) return ""; // Email is optional
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) return "Please enter a valid email address";
     return "";
@@ -227,8 +250,13 @@ const EditProfile = () => {
     return "";
   };
 
+  // const validateAddress = (address: any) => {
+  //   if (!address.trim()) return "Address is required";
+  //   if (address.length < 5) return "Please enter a valid address";
+  //   return "";
+  // };
   const validateAddress = (address: any) => {
-    if (!address.trim()) return "Address is required";
+    if (!address.trim()) return ""; // Address is optional
     if (address.length < 5) return "Please enter a valid address";
     return "";
   };
@@ -256,8 +284,8 @@ const EditProfile = () => {
       const updateData = {
         driver_id: driverId,
         name: userName.trim(),
-        email: email.trim(),
-        city: address.trim(),
+        email: email.trim() || null,
+        city: address.trim() || null,
         state: stateName,
         dob: dob,
         profile_pic: "new_base64encodedstring",
@@ -273,7 +301,11 @@ const EditProfile = () => {
         }
       );
 
-      if (response.data && (response.data.success === "success" || response.data.status === "success")) {
+      if (
+        response.data &&
+        (response.data.success === "success" ||
+          response.data.status === "success")
+      ) {
         Alert.alert(
           "Success! 🎉",
           "Your profile has been updated successfully",
@@ -290,7 +322,8 @@ const EditProfile = () => {
       }
     } catch (error: any) {
       console.error("Error updating profile:", error);
-      const errorMessage = error.response?.data?.message || "Something went wrong!";
+      const errorMessage =
+        error.response?.data?.message || "Something went wrong!";
       Alert.alert("Error", errorMessage);
     } finally {
       setUpdating(false);
@@ -313,8 +346,9 @@ const EditProfile = () => {
     keyboardType: any = "default",
     error?: string
   ) => {
-    const IconComponent = iconFamily === "MaterialIcons" ? MaterialIcons : Feather;
-    
+    const IconComponent =
+      iconFamily === "MaterialIcons" ? MaterialIcons : Feather;
+
     return (
       <View style={styles.inputContainer}>
         <View style={[styles.inputWrapper, error ? styles.inputError : null]}>
@@ -345,7 +379,7 @@ const EditProfile = () => {
   return (
     <View style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="#1a365d" />
-      
+
       {/* Enhanced Header */}
       <LinearGradient
         colors={["#1a365d", "#2d5a87", "#4a90c2"]}
@@ -412,7 +446,12 @@ const EditProfile = () => {
               )}
 
               <View style={styles.inputContainer}>
-                <View style={[styles.inputWrapper, errors.dob ? styles.inputError : null]}>
+                <View
+                  style={[
+                    styles.inputWrapper,
+                    errors.dob ? styles.inputError : null,
+                  ]}
+                >
                   <MaterialIcons
                     name="calendar-today"
                     size={20}
@@ -426,7 +465,9 @@ const EditProfile = () => {
                     // Remove style prop as it's not supported by SimpleDatePicker component
                   />
                 </View>
-                {errors.dob ? <Text style={styles.errorText}>{errors.dob}</Text> : null}
+                {errors.dob ? (
+                  <Text style={styles.errorText}>{errors.dob}</Text>
+                ) : null}
               </View>
 
               {renderInputField(
@@ -443,11 +484,18 @@ const EditProfile = () => {
               )}
 
               <View style={styles.inputContainer}>
-                <View style={[styles.inputWrapper, errors.stateName ? styles.inputError : null]}>
+                <View
+                  style={[
+                    styles.inputWrapper,
+                    errors.stateName ? styles.inputError : null,
+                  ]}
+                >
                   <MaterialIcons
                     name="location-on"
                     size={20}
-                    color={errors.stateName ? "#e53e3e" : theme.colors.brand.blue}
+                    color={
+                      errors.stateName ? "#e53e3e" : theme.colors.brand.blue
+                    }
                     style={styles.inputIcon}
                   />
                   <Dropdown
@@ -464,11 +512,16 @@ const EditProfile = () => {
                     value={stateName}
                     onChange={(item) => {
                       setStateName(item.value);
-                      setErrors({ ...errors, stateName: validateState(item.value) });
+                      setErrors({
+                        ...errors,
+                        stateName: validateState(item.value),
+                      });
                     }}
                   />
                 </View>
-                {errors.stateName ? <Text style={styles.errorText}>{errors.stateName}</Text> : null}
+                {errors.stateName ? (
+                  <Text style={styles.errorText}>{errors.stateName}</Text>
+                ) : null}
               </View>
 
               {renderInputField(
@@ -489,10 +542,17 @@ const EditProfile = () => {
             <TouchableOpacity
               onPress={handleUpdate}
               disabled={updating}
-              style={[styles.updateButton, updating && styles.updateButtonDisabled]}
+              style={[
+                styles.updateButton,
+                updating && styles.updateButtonDisabled,
+              ]}
             >
               <LinearGradient
-                colors={updating ? ["#9CA3AF", "#6B7280"] : ["#1a365d", "#2d5a87", "#4a90c2"]}
+                colors={
+                  updating
+                    ? ["#9CA3AF", "#6B7280"]
+                    : ["#1a365d", "#2d5a87", "#4a90c2"]
+                }
                 style={styles.buttonGradient}
               >
                 {updating ? (
@@ -505,7 +565,11 @@ const EditProfile = () => {
                 ) : (
                   <View style={styles.buttonContent}>
                     <Text style={styles.buttonText}>{t("Update profile")}</Text>
-                    <MaterialIcons name="check-circle" size={20} color="white" />
+                    <MaterialIcons
+                      name="check-circle"
+                      size={20}
+                      color="white"
+                    />
                   </View>
                 )}
               </LinearGradient>

@@ -20,14 +20,12 @@ import {
 } from "react-native-responsive-screen";
 import { useTranslation } from "react-i18next";
 import axiosInstance from "@/utils/axions-instance";
-import ReferalCard from "@/components/profile/referal-card";
 import SimpleDatePicker from "@/components/general/dob-input";
-import RNPickerSelect from "react-native-picker-select";
 import { Dropdown } from "react-native-element-dropdown";
 import { indianStates } from "@/utils/data";
 
 // Skeleton Component
-const SkeletonLoader = ({ width, height, style }:any) => {
+const SkeletonLoader = ({ width, height, style }: any) => {
   const opacity = useRef(new Animated.Value(0.3)).current;
 
   useEffect(() => {
@@ -73,18 +71,42 @@ const UserDetailsSkeleton = () => {
     <ScrollView contentContainerStyle={styles.container}>
       {/* Header Skeleton */}
       <SkeletonLoader width={200} height={40} style={{ marginBottom: 20 }} />
-      
+
       <View style={styles.formContainer}>
         {/* Input Fields Skeleton */}
-        <SkeletonLoader width={wp("90%")} height={hp("7%")} style={{ borderRadius: 5 }} />
-        <SkeletonLoader width={wp("90%")} height={hp("7%")} style={{ borderRadius: 5 }} />
-        <SkeletonLoader width={wp("90%")} height={hp("7%")} style={{ borderRadius: 5 }} />
-        <SkeletonLoader width={wp("90%")} height={hp("7%")} style={{ borderRadius: 5 }} />
-        <SkeletonLoader width={wp("90%")} height={hp("7%")} style={{ borderRadius: 5 }} />
+        <SkeletonLoader
+          width={wp("90%")}
+          height={hp("7%")}
+          style={{ borderRadius: 5 }}
+        />
+        <SkeletonLoader
+          width={wp("90%")}
+          height={hp("7%")}
+          style={{ borderRadius: 5 }}
+        />
+        <SkeletonLoader
+          width={wp("90%")}
+          height={hp("7%")}
+          style={{ borderRadius: 5 }}
+        />
+        <SkeletonLoader
+          width={wp("90%")}
+          height={hp("7%")}
+          style={{ borderRadius: 5 }}
+        />
+        <SkeletonLoader
+          width={wp("90%")}
+          height={hp("7%")}
+          style={{ borderRadius: 5 }}
+        />
       </View>
 
       {/* Button Skeleton */}
-      <SkeletonLoader width={wp("90%")} height={hp("7%")} style={{ borderRadius: 10 }} />
+      <SkeletonLoader
+        width={wp("90%")}
+        height={hp("7%")}
+        style={{ borderRadius: 10 }}
+      />
     </ScrollView>
   );
 };
@@ -97,7 +119,7 @@ const UserDetails = () => {
   }>();
 
   const [userName, setUserName] = useState("");
-  const [dob, setDob] = useState(""); // Store date as a string in format YYYY-MM-DD
+  const [dob, setDob] = useState("");
   const [email, setEmail] = useState("");
   const [stateName, setStateName] = useState("");
   const [address, setAddress] = useState("");
@@ -123,7 +145,7 @@ const UserDetails = () => {
   }, []);
 
   // Validation functions
-  const validateName = (name:any) => {
+  const validateName = (name: any) => {
     if (!name.trim()) {
       return "Name is required";
     }
@@ -133,34 +155,48 @@ const UserDetails = () => {
     return "";
   };
 
-  const validateEmail = (email:any) => {
-    if (!email.trim()) {
-      return "Email is required";
-    }
+  // const validateEmail = (email:any) => {
+  //   if (!email.trim()) {
+  //     return "Email is required";
+  //   }
+  //   if (!email.includes("@gmail.com")) {
+  //     return "Email must contain @gmail.com";
+  //   }
+  //   return "";
+  // };
+  const validateEmail = (email: any) => {
+    if (!email.trim()) return ""; // Optional
     if (!email.includes("@gmail.com")) {
       return "Email must contain @gmail.com";
     }
     return "";
   };
 
-  const validateDob = (dob:any) => {
+  const validateDob = (dob: any) => {
     if (!dob) {
       return "Date of birth is required";
     }
     return "";
   };
 
-  const validateState = (state:any) => {
+  const validateState = (state: any) => {
     if (!state || state === "empty") {
       return "Please select a state";
     }
     return "";
   };
 
-  const validateAddress = (address:any) => {
-    if (!address.trim()) {
-      return "Address is required";
-    }
+  // const validateAddress = (address:any) => {
+  //   if (!address.trim()) {
+  //     return "Address is required";
+  //   }
+  //   if (address.length < 5) {
+  //     return "Please enter a valid address";
+  //   }
+  //   return "";
+  // };
+  const validateAddress = (address: any) => {
+    if (!address.trim()) return ""; // Optional
     if (address.length < 5) {
       return "Please enter a valid address";
     }
@@ -179,14 +215,14 @@ const UserDetails = () => {
     setErrors(newErrors);
 
     // Form is valid if no error messages exist
-    return !Object.values(newErrors).some(error => error !== "");
+    return !Object.values(newErrors).some((error) => error !== "");
   };
 
   const onSubmitDetails = async () => {
     try {
       // Validate the form
       const isValid = validateForm();
-      
+
       if (!isValid) {
         return; // Don't proceed if validation fails
       }
@@ -202,7 +238,7 @@ const UserDetails = () => {
           email: email,
           state: stateName,
           city: address,
-          profile_pic: "new_base64encodedstring", 
+          profile_pic: "new_base64encodedstring",
         },
         {
           headers: {
@@ -210,7 +246,7 @@ const UserDetails = () => {
           },
         }
       );
-      
+
       // console.log("Response:", response.data);
       router.replace("/(tabs)");
     } catch (error) {
@@ -222,7 +258,7 @@ const UserDetails = () => {
   // Handle date change from SimpleDatePicker
   const handleDateChange = (dateString: any) => {
     setDob(dateString);
-    setErrors({...errors, dob: validateDob(dateString)});
+    setErrors({ ...errors, dob: validateDob(dateString) });
   };
 
   if (loading) {
@@ -243,14 +279,16 @@ const UserDetails = () => {
               style={[styles.input, errors.userName ? styles.inputError : null]}
               onChangeText={(text) => {
                 setUserName(text);
-                setErrors({...errors, userName: validateName(text)});
+                setErrors({ ...errors, userName: validateName(text) });
               }}
               value={userName}
               placeholder={t("Enter your Full Name")}
               keyboardType="name-phone-pad"
               placeholderTextColor={theme.colors.ui.black + "70"}
             />
-            {errors.userName ? <Text style={styles.errorText}>{errors.userName}</Text> : null}
+            {errors.userName ? (
+              <Text style={styles.errorText}>{errors.userName}</Text>
+            ) : null}
           </View>
 
           <View>
@@ -259,7 +297,9 @@ const UserDetails = () => {
               onDateChange={handleDateChange}
               placeholder={t("Date of Birth")}
             />
-            {errors.dob ? <Text style={styles.errorText}>{errors.dob}</Text> : null}
+            {errors.dob ? (
+              <Text style={styles.errorText}>{errors.dob}</Text>
+            ) : null}
           </View>
 
           <View>
@@ -267,19 +307,24 @@ const UserDetails = () => {
               style={[styles.input, errors.email ? styles.inputError : null]}
               onChangeText={(text) => {
                 setEmail(text);
-                setErrors({...errors, email: validateEmail(text)});
+                setErrors({ ...errors, email: validateEmail(text) });
               }}
               value={email}
               placeholder={t("Enter your Email")}
               keyboardType="email-address"
               placeholderTextColor={theme.colors.ui.black + "70"}
             />
-            {errors.email ? <Text style={styles.errorText}>{errors.email}</Text> : null}
+            {errors.email ? (
+              <Text style={styles.errorText}>{errors.email}</Text>
+            ) : null}
           </View>
 
           <View>
             <Dropdown
-              style={[styles2.dropdown, errors.stateName ? styles2.dropdownError : null]}
+              style={[
+                styles2.dropdown,
+                errors.stateName ? styles2.dropdownError : null,
+              ]}
               placeholderStyle={styles2.placeholderStyle}
               selectedTextStyle={styles2.selectedTextStyle}
               inputSearchStyle={styles2.inputSearchStyle}
@@ -292,9 +337,9 @@ const UserDetails = () => {
               searchPlaceholder="Search..."
               value={stateName}
               onChange={(item) => {
-                // console.log(item.label);  
+                // console.log(item.label);
                 setStateName(item.value);
-                setErrors({...errors, stateName: validateState(item.value)});
+                setErrors({ ...errors, stateName: validateState(item.value) });
               }}
               renderLeftIcon={() => (
                 <AntDesign
@@ -305,7 +350,9 @@ const UserDetails = () => {
                 />
               )}
             />
-            {errors.stateName ? <Text style={styles.errorText}>{errors.stateName}</Text> : null}
+            {errors.stateName ? (
+              <Text style={styles.errorText}>{errors.stateName}</Text>
+            ) : null}
           </View>
 
           <View>
@@ -313,14 +360,16 @@ const UserDetails = () => {
               style={[styles.input, errors.address ? styles.inputError : null]}
               onChangeText={(text) => {
                 setAddress(text);
-                setErrors({...errors, address: validateAddress(text)});
+                setErrors({ ...errors, address: validateAddress(text) });
               }}
               value={address}
               placeholder={t("Address")}
               keyboardType="name-phone-pad"
               placeholderTextColor={theme.colors.ui.black + "70"}
             />
-            {errors.address ? <Text style={styles.errorText}>{errors.address}</Text> : null}
+            {errors.address ? (
+              <Text style={styles.errorText}>{errors.address}</Text>
+            ) : null}
           </View>
         </View>
 
@@ -354,7 +403,7 @@ const styles2 = StyleSheet.create({
     paddingHorizontal: hp("2.3%"),
   },
   dropdownError: {
-    borderColor: 'red',
+    borderColor: "red",
     borderWidth: 1,
   },
   icon: {
@@ -411,11 +460,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: hp("2.3%"),
   },
   inputError: {
-    borderColor: 'red',
+    borderColor: "red",
     borderWidth: 1,
   },
   errorText: {
-    color: 'red',
+    color: "red",
     fontSize: hp(1.6),
     marginTop: 3,
     marginLeft: 5,

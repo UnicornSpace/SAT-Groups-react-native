@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { getMilestoneData } from "@/api/milestone/milestone-data";
+import { Milestone } from "@/types/milestone.type";
 
 export const useMilestoneState = (initialPoints: any, milestoneData: Milestone[], driverId: any, token: any) => {
   const [totalPoints, setTotalPoints] = useState(initialPoints);
