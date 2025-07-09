@@ -232,9 +232,12 @@ const MilestoneComponent: React.FC<MilestonePathProps> = ({
       // Call the claim API
       const response = await claimMilestone(driverId, token, milestoneId)
 
-      if (response.status !== 200) {
-        Alert.alert("Error", "Failed to claim milestone")
-        return
+     if (response.status !== 200) {
+        const errorMessage =
+          response?.data?.message ||
+          "Failed to claim milestone. Please try again later.";
+        Alert.alert("Error", errorMessage);
+        return;
       }
 
       // Immediately update the local state to show claimed status
@@ -242,13 +245,7 @@ const MilestoneComponent: React.FC<MilestonePathProps> = ({
         prevMilestones.map((m) => (m.id === milestoneId ? { ...m, status: "claimed" as const } : m)),
       )
 
-      // Update total points immediately if reward points are available
-      const rewardPoints = Number(milestone.rewardPoints)
-      if (rewardPoints > 0) {
-        setTotalPoints((prevTotal) => prevTotal + rewardPoints)
-      }
-  hideModal()
-      // Fetch fresh data from server to ensure consistency
+   
       await fetchUserMilestones()
 
       Alert.alert("Success!", `Milestone claimed! You earned ${milestone.rewardPoints} points.`)
@@ -298,11 +295,17 @@ const MilestoneComponent: React.FC<MilestonePathProps> = ({
     onShouldBlockNativeResponder: (evt, gestureState) => false,
   })
 
-  const onRefresh = () => {
-    setRefreshing(true)
-    fetchUserMilestones()
+const onRefresh = async () => {
+  setRefreshing(true)
+  try {
+    await fetchUserMilestones()
+  } catch (err) {
+    console.error("Error refreshing:", err)
+  } finally {
     setRefreshing(false)
   }
+}
+
 
   return (
     <View style={styles.container}>

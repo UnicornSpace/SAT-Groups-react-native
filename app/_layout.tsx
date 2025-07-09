@@ -57,7 +57,7 @@ const processReferralLink = async (url: string) => {
     console.log("Error processing referral link:", error);
   }
 };
-
+  
 const _layout = () => {
   const [hasGlobalError, setHasGlobalError] = useState(false);
   let [poppinsLoaded] = useFonts({
@@ -74,21 +74,30 @@ const _layout = () => {
   }, []);
 
   // Move useEffect BEFORE the conditional return
-  useEffect(() => {
-    const handleReferralLinks = async () => {
-      const initialUrl = await Linking.getInitialURL();
-      if (initialUrl) {
-        await processReferralLink(initialUrl);
-      }
-
-      const subscription = Linking.addEventListener("url", async ({ url }) => {
-        await processReferralLink(url);
+useEffect(() => {
+  const captureInstallReferrer = async () => {
+    try {
+      const { PlayInstallReferrer } = await import('react-native-play-install-referrer');
+      PlayInstallReferrer.getInstallReferrerInfo(async (info, error) => {
+        if (!error) {
+          const ref = info.installReferrer;
+          if (ref?.startsWith("ref_")) {
+            const code = ref.replace("ref_", "");
+            await AsyncStorage.setItem("pendingReferralCode", code);
+            console.log("✅ Captured referral code from install referrer:", code);
+          }
+        } else {
+          console.log("❌ Failed to get install referrer:", error);
+        }
       });
-      return () => subscription?.remove();
-    };
+    } catch (e) {
+      console.log("📦 Failed to load install referrer module:", e);
+    }
+  };
 
-    handleReferralLinks();
-  }, []);
+  captureInstallReferrer();
+}, []);
+
 
   if (hasGlobalError) {
     return <ErrorFallback onRetry={() => setHasGlobalError(false)} />;

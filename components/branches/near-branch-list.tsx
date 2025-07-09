@@ -49,7 +49,7 @@ const Branches = ({ data, userLocation }: any) => {
   }
 
   // Limit to first 3 branches based on distance
-  const branchesToShow = data.slice(0, 3);
+  const branchesToShow = data.slice(0, 6);
   console.log("Showing", branchesToShow.length, "branches");
 
   return (

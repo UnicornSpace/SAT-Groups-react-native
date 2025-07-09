@@ -7,16 +7,14 @@ import {
 } from "react-native";
 import React, { useState } from "react";
 import { theme } from "@/infrastructure/themes";
-import {
-  IconArrowBarToDown,
-  IconArrowBarToUp,
-} from "@tabler/icons-react-native";
+
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
 import { width, height, size, fontSize } from "react-native-responsive-sizes";
 import { useTranslation } from "react-i18next";
+import { Ionicons } from "@expo/vector-icons";
 const TranscationBtn = ({
   name,
   color,
@@ -53,9 +51,9 @@ const TranscationBtn = ({
         {name}
       </Text>
       {name === "Received" ? (
-        <IconArrowBarToDown size={14} color={color} />
+        <Ionicons name="arrow-down" size={14} color={color} />
       ) : name === "Spent" ? (
-        <IconArrowBarToUp size={14} color={color} />
+        <Ionicons name="arrow-up" size={14} color={color} />
       ) : null}
     </TouchableOpacity>
   );

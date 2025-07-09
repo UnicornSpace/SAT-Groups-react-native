@@ -1,10 +1,10 @@
-// 2. Updated Location.tsx - Enhanced to pass complete branch data
-import { ScrollView, StyleSheet, View } from "react-native";
+import { ScrollView, StyleSheet, View, RefreshControl, Text } from "react-native";
 import { useState } from "react";
 import LocationSkeleton from "@/components/skeleton/location/location-skeleton";
 import FuelStationDetails from "../(screens)/fuel-station";
 import { useBranchData } from "@/hooks/use-branch-data";
 import BranchHeader from "@/components/branches/branch-header";
+import { Button } from "react-native-paper";
 
 const Location = () => {
   const [selectedBranch, setSelectedBranch] = useState(null);
@@ -16,35 +16,44 @@ const Location = () => {
       distance: branchData.calculatedDistance || branchData.distance,
       duration: branchData.calculatedDuration || branchData.duration,
     });
-    
     setSelectedBranch(branchData);
   };
 
-  if (loading) {
+  // Optional: Show a loading skeleton screen only for the *first* load
+  if (loading && branches.length === 0) {
     return <LocationSkeleton />;
   }
 
   return (
-    <ScrollView style={{ flex: 1 }}>
+    <ScrollView
+      style={{ flex: 1 }}
+      refreshControl={
+        <RefreshControl refreshing={loading} onRefresh={refetch} />
+      }
+    >
       {!selectedBranch ? (
-        <BranchHeader 
-          isSeleted={handleBranchSelection} 
-          error={error} 
-          refetch={refetch} 
-          branches={branches} 
-        />
+        <>
+          {error && (!branches || branches.length === 0) ? (
+            <View style={{ alignItems: "center", marginTop: 20 }}>
+              <Text style={{ textAlign: "center", color: "red", marginBottom: 10 }}>
+                Something went wrong. Please try again.
+              </Text>
+              <Button onPress={refetch} mode="contained">Retry</Button>
+            </View>
+          ) : (
+            <BranchHeader
+              isSeleted={handleBranchSelection}
+              error={error}
+              refetch={refetch}
+              branches={branches}
+            />
+          )}
+        </>
       ) : (
-        <View>
-          <FuelStationDetails
-            data={selectedBranch}
-            onBack={() => setSelectedBranch(null)}
-            // Now selectedBranch includes:
-            // - calculatedDistance
-            // - calculatedDuration
-            // - userLocation
-            // - all original branch data
-          />
-        </View>
+        <FuelStationDetails
+          data={selectedBranch}
+          onBack={() => setSelectedBranch(null)}
+        />
       )}
     </ScrollView>
   );

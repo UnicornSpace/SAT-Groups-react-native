@@ -10,6 +10,7 @@ import {
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
 import { useFocusEffect } from "expo-router";
+import { RedeemItem } from "@/types/index.type";
 
 export default function RedeemPoints() {
   const { token, driverId } = useAuth();
@@ -18,8 +19,16 @@ export default function RedeemPoints() {
   const [redeemList, setRedeemList] = useState<RedeemItem[]>([]);
   const [dataChecked, setDataChecked] = useState(false);
 
+  useEffect(() => {
+    if (dataChecked && redeemList.length === 0 && visible) {
+      setVisible(false);
+    }
+  }, [dataChecked, redeemList, visible]);
+
   const currentItem =
-    redeemList && redeemList.length > 0 ? redeemList[currentIndex] : null;
+    redeemList.length > 0 && currentIndex < redeemList.length
+      ? redeemList[currentIndex]
+      : null;
 
   const fetchRedeemList = async () => {
     // Don't fetch if already checked or missing credentials
@@ -78,14 +87,14 @@ export default function RedeemPoints() {
       setDataChecked(true);
     }
   };
-   useFocusEffect(
+  useFocusEffect(
     React.useCallback(() => {
       fetchRedeemList(); // Automatically refetch on tab focus
     }, [])
   );
-  useEffect(() => {
-    fetchRedeemList();
-  }, [token, driverId, dataChecked]);
+  // useEffect(() => {
+  //   fetchRedeemList();
+  // }, [token, driverId, dataChecked]);
   // useFocusEffect(
   //   React.useCallback(() => {
   //     fetchRedeemList(); // Automatically refetch on tab focus

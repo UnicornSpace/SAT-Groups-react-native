@@ -28,8 +28,7 @@ const UserOTPScreen = () => {
   const [error, setError] = useState<string | null>(null);
 
   const SubmitNumber = async () => {
-    if (number.length !== 11) {
-
+    if (number.replace("-", "").length !== 10) {
       setError("Please enter a valid number");
       return;
     }
@@ -42,7 +41,7 @@ const UserOTPScreen = () => {
         mobile: formattedNumber,
       });
 
-      if (response.status === 200) {
+      if (response.status === 200 && response.data?.status === "otp_sent") {
         router.replace({
           pathname: "/(screens)/otp-confirmation-screen",
           params: {
@@ -50,12 +49,13 @@ const UserOTPScreen = () => {
             UserExist: response.data.is_new_user,
           },
         });
+      } else {
+        console.warn("OTP send failed:", response.data); // Developer log
+        setError("Something went wrong. Please try again."); // User-friendly message
       }
-      else{
-        setError("Failed to send OTP. Please try again.");
-      }
-    } catch (error) {
-      Alert.alert("Something went wrong");
+    } catch (error: any) {
+      console.error("OTP request error:", error); // Dev log
+      Alert.alert("Oops!", "Unable to send OTP. Please try again later."); // Friendly alert
     } finally {
       setLoading(false);
     }

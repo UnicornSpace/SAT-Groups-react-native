@@ -7,3 +7,13 @@ type RedeemItem = {
   authorization_status: string;
   id: string;
 };
+
+interface Transaction {
+  points: string;
+  type: string; // "Received" or "Redeemed"
+  referred_date: string;
+  branch: string;
+  logo?: string;
+}
+
+export type { Transaction, RedeemItem };

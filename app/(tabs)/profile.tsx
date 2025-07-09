@@ -1,4 +1,5 @@
 import {
+  RefreshControl,
   ScrollView,
   StyleSheet,
   Text,
@@ -27,20 +28,30 @@ const profile = () => {
   const [loading, setLoading] = useState(true);
   const { token, driverId, logout: authLogout } = useAuth();
   const { t } = useTranslation();
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    try {
+      const user = await getUserDetails(driverId, token);
+      setuserInfo(user.driver);
+      if (!user?.driver) {
+        // logout or show fallback UI
+        await authLogout();
+        router.replace("/(screens)/language-selection-screen");
+        return;
+      }
+    } catch (error) {
+      console.error("Refresh failed", error);
+    } finally {
+      setRefreshing(false);
+      setLoading(false); // ✅ Add this line back
+    }
+  }, [driverId, token]);
 
   useEffect(() => {
-    const fetchuserDetails = async () => {
-      try {
-        const user = await getUserDetails(driverId, token);
-        setuserInfo(user.driver);
-      } catch (error) {
-        console.error("Error fetching user details:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchuserDetails();
-  }, []);
+    onRefresh();
+  }, [onRefresh]);
 
   const handleLogout = async () => {
     try {
@@ -56,7 +67,11 @@ const profile = () => {
   }
 
   return (
-    <ScrollView>
+    <ScrollView
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
+    >
       <ProfileHeader userInfo={userInfo} />
       <View style={styles.container}>
         <UserBentogrids />

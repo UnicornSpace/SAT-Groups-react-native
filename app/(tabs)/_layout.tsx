@@ -1,8 +1,15 @@
-import { Image, StyleSheet, View, Text, BackHandler } from "react-native";
+import {
+  Image,
+  StyleSheet,
+  View,
+  Text,
+  BackHandler,
+  Alert,
+} from "react-native";
 import { Link, Tabs, useRouter } from "expo-router";
 import { FontAwesome, Ionicons } from "@expo/vector-icons";
 import React, { useEffect } from "react";
-import '@/app/language-selection'
+import "@/app/language-selection";
 import { theme } from "@/infrastructure/themes";
 
 import EditButton from "@/components/profile/edit";
@@ -21,41 +28,47 @@ TextComponent.defaultProps.allowFontScaling = false;
 
 function LogoTitle() {
   return (
-   <Link href={"/(tabs)"}>
-    <View
-      style={{
-        flexDirection: "row",
-        justifyContent: "space-between",
-        alignItems: "center",
-        backgroundColor: "#F8F9FA",
-        paddingHorizontal: 20,
-      }}
-    >
-      <Image
-        style={{ width: 80, height: 50 }}
-        source={require("../../assets/images/satgroups/splash-screen.png")}
-        resizeMode="contain"
-      />
-      {/* <LanguageSelection/> */}
-    </View></Link>
+    <Link href={"/(tabs)"}>
+      <View
+        style={{
+          flexDirection: "row",
+          justifyContent: "space-between",
+          alignItems: "center",
+          backgroundColor: "#F8F9FA",
+          paddingHorizontal: 20,
+        }}
+      >
+        <Image
+          style={{ width: 80, height: 50 }}
+          source={require("../../assets/images/satgroups/splash-screen.png")}
+          resizeMode="contain"
+        />
+        {/* <LanguageSelection/> */}
+      </View>
+    </Link>
   );
 }
 
 const TabLayout = () => {
   const { logout } = useAuth();
   const router = useRouter();
-const { isConnected, checkInternet } = useInternetStatus();
+  const { isConnected, checkInternet } = useInternetStatus();
   // Prevent back button from navigating to auth screens
   useEffect(() => {
-    const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
-      // Return true to prevent default behavior (going back)
-      return true;
-    });
+    const backHandler = BackHandler.addEventListener(
+      "hardwareBackPress",
+      () => {
+        // Return true to prevent default behavior (going back)
+        Alert.alert("Exit App", "Are you sure you want to exit?", [
+          { text: "Cancel", style: "cancel" },
+          { text: "Exit", onPress: () => BackHandler.exitApp() },
+        ]);
+        return true;
+      }
+    );
 
     return () => backHandler.remove();
   }, []);
-  
-   
 
   // If no internet, show no internet screen
   if (!isConnected) {
@@ -63,7 +76,6 @@ const { isConnected, checkInternet } = useInternetStatus();
   }
   return (
     <ProtectedRoute>
-
       <Tabs
         screenOptions={{
           sceneStyle: { backgroundColor: "#F8F9FA" },
@@ -78,14 +90,20 @@ const { isConnected, checkInternet } = useInternetStatus();
             tabBarIcon: ({ color }) => (
               <FontAwesome size={24} name="home" color={color} />
             ),
-            header:()=>{
+            header: () => {
               return (
-                <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between"}}>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                  }}
+                >
                   <LogoTitle />
                   {/* <SearchInput /> */}
                 </View>
               );
-            }
+            },
           }}
         />
         <Tabs.Screen
@@ -95,14 +113,20 @@ const { isConnected, checkInternet } = useInternetStatus();
             tabBarIcon: ({ color }) => (
               <FontAwesome size={24} name="map-marker" color={color} />
             ),
-            header:()=>{
+            header: () => {
               return (
-                <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between"}}>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                  }}
+                >
                   <LogoTitle />
                   <SearchInput />
                 </View>
               );
-            }
+            },
           }}
         />
         <Tabs.Screen
@@ -112,28 +136,45 @@ const { isConnected, checkInternet } = useInternetStatus();
             tabBarIcon: ({ color }) => (
               <FontAwesome size={24} name="gift" color={color} />
             ),
-            header:()=>{
+            header: () => {
               return (
-                <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between"}}>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                  }}
+                >
                   <LogoTitle />
                   {/* <SearchInput /> */}
                 </View>
               );
-            }
+            },
           }}
         />
         <Tabs.Screen
           name="profile"
           options={{
             header: () => (
-              <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between"}}>
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                }}
+              >
                 <LogoTitle />
                 <EditButton />
               </View>
             ),
             title: "Profile",
             tabBarIcon: ({ color }) => (
-              <FontAwesome size={24} name="user" color={color} />
+              <FontAwesome
+                size={24}
+                name="user"
+                color={color}
+                accessibilityLabel="Home "
+              />
             ),
           }}
         />

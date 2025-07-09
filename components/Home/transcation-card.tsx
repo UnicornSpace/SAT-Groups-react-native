@@ -14,6 +14,7 @@ interface TransactionCardProps {
   date: string;
   points: string;
   transactionType: string;
+  logo?: string; 
 }
 
 const TransactionCard = ({
@@ -21,6 +22,7 @@ const TransactionCard = ({
   date ,
   points ,
   transactionType ,
+  logo
 }: TransactionCardProps) => {
   const { t } = useTranslation();
 
@@ -37,7 +39,8 @@ const TransactionCard = ({
     <View style={styles.card}>
       <View style={styles.cardLeft}>
         <Image
-          source={require("@/assets/images/satgroups/nox-blue-logo.png")}
+          source={logo ? { uri: logo } : require("@/assets/images/satgroups/fallback.jpg")}
+          resizeMode="contain"
           style={styles.logo}
         />
 
@@ -72,16 +75,18 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingHorizontal: size(8),
     width: width(90),
+    height: height(10),
+    marginVertical: size(5),
   },
   cardLeft: {
     flexDirection: "row",
     alignItems: "center",
     display: "flex",
-
-    gap: size(10),
+    gap: size(20),
   },
   logo: {
-    width: width(14),
+   width: wp("13%"),
+    height: hp("3%"),
     resizeMode: "contain",
   },
   detailsContainer: {

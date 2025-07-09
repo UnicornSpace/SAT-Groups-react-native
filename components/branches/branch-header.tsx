@@ -23,7 +23,7 @@ const BranchHeader = ({error,branches,loading,refetch,isSeleted}:any) => {
           alignItems: "flex-start",
         }}
       >
-        <Title style={{fontFamily:theme.fontFamily.semiBold,fontSize:size(18)}}>{t("Our Branches").trim()}</Title>
+        <Text style={{fontFamily:theme.fontFamily.semiBold,fontSize:size(18),color:theme.colors.brand.blue}}>{t("Our Branches").trim()}</Text>
         <Text style={styles.description}>{t("Check out nearby branches")}</Text>
       </View>
 

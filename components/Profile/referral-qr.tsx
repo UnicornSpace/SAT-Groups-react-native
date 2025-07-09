@@ -1,44 +1,51 @@
 import {
-  Alert,
   Share,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
+  Alert,
+  ActivityIndicator,
 } from "react-native";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useAuth } from "@/utils/auth-context";
 import QRCode from "react-native-qrcode-svg";
 import { theme } from "@/infrastructure/themes";
 import { t } from "i18next";
 import axiosInstance from "@/utils/axions-instance";
+import * as Clipboard from "expo-clipboard";
+
 const ReferralQR = () => {
   const { driverId, token } = useAuth();
-  const [refferralId, setReferralId] = React.useState("");
+  const [refferralId, setReferralId] = useState("");
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
     const fetchReferralId = async () => {
-    try {
-      const response = await axiosInstance.post(
-      "/user-details.php",
-      { driver_id: driverId },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+      try {
+        const response = await axiosInstance.post(
+          "/user-details.php",
+          { driver_id: driverId },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        const data = response.data;
+        console.log("Referral ID fetched:🏅", data.driver.referral_code);
+        console.log("Referred by:🏅", data.driver.referred_by);
+        setReferralId(data.driver.referral_code);
+      } catch (error) {
+        console.error("Failed to fetch referral code:", error);
+        Alert.alert("Error", "Could not load your referral code.");
+      } finally {
+        setLoading(false);
       }
-    );
-    const data = response.data;
-    console.log("Referral ID fetched:🏅", data.driver.referral_code);
-    console.log("Referral ID fetched:🏅", data.driver.referred_by);
-    setReferralId(data.driver.referral_code);
-    } catch (error) {
-      
-    }
-  };
-  fetchReferralId();
-  }, [])
-  
- 
+    };
+
+    fetchReferralId();
+  }, []);
 
   const referralLink = `https://play.google.com/store/apps/details?id=com.satgroups.app&referrer=ref_${refferralId}`;
 
@@ -52,9 +59,29 @@ const ReferralQR = () => {
       Alert.alert("Error", "Could not share referral link");
     }
   };
+
+  const copyToClipboard = () => {
+    Clipboard.setString(refferralId);
+    Alert.alert("Copied", "Referral code copied to clipboard!");
+  };
+
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator size="large" color={theme.colors.brand.blue} />
+        <Text style={styles.loadingText}>Loading referral info...</Text>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Referral Code :<Text style={{color:theme.colors.brand.blue,fontFamily:theme.fontFamily.bold}}> {refferralId} </Text></Text>
+      <TouchableOpacity onPress={copyToClipboard}>
+        <Text style={styles.title}>
+          Copy Code :
+          <Text style={styles.codeText}> {refferralId} </Text>
+        </Text>
+      </TouchableOpacity>
 
       <View style={styles.qrContainer}>
         <QRCode
@@ -70,10 +97,6 @@ const ReferralQR = () => {
           "Friends scan this QR code to download the app with your referral code!"
         )}
       </Text>
-
-      {/* <Text style={styles.userId}>
-        Your ID: {driverId}
-      </Text> */}
 
       <TouchableOpacity style={styles.shareButton} onPress={shareReferralLink}>
         <Text style={styles.shareButtonText}>{t("Share Link")}</Text>
@@ -92,12 +115,21 @@ const styles = StyleSheet.create({
     padding: 20,
     backgroundColor: "#f5f5f5",
   },
+  loadingText: {
+    marginTop: 12,
+    fontFamily: theme.fontFamily.medium,
+    fontSize: 16,
+    color: "#666",
+  },
   title: {
     fontSize: theme.fontSize.medium,
-    // fontWeight: 'bold',
     marginBottom: 20,
     color: "#333",
     fontFamily: theme.fontFamily.medium,
+  },
+  codeText: {
+    color: theme.colors.brand.blue,
+    fontFamily: theme.fontFamily.bold,
   },
   qrContainer: {
     padding: 20,
@@ -115,11 +147,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#666",
     marginBottom: 10,
-  },
-  userId: {
-    fontSize: 14,
-    color: "#888",
-    marginBottom: 30,
   },
   shareButton: {
     backgroundColor: theme.colors.brand.blue,

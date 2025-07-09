@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -6,106 +6,42 @@ import {
   StyleSheet,
   FlatList,
   Dimensions,
-  ScrollView,
 } from "react-native";
 import TransactionCard from "@/components/home/transcation-card";
 import { theme } from "@/infrastructure/themes";
-import axiosInstance from "@/utils/axions-instance";
 import { width } from "react-native-responsive-sizes";
-import { useAuth } from "@/utils/auth-context";
 import { t } from "i18next";
 import { SkeletonLoader } from "../skeleton/home/home-skeleton";
 import Title from "../general/title";
-import { useFocusEffect } from "expo-router";
+import { Transaction } from "@/types/index.type";
 
-// Define the transaction type
-interface Transaction {
-  points: string;
-  type: string; // "Received" or "Redeemed"
-  referred_date: string;
-  branch: string;
-}
-
-export default function RecentTransactionTabs() {
+export default function RecentTransactionTabs({
+  transactions,
+  loading,
+}: {
+  transactions: Transaction[];
+  loading: boolean;
+}) {
   const [activeTab, setActiveTab] = useState("Received");
-  const [transactionsData, setTransactionsData] = useState<Transaction[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [totalPoints, setTotalPoints] = useState(0);
-  const { token, driverId } = useAuth();
-const fetchTransactions = async () => {
-      try {
-        setLoading(true);
 
-        const driver_id = driverId;
-        const usertoken = token;
-
-        const response = await axiosInstance.post(
-          "/driver-points.php",
-          {
-            driver_id,
-            take: 20,
-            skip: 0,
-          },
-          {
-            headers: {
-              Authorization: `Bearer ${usertoken}`,
-            },
-          }
-        );
-
-        // console.log("API Response:", response.data);
-
-        if (response.data.status === "success") {
-          setTransactionsData(response.data.transactions || []);
-          setTotalPoints(response.data.total_points || 0);
-        } else {
-          console.error("API returned error:", response.data);
-        }
-      } catch (error) {
-        console.error("Error fetching transactions:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-  useEffect(() => {
-    
-    fetchTransactions();
-  }, []);
-
-   useFocusEffect(
-    React.useCallback(() => {
-      fetchTransactions(); // Automatically refetch on tab focus
-    }, [])
-  );
-
-
-  // Filter transactions based on active tab
   const getFilteredTransactions = () => {
-    if (!transactionsData || transactionsData.length === 0) {
-      return [];
-    }
+    if (!transactions || transactions.length === 0) return [];
 
     switch (activeTab) {
       case "Received":
-        return transactionsData.filter(
-          (transaction) => transaction.type === "Received"
-        );
+        return transactions.filter((tx) => tx.type === "Received");
       case "Spent":
-        return transactionsData.filter(
-          (transaction) =>
-            transaction.type === "Redeemed" ||
-            parseFloat(transaction.points) < 0
+        return transactions.filter(
+          (tx) => tx.type === "Redeemed" || parseFloat(tx.points) < 0
         );
       case "All":
-        return transactionsData;
+        return transactions;
       default:
         return [];
     }
   };
 
   const EachTransactionCard = ({ item }: { item: Transaction }) => {
-    // Format the date from "YYYY-MM-DD" to a more readable format
     const formatDate = (dateString: string) => {
       const date = new Date(dateString);
       return date.toLocaleDateString("en-US", {
@@ -114,16 +50,16 @@ const fetchTransactions = async () => {
       });
     };
 
-    // Determine if it's a positive or negative transaction
     const isPositive = parseFloat(item.points) >= 0;
     const pointsDisplay = isPositive ? `+${item.points}` : item.points;
 
     return (
       <TransactionCard
-        companyName={item.branch} //
+        companyName={item.branch}
         date={formatDate(item.referred_date)}
         points={pointsDisplay}
         transactionType={item.type}
+        logo={item.logo}
       />
     );
   };
@@ -136,75 +72,40 @@ const fetchTransactions = async () => {
 
   const filteredTransactions = getFilteredTransactions();
   const deviceWidth = Dimensions.get("window").width;
-  const tabWidth = (deviceWidth * 0.9 - 16) / 3; // Calculate based on container width, accounting for padding and gaps
+  const tabWidth = (deviceWidth * 0.9 - 16) / 3;
 
   return (
     <View style={{ width: width(90), alignItems: "flex-start", gap: 10 }}>
       <Title>{t("Recent_Transcation")}</Title>
       <View style={styles.container}>
         <View style={styles.tabsList}>
-          <TouchableOpacity
-            style={[
-              styles.tabsTrigger,
-              { width: tabWidth },
-              activeTab === "Received" && styles.activeTabsTrigger,
-            ]}
-            onPress={() => setActiveTab("Received")}
-          >
-            <Text
+          {["Received", "Spent", "All"].map((tab) => (
+            <TouchableOpacity
+              key={tab}
               style={[
-                styles.tabsTriggerText,
-                activeTab === "Received" && styles.activeTabsTriggerText,
+                styles.tabsTrigger,
+                { width: tabWidth },
+                activeTab === tab && styles.activeTabsTrigger,
               ]}
-              numberOfLines={1}
-              adjustsFontSizeToFit
+              onPress={() => setActiveTab(tab)}
             >
-              {t("Received")}
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[
-              styles.tabsTrigger,
-              { width: tabWidth },
-              activeTab === "Spent" && styles.activeTabsTrigger,
-            ]}
-            onPress={() => setActiveTab("Spent")}
-          >
-            <Text
-              style={[
-                styles.tabsTriggerText,
-                activeTab === "Spent" && styles.activeTabsTriggerText,
-              ]}
-              numberOfLines={1}
-              adjustsFontSizeToFit
-            >
-              {t("Spent")}
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[
-              styles.tabsTrigger,
-              { width: tabWidth },
-              activeTab === "All" && styles.activeTabsTrigger,
-            ]}
-            onPress={() => setActiveTab("All")}
-          >
-            <Text
-              style={[
-                styles.tabsTriggerText,
-                activeTab === "All" && styles.activeTabsTriggerText,
-              ]}
-              numberOfLines={1}
-              adjustsFontSizeToFit
-            >
-              {t("All")}
-            </Text>
-          </TouchableOpacity>
+              <Text
+                style={[
+                  styles.tabsTriggerText,
+                  activeTab === tab && styles.activeTabsTriggerText,
+                ]}
+                numberOfLines={1}
+                adjustsFontSizeToFit
+              >
+                {t(tab)}
+              </Text>
+            </TouchableOpacity>
+          ))}
         </View>
 
         <FlatList
           keyboardShouldPersistTaps="handled"
-          data={loading ? [] : [...filteredTransactions]}
+          data={loading ? [] : filteredTransactions}
           renderItem={EachTransactionCard}
           keyExtractor={(item, index) => `transaction-${index}`}
           contentContainerStyle={styles.listContainer}
@@ -262,10 +163,6 @@ const styles = StyleSheet.create({
   activeTabsTriggerText: {
     color: "#fff",
   },
-  transactionsContainer: {
-    width: "100%",
-    paddingHorizontal: 10,
-  },
   listContainer: {
     paddingVertical: 10,
   },
@@ -280,11 +177,5 @@ const styles = StyleSheet.create({
     color: theme.colors.text.secondary,
     fontFamily: theme.fontFamily.regular,
     fontSize: 14,
-  },
-  loadingText: {
-    color: theme.colors.text.secondary,
-    fontFamily: theme.fontFamily.regular,
-    fontSize: 14,
-    padding: 20,
   },
 });

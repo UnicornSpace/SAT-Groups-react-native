@@ -152,8 +152,7 @@ const AllBranches: React.FC<AllBranchesProps> = ({
                 source={{
                   uri:
                     item.brand_logo ||
-                    item.logo ||
-                    "https://via.placeholder.com/100",
+                    ""
                 }}
                 resizeMode="contain"
               />
@@ -215,7 +214,7 @@ const styles = StyleSheet.create({
     width: wp("20%"),
     height: hp("10%"),
     borderRadius: 100,
-    marginBottom: 8,
+    // marginBottom: 8,
   },
   branchInfo: {
     display: "flex",

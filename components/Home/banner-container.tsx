@@ -12,46 +12,10 @@ import axiosInstance from "@/utils/axions-instance";
 import { useAuth } from "@/utils/auth-context";
 import { router, useFocusEffect } from "expo-router";
 import { SkeletonLoader } from "../skeleton/home/home-skeleton";
-const BannerContainer = () => {
+const BannerContainer = ({ points }: { points: number | null }) => {
   const { t } = useTranslation();
-  const [Points, setPoints] = useState("");
-  const { token, driverId } = useAuth();
-  const [isLoading, setIsLoading] = useState(true);
 
-  const { myDynamicPoints, setMyDynamicPoints } = useAuth();
-  const driver_id = driverId;
-  const usertoken = token;
-
-  const getPoints = async () => {
-    try {
-      const response = await axiosInstance.post(
-        "/driver-points.php",
-        { driver_id, take: 20, skip: 0 },
-        {
-          headers: {
-            Authorization: `Bearer ${usertoken}`,
-          },
-        }
-      );
-      const userPoints = response.data;
-      setPoints(userPoints.total_points);
-      setMyDynamicPoints(Math.ceil(Number(userPoints.total_points) || 0));
-      setIsLoading(false);
-      // console.log("User Details:", userPoints.total_points);
-      return userPoints.total_points;
-    } catch (error) {
-      console.error("Error fetching user details:", error);
-    }
-  };
-  useEffect(() => {
-    getPoints();
-  }, []);
-  useFocusEffect(
-    React.useCallback(() => {
-      getPoints(); // Automatically refetch on tab focus
-    }, [])
-  );
-  if (isLoading) {
+  if (points === null) {
     return <SkeletonLoader width={width(90)} height={180} />;
   }
 
@@ -65,9 +29,7 @@ const BannerContainer = () => {
       <View style={{ position: "absolute", top: size(28), left: size(22) }}>
         <View style={{ flexDirection: "column", justifyContent: "flex-start" }}>
           <Text style={styles.bannerText}>{t("Total Points")}</Text>
-          <Text style={styles.pointsText}>
-            {Number(Points).toFixed(2) || 0}
-          </Text>
+          <Text style={styles.pointsText}>{points.toFixed(2)}</Text>
         </View>
         <TouchableOpacity
           onPress={() => router.push("/(screens)/redeem-navigate")}
@@ -76,7 +38,6 @@ const BannerContainer = () => {
           <Text
             style={{
               fontFamily: theme.fontFamily.semiBold,
-              // fontSize: hp("1.8%"),
               fontSize: fontSize(12),
               color: theme.colors.brand.red,
             }}

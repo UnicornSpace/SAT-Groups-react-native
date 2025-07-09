@@ -118,8 +118,8 @@ const FuelStationDetails: React.FC<FuelStationDetailsProps> = ({
         <View style={styles.heroSection}>
           <View style={styles.brandContainer}>
             <Image
-              source={{ uri: data.brand_logo }}
-              style={styles.brandLogo}
+              source={{ uri: data.brand_logo  }}
+              style={styles.brandLogo }
               resizeMode="contain"
             />
             {/* <View style={styles.stationBadge}>

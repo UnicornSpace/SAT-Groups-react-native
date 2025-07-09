@@ -88,24 +88,6 @@ const OtpConfirmationScreen = () => {
     return () => clearInterval(interval);
   }, [count]);
 
-  useEffect(() => {
-    // Check if there's a stored referral code
-    const loadReferralCode = async () => {
-      try {
-        const storedReferralCode = await AsyncStorage.getItem("referralCode");
-        // console.log("Stored Referral Code:👀👀", storedReferralCode);
-        if (storedReferralCode) {
-          setReferralCode(storedReferralCode);
-          // Optionally remove it after setting
-          await AsyncStorage.removeItem("referralCode");
-        }
-      } catch (error) {
-        console.log("Error loading referral code:", error);
-      }
-    };
-
-    loadReferralCode();
-  }, []);
 
   const handleOtpChange = (text: string) => {
     setOtp(text);
@@ -117,12 +99,12 @@ const OtpConfirmationScreen = () => {
     }
 
     // Auto-verify when OTP is complete
-    if (text.length === CELL_COUNT) {
-      // Small delay to ensure state is updated
-      setTimeout(() => {
-        otpVerified(text);
-      }, 100);
-    }
+    // if (text.length === CELL_COUNT) {
+    //   // Small delay to ensure state is updated
+    //   setTimeout(() => {
+    //     otpVerified(text);
+    //   }, 100);
+    // }
   };
 
   const otpVerified = async (otpValue?: string) => {
@@ -242,7 +224,7 @@ const OtpConfirmationScreen = () => {
     const isOtpComplete = otp.length === CELL_COUNT;
     // For new users, require both OTP and referral code
     // For existing users, only require OTP
-    return isOtpComplete && (!isNewUser || isNewUser) && !otpError;
+   return isOtpComplete && !otpError;
   };
 
   return (
