@@ -96,8 +96,8 @@ const Branches = ({ data, userLocation }: any) => {
                           .includes("gulf")
                           ? "#F97316" // Orange-500
                           : item.brand.toLowerCase().includes("nox")
-                          ? "#84CC16" // Lime-500
-                          : "#1D4ED8", // Existing Blue (Tailwind Blue-700)
+                          ? "#65a30d" // Lime-500
+                           : theme.colors.brand.blue, // Existing Blue (Tailwind Blue-700)
                       },
                     ]}
                   >
