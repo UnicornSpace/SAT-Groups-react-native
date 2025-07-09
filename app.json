@@ -21,7 +21,7 @@
       },
       // TODO: change before release
       "package": "com.satgroups.app",
-      "versionCode": 13
+      "versionCode": 14
     },
     "web": {
       "bundler": "metro",
